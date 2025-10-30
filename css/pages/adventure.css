@@ -1,0 +1,38 @@
+.map {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.map-node {
+  background: #1a2130;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+.map-node.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.hp-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.bar {
+  height: 10px;
+  background: #2a3242;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+#questionMount .btn {
+  margin-top: 8px;
+}

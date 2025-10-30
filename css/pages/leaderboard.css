@@ -1,0 +1,13 @@
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lb-table th,
+.lb-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+}
+.lb-table tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}

@@ -1,0 +1,18 @@
+.shop-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f1420;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px;
+}
+#equippedList {
+  margin: 0;
+  padding-left: 18px;
+}

@@ -1,0 +1,22 @@
+.trace-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.trace-canvas {
+  border: 1px solid #2a3242;
+  border-radius: 12px;
+  background: #0f1420;
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+}
+.trace-controls {
+  display: grid;
+  gap: 8px;
+  align-content: flex-start;
+}
+.trace-legend {
+  color: var(--muted);
+}

@@ -1,0 +1,29 @@
+.calendar {
+  display: grid;
+  gap: 12px;
+}
+.event {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px dashed #2a3242;
+  background: rgba(255, 255, 255, 0.02);
+}
+.event-info .when {
+  font-weight: 700;
+}
+.event-cta .btn {
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .event {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .event-cta {
+    display: flex;
+  }
+}

@@ -1,0 +1,11 @@
+.grid-actions {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.learning-path {
+  margin: 0;
+  padding-left: 18px;
+}
+.quest-list {
+  margin: 0;
+  padding-left: 18px;
+}

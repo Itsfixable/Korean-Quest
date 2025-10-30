@@ -1,0 +1,8 @@
+.card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.card p,
+.card li {
+  color: var(--text);
+}
