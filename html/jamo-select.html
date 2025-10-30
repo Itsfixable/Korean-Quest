@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Korean Quest — Jamo Level Select</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Your existing shared styles -->
+  <link rel="stylesheet" href="../css/master.css" />
+  <!-- Optional page style (you can skip if you want) -->
+  <link rel="stylesheet" href="../css/pages/alphabetWorld.css" />
+  
+  <!-- This page's script -->
+  <script type="module" defer src="../js/levels/jamo-select.js"></script>
+</head>
+<body>
+  <header class="container">
+    <nav class="nav" aria-label="Primary">
+      <div class="logo">🇰🇷 Korean Quest</div>
+      <a class="pill" href="index.html">Home</a>
+      <a class="pill" href="resources.html">Resources</a>
+      <a class="pill" href="jamo-select.html" aria-current="page">Jamo Select</a>
+      <a class="pill" href="tracing.html">Tracing</a>
+    </nav>
+  </header>
+
+  <main class="container grid">
+    <section class="card">
+      <h1>🔠 Choose a Jamo</h1>
+      <p class="muted">Tap a character to practice. The preview shows the correct stroke order animation.</p>
+
+      <div class="aw-grid" id="jamoGrid" role="list">
+        <!-- JS will populate cards like:
+          <article class="aw-level-card" role="listitem">
+            <header class="flex" style="justify-content:space-between">
+              <h3>ㄱ</h3><span class="badge">Consonant</span>
+            </header>
+            <canvas width="120" height="120" data-char="ㄱ"></canvas>
+            <div class="flex">
+              <a class="btn" href="tracing.html?char=%E3%84%B1">Practice</a>
+              <button class="btn secondary" data-play>Replay</button>
+            </div>
+          </article>
+        -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <small>Tip: Earn ✍️ tracing badges by scoring ≥ 80 on each jamo.</small>
+  </footer>
+</body>
+</html>
