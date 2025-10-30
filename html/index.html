@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- CSS (to be created later) -->
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/home.css" />
+
+    <!-- JS (to be created later) -->
+    <script defer src="../js/main/router.js"></script>
+    <script defer src="../js/main/state.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html" aria-current="page">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="shop.html">Shop</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
+        <a class="pill" href="about.html">About</a>
+        <button class="pill login" type="button">login</button>
+        <button class="pill profile" type="button" title="Account">
+          <img alt="Profile picture" />
+        </button>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>Welcome to <span class="badge">Korean Quest</span></h1>
+        <p class="muted">
+          By students, for students — master Hangul, core words, phrases, and
+          sentence patterns through short lessons and a game-style adventure.
+        </p>
+        <div class="kpi" role="region" aria-label="Key progress">
+          <div class="metric">
+            <div class="muted">Level</div>
+            <div class="kpi-value" id="kq-level">1</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Streak</div>
+            <div class="kpi-value" id="kq-streak">0🔥</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Badges</div>
+            <div id="kq-badges">—</div>
+          </div>
+        </div>
+
+        <div class="grid grid-actions">
+          <a class="btn" href="resources.html">Start a Lesson</a>
+          <a class="btn secondary" href="adventure.html">Enter Adventure</a>
+          <a class="btn secondary" href="schedule.html">Join Study Session</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Today’s Quests</h2>
+        <ul class="quest-list" id="daily-quests" aria-live="polite">
+          <!-- JS will populate quests like:
+          <li data-quest-id="xp30">Earn 30 XP today — 0/30</li>
+        --></ul>
+        <p class="muted">
+          Complete daily quests to earn coins and rare cosmetics. Keep your
+          streak to unlock weekly rewards.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Learning Path</h2>
+        <ol class="learning-path">
+          <li>
+            <strong>Hangul</strong> — write & read consonants (초성/종성),
+            vowels (중성), and build syllables.
+          </li>
+          <li>
+            <strong>Common Words</strong> — numbers, family, food, school, time.
+          </li>
+          <li>
+            <strong>Phrases</strong> — greetings, introductions, requests,
+            likes/dislikes.
+          </li>
+          <li>
+            <strong>Sentence Structure</strong> — SOV order, particles (은/는,
+            이/가, 을/를), locations/time, present tense.
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <!-- Auth Modal (HTML only; JS wires later) -->
+    <div class="modal" id="authModal" aria-hidden="true">
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-labelledby="authTitle"
+        aria-modal="true"
+      >
+        <div class="modal-header">
+          <h3 id="authTitle">Sign in</h3>
+          <button class="modal-close" id="authCloseBtn" type="button">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="authForm" class="grid" data-auth-form>
+            <input type="email" id="authEmail" placeholder="Email" required />
+            <input
+              type="password"
+              id="authPassword"
+              placeholder="Password"
+              required
+            />
+            <div class="flex">
+              <button class="btn" id="authSignInBtn" type="submit">
+                Sign In
+              </button>
+              <button class="btn secondary" id="authSignUpBtn" type="button">
+                Create Account
+              </button>
+              <button class="btn" id="authGoogleBtn" type="button">
+                Google
+              </button>
+              <button class="btn secondary" id="authMagicBtn" type="button">
+                Magic Link
+              </button>
+            </div>
+            <p class="text-muted" id="authMsg"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer class="container footer">
+      <small
+        >© Korean Quest — FBLA “Design to Learn” demo. Built by students, for
+        students.</small
+      >
+    </footer>
+  </body>
+</html>

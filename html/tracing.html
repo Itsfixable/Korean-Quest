@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Tracing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/tracing.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script type="module" defer src="../js/levels/tracing-level.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="tracing.html" aria-current="page">Tracing</a>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>✍️ Tracing Practice</h1>
+        <p class="muted">
+          Follow correct stroke order. Score ≥80 to earn a badge.
+        </p>
+
+        <div class="trace-wrap">
+          <canvas
+            id="traceCanvas"
+            width="320"
+            height="320"
+            class="trace-canvas"
+            aria-label="Tracing canvas"
+          ></canvas>
+          <div class="trace-controls">
+            <div class="muted">
+              Character: <strong id="traceChar">ㄱ</strong>
+            </div>
+            <button class="btn" id="btnClear" type="button">Clear</button>
+            <button class="btn" id="btnGrade" type="button">Grade</button>
+            <details class="trace-legend">
+              <summary>Stroke Order</summary>
+              <ol id="strokeLegend"></ol>
+            </details>
+            <div id="traceScore" class="muted"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small>Stroke order DB and grading will be provided by JS later.</small>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Leaderboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/leaderboard.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script defer src="../js/main/leaderboard.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="leaderboard.html" aria-current="page"
+          >Leaderboard</a
+        >
+        <a class="pill" href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>🏆 Leaderboard</h1>
+        <p class="muted">
+          Weekly XP standings motivate consistency and friendly competition.
+        </p>
+        <table class="lb-table" id="lbTable" aria-label="Leaderboard">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student</th>
+              <th>XP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS injects rows -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Top learners unlock profile frames and rare cosmetics (visual
+        only).</small
+      >
+    </footer>
+  </body>
+</html>

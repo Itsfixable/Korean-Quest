@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Schedule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/schedule.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script defer src="../js/main/schedule.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="schedule.html" aria-current="page">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>📅 Live Tutoring & Group Study</h1>
+        <p class="muted">
+          Join a session to practice Hangul, pronunciation, and beginner
+          conversation. RSVP to save your spot.
+        </p>
+
+        <div class="calendar" id="kq-calendar" role="list">
+          <!-- JS will render events:
+          <article class="event" data-event-id="e1" role="listitem">
+            <div class="event-info">
+              <div class="when">Tue, Nov 12, 7:00 PM</div>
+              <div class="title">Hangul Basics: ㄱ ㄴ ㄷ ㅁ ㅂ + ㅏ</div>
+              <div class="meta">Host: Ava (11th) • Seats left: 12</div>
+            </div>
+            <div class="event-cta">
+              <button class="btn" data-rsvp="e1">RSVP</button>
+            </div>
+          </article>
+        --></div>
+      </section>
+
+      <section class="card">
+        <h2>Study Session Types</h2>
+        <ul>
+          <li>
+            <strong>Hangul Lab</strong> — tracing stroke order & building
+            syllables.
+          </li>
+          <li>
+            <strong>Vocab Sprint</strong> — timed practice for food, family,
+            school terms.
+          </li>
+          <li>
+            <strong>Phrase Jam</strong> — greetings, requests, likes/dislikes.
+          </li>
+          <li>
+            <strong>Grammar Mini</strong> — particles (은/는, 이/가, 을/를) &
+            word order.
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Tip: use the Dashboard to see your RSVPs and today’s quests.</small
+      >
+    </footer>
+  </body>
+</html>

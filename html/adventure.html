@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Adventure</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/adventure.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script defer type="module" src="../js/main/adventure.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="adventure.html" aria-current="page">Adventure</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="shop.html">Shop</a>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>⚔️ Adventure Mode</h1>
+        <p class="muted">
+          Answer correctly to deal damage. Win battles to earn XP, coins, and
+          badges. Zones unlock as you level up.
+        </p>
+
+        <div class="map" id="kq-map" role="list">
+          <!-- JS renders zone nodes:
+          <button class="map-node" data-zone="forest" data-required-level="1">Forest (Hangul)</button>
+          <button class="map-node locked" data-zone="village" data-required-level="3">Village (Vocab)</button>
+          <button class="map-node locked" data-zone="market" data-required-level="5">Market (Phrases)</button>
+          <button class="map-node locked" data-zone="temple" data-required-level="7">Temple (Grammar)</button>
+        --></div>
+      </section>
+
+      <section class="card" id="battle-card" aria-live="polite">
+        <h2>Battle</h2>
+        <div class="hp-row">
+          <div>YOU HP: <strong id="youHP">40</strong></div>
+          <div class="bar"><i id="youBar" style="width: 100%"></i></div>
+        </div>
+        <div class="hp-row">
+          <div>ENEMY HP: <strong id="enemyHP">50</strong></div>
+          <div class="bar"><i id="enemyBar" style="width: 100%"></i></div>
+        </div>
+        <div id="questionMount" class="q"></div>
+        <div id="battleResult" class="muted" style="margin-top: 8px"></div>
+        <div class="flex">
+          <button class="btn" id="startBattle" type="button">
+            Start Battle
+          </button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Zone Rewards</h2>
+        <ul>
+          <li>
+            <strong>Forest</strong> — Hangul Starter badge, +20 XP, +10 coins
+          </li>
+          <li>
+            <strong>Village</strong> — Vocab Ranger badge, +30 XP, +15 coins
+          </li>
+          <li>
+            <strong>Market</strong> — Phrase Tactician badge, +40 XP, +20 coins
+          </li>
+          <li>
+            <strong>Temple</strong> — Sentence Smith badge, +50 XP, +25 coins
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Tip: Use coins in the Shop for cosmetics. Keep daily streaks to unlock
+        rare items.</small
+      >
+    </footer>
+  </body>
+</html>

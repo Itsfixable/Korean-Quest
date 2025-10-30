@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Syllable Builder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/jamo.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script type="module" src="../js/levels/jamo-level.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="jamo.html" aria-current="page"
+          >Syllable Builder</a
+        >
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card jamo-builder">
+        <h1>🧱 Build a Syllable</h1>
+        <p class="muted">Pick 초성/중성/종성 to form a valid Hangul block.</p>
+
+        <div class="jamo-row">
+          <label
+            >초성
+            <select id="selCho"></select>
+          </label>
+          <label
+            >중성
+            <select id="selJung"></select>
+          </label>
+          <label
+            >종성
+            <select id="selJong"></select>
+          </label>
+          <button class="btn" id="btnCompose" type="button">Compose</button>
+        </div>
+
+        <div class="jamo-output" id="syllableOut" aria-live="polite">—</div>
+        <p class="muted" id="syllableMeta"></p>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Builder uses Unicode composition (AC00 formula) for full modern
+        combos.</small
+      >
+    </footer>
+  </body>
+</html>

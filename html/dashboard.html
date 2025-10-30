@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/dashboard.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script defer src="../js/main/dashboard.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="dashboard.html" aria-current="page">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>🎯 Student Dashboard</h1>
+        <ul class="stats">
+          <li>Level: <strong id="dLevel">1</strong></li>
+          <li>XP: <strong id="dXP">0</strong> / <span id="dNext">100</span></li>
+          <li>Streak: <strong id="dStreak">0</strong> days</li>
+          <li>Coins: <strong id="dCoins">0</strong></li>
+          <li>Badges: <span id="dBadges">—</span></li>
+        </ul>
+        <div class="progress" aria-label="Overall progress">
+          <i id="dBar" style="width: 0%"></i>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>🔥 Daily Quests</h2>
+        <ul id="questList">
+          <!-- JS renders: Earn 30 XP today, Complete 1 lesson, Win 1 battle -->
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>📝 Your RSVPs</h2>
+        <ul id="rsvpList">
+          <!-- JS populates from schedule -->
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>Recent Lessons</h2>
+        <ul id="recentLessons"></ul>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Track progress, view quests, manage RSVPs, and celebrate your
+        wins.</small
+      >
+    </footer>
+  </body>
+</html>

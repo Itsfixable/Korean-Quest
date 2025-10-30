@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/shop.css" />
+
+    <script defer src="../js/main/state.js"></script>
+    <script defer src="../js/main/shop.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="shop.html" aria-current="page">Shop</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>🛍️ Shop</h1>
+        <p>Your coins: <strong id="coinCount">0</strong></p>
+
+        <div class="shop-grid" id="shopGrid" role="list">
+          <!-- JS renders items:
+          <div class="shop-item" role="listitem">
+            <span>🎓 Study Hat</span>
+            <button class="btn" data-item="hat1" data-cost="30">Buy — 30</button>
+          </div>
+        --></div>
+      </section>
+
+      <section class="card">
+        <h2>Equipped</h2>
+        <ul id="equippedList">
+          <!-- JS shows current cosmetics -->
+        </ul>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Cosmetics are educationally safe: visual customization only (no
+        gameplay advantage).</small
+      >
+    </footer>
+  </body>
+</html>
