@@ -5,13 +5,9 @@
   <title>Korean Quest — Jamo Level Select</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Your existing shared styles -->
+  <!-- Shared styles you already have -->
   <link rel="stylesheet" href="../css/master.css" />
-  <!-- Optional page style (you can skip if you want) -->
   <link rel="stylesheet" href="../css/pages/alphabetWorld.css" />
-  
-  <!-- This page's script -->
-  <script type="module" defer src="../js/levels/jamo-select.js"></script>
 </head>
 <body>
   <header class="container">
@@ -27,27 +23,23 @@
   <main class="container grid">
     <section class="card">
       <h1>🔠 Choose a Jamo</h1>
-      <p class="muted">Tap a character to practice. The preview shows the correct stroke order animation.</p>
+      <p class="muted">Pick a character to practice. Previews animate the <strong>traditional stroke order</strong>. Earn ⭐ and level up!</p>
 
-      <div class="aw-grid" id="jamoGrid" role="list">
-        <!-- JS will populate cards like:
-          <article class="aw-level-card" role="listitem">
-            <header class="flex" style="justify-content:space-between">
-              <h3>ㄱ</h3><span class="badge">Consonant</span>
-            </header>
-            <canvas width="120" height="120" data-char="ㄱ"></canvas>
-            <div class="flex">
-              <a class="btn" href="tracing.html?char=%E3%84%B1">Practice</a>
-              <button class="btn secondary" data-play>Replay</button>
-            </div>
-          </article>
-        -->
+      <!-- Grid: JS will enforce 3–5 columns on desktop (1–2 on small screens) -->
+      <div class="aw-grid" id="jamoGrid" role="list" style="gap:12px">
+        <!-- JS populates the cards -->
       </div>
+
+      <p class="muted" style="margin-top:8px">Stars: ≥90 → ⭐⭐⭐ • ≥75 → ⭐⭐ • ≥60 → ⭐</p>
     </section>
   </main>
 
   <footer class="container footer">
-    <small>Tip: Earn ✍️ tracing badges by scoring ≥ 80 on each jamo.</small>
+    <small>© Korean Quest — FBLA “Design to Learn”</small>
   </footer>
+
+  <!-- Modules -->
+  <script type="module" src="../js/main/state.js"></script>
+  <script type="module" src="../js/levels/jamo-select.js"></script>
 </body>
 </html>
