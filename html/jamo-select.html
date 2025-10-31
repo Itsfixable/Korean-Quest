@@ -5,9 +5,31 @@
   <title>Korean Quest — Jamo Level Select</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Shared styles you already have -->
+  <!-- Your shared CSS (keep these) -->
   <link rel="stylesheet" href="../css/master.css" />
   <link rel="stylesheet" href="../css/pages/alphabetWorld.css" />
+
+  <!-- Hard guarantee the grid shows as columns even if page CSS misses -->
+  <style>
+    /* FORCE a GRID here so it never falls back to stacked rows */
+    #jamoGrid {
+      display: grid !important;
+      gap: 12px;
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+    }
+    @media (max-width: 1200px) {
+      #jamoGrid { grid-template-columns: repeat(3, minmax(160px, 1fr)); }
+    }
+    @media (max-width: 820px) {
+      #jamoGrid { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+    }
+    @media (max-width: 520px) {
+      #jamoGrid { grid-template-columns: 1fr; }
+    }
+    /* Small card polish to fit 5-wide */
+    .aw-level-card canvas { width: 120px; height: 120px; margin-inline: auto; display:block; }
+    .aw-level-card header h3 { margin: 0; }
+  </style>
 </head>
 <body>
   <header class="container">
@@ -23,10 +45,10 @@
   <main class="container grid">
     <section class="card">
       <h1>🔠 Choose a Jamo</h1>
-      <p class="muted">Pick a character to practice. Previews animate the <strong>traditional stroke order</strong>. Earn ⭐ and level up!</p>
+      <p class="muted">Tap a character to practice. The preview animates the <strong>traditional stroke order</strong>. Earn ⭐ for accuracy.</p>
 
-      <!-- Grid: JS will enforce 3–5 columns on desktop (1–2 on small screens) -->
-      <div class="aw-grid" id="jamoGrid" role="list" style="gap:12px">
+      <!-- REAL GRID (5 cols desktop → 3/2/1 responsive) -->
+      <div class="aw-grid" id="jamoGrid" role="list">
         <!-- JS populates the cards -->
       </div>
 
@@ -38,7 +60,7 @@
     <small>© Korean Quest — FBLA “Design to Learn”</small>
   </footer>
 
-  <!-- Modules -->
+  <!-- Modules (keep type="module") -->
   <script type="module" src="../js/main/state.js"></script>
   <script type="module" src="../js/levels/jamo-select.js"></script>
 </body>

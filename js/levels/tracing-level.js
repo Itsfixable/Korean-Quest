@@ -1,4 +1,4 @@
-// tracing-level.js — tracer with improved grading + ⭐ award (keeps best stars)
+// tracing-level.js — tracer with robust grading + ⭐ (no OffscreenCanvas)
 import { addXP, addCoins, addBadge, setJamoStars, getJamoStars } from "../main/state.js";
 
 const canvas = document.getElementById("traceCanvas");
@@ -7,9 +7,9 @@ const legend = document.getElementById("strokeLegend");
 const charSpan = document.getElementById("traceChar");
 
 const ctx = canvas.getContext("2d");
-const size = 320, LW = 16;
+const SIZE = 320, LW = 16;
 
-/* Traditional stroke order DB (consistent with jamo-select) */
+/* Traditional stroke order DB (synced with jamo-select) */
 const DB = {
   'ㄱ': [[[0.20,0.25, 0.75,0.25]], [[0.75,0.25, 0.75,0.78]]],
   'ㄴ': [[[0.25,0.22, 0.25,0.78]], [[0.25,0.78, 0.78,0.78]]],
@@ -35,16 +35,19 @@ if (!DB[target]) target = "ㄱ";
 charSpan.textContent = target;
 legend.innerHTML = DB[target].map((_,i)=>`<li>Stroke ${i+1}</li>`).join("");
 
-function N(v){ return Math.round(v*size); }
+/* Template draw */
+function N(v){ return Math.round(v*SIZE); }
 function drawTemplate(){
-  ctx.clearRect(0,0,size,size);
+  ctx.clearRect(0,0,SIZE,SIZE);
   ctx.strokeStyle = 'rgba(79,140,255,.25)';
   ctx.lineWidth = LW; ctx.lineCap='round'; ctx.lineJoin='round';
-  DB[target].forEach(segs => { segs.forEach(s => { const [x1,y1,x2,y2]=s.map(N); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }); });
+  DB[target].forEach(segs => {
+    segs.forEach(s => { const [x1,y1,x2,y2]=s.map(N); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); });
+  });
 }
 
-/* Capture ink */
-const ink = document.createElement("canvas"); ink.width=size; ink.height=size;
+/* Ink layer (no OffscreenCanvas) */
+const ink = document.createElement("canvas"); ink.width=SIZE; ink.height=SIZE;
 const ictx = ink.getContext("2d"); ictx.lineWidth=LW; ictx.lineCap='round'; ictx.lineJoin='round'; ictx.strokeStyle='#e6e7eb';
 let drawing=false,last=null,strokes=[];
 
@@ -59,20 +62,20 @@ canvas.addEventListener("touchend", ()=>drawing=false, {passive:false});
 function render(){ drawTemplate(); ctx.drawImage(ink,0,0); }
 render();
 
-/* ---------- Improved grading ---------- */
-/* 1) IoU overlap (raster) */
-function maskStroke(segs){
-  const c=new OffscreenCanvas(size,size); const cx=c.getContext("2d");
+/* ---------- Scoring ---------- */
+/* IoU on raster */
+function maskFromStrokeSegs(segs){
+  const c=document.createElement('canvas'); c.width=SIZE; c.height=SIZE; const cx=c.getContext('2d');
   cx.lineWidth=LW; cx.lineCap='round'; cx.lineJoin='round'; cx.strokeStyle='#000';
   segs.forEach(s=>{ const [x1,y1,x2,y2]=s.map(N); cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(x2,y2); cx.stroke(); });
-  const d=c.getImageData(0,0,size,size).data, m=new Uint8Array(size*size);
+  const d=c.getImageData(0,0,SIZE,SIZE).data, m=new Uint8Array(SIZE*SIZE);
   for(let i=0;i<d.length;i+=4) m[i>>2]=d[i+3]>0?1:0; return m;
 }
-function maskUser(points){
-  const c=new OffscreenCanvas(size,size); const cx=c.getContext("2d");
+function maskFromPoints(points){
+  const c=document.createElement('canvas'); c.width=SIZE; c.height=SIZE; const cx=c.getContext('2d');
   cx.lineWidth=LW; cx.lineCap='round'; cx.lineJoin='round'; cx.strokeStyle='#000';
   for(let i=1;i<points.length;i++){ cx.beginPath(); cx.moveTo(points[i-1].x,points[i-1].y); cx.lineTo(points[i].x,points[i].y); cx.stroke(); }
-  const d=c.getImageData(0,0,size,size).data, m=new Uint8Array(size*size);
+  const d=c.getImageData(0,0,SIZE,SIZE).data, m=new Uint8Array(SIZE*SIZE);
   for(let i=0;i<d.length;i+=4) m[i>>2]=d[i+3]>0?1:0; return m;
 }
 function iouScore(a,b){
@@ -80,77 +83,72 @@ function iouScore(a,b){
   const iou=ov/(ca+cb-ov+1e-6), cov=ov/(ca+1e-6); return 0.7*iou+0.3*cov;
 }
 
-/* 2) Shape distance (symmetric Chamfer on resampled polylines) */
+/* Chamfer on resampled polylines */
 function resample(points, n=64){
-  // cumulative length
-  let L=[0]; for(let i=1;i<points.length;i++){ const dx=points[i].x-points[i-1].x, dy=points[i].y-points[i-1].y; L[i]=L[i-1]+Math.hypot(dx,dy); }
-  const total=L[L.length-1]||1;
-  const out=[];
+  if (!points || points.length<2){ return Array.from({length:n}, ()=>points?.[0]||{x:0,y:0}); }
+  let L=[0]; for(let i=1;i<points.length;i++){ L[i]=L[i-1]+Math.hypot(points[i].x-points[i-1].x, points[i].y-points[i-1].y); }
+  const total=L[L.length-1]||1, out=[];
   for(let k=0;k<n;k++){
-    const t = (k/(n-1))*total;
-    // find segment
-    let i=1; while(i<L.length && L[i]<t) i++;
-    const t0=L[i-1], t1=L[i]||t0+1e-6, ratio=(t-t0)/(t1-t0);
+    const t=(k/(n-1))*total; let i=1; while(i<L.length && L[i]<t) i++;
+    const t0=L[i-1], t1=L[i]||t0+1e-6, r=(t-t0)/(t1-t0);
     const p0=points[i-1], p1=points[i]||points[i-1];
-    out.push({x:p0.x+(p1.x-p0.x)*ratio, y:p0.y+(p1.y-p0.y)*ratio});
+    out.push({x:p0.x+(p1.x-p0.x)*r, y:p0.y+(p1.y-p0.y)*r});
   }
   return out;
 }
-function resampleTemplate(segs, n=64){
-  // turn template segments into dense points
+function resampleSegs(segs, n=64){
   const pts=[];
   for(const s of segs){
     const [x1,y1,x2,y2] = s.map(N);
-    const steps = 32;
-    for(let i=0;i<=steps;i++){
-      const t=i/steps; pts.push({x:x1+(x2-x1)*t, y:y1+(y2-y1)*t});
-    }
+    const steps=32;
+    for(let i=0;i<=steps;i++){ const t=i/steps; pts.push({x:x1+(x2-x1)*t, y:y1+(y2-y1)*t}); }
   }
   return resample(pts, n);
 }
 function chamfer(a,b){
-  // average nearest distance both ways
-  function d1(a,b){ return a.reduce((sum,p)=>sum+nearest(p,b),0)/a.length; }
-  function nearest(p,arr){ let best=1e9; for(const q of arr){ const d=Math.hypot(p.x-q.x,p.y-q.y); if(d<best) best=d; } return best; }
-  const da = d1(a,b), db = d1(b,a);
-  return (da+db)/2;
+  function nearest(p,arr){ let best=1e9; for(const q of arr){ const d=Math.hypot(p.x-q.x, p.y-q.y); if(d<best) best=d; } return best; }
+  function avg(a,b){ return a.reduce((s,p)=>s+nearest(p,b),0)/a.length; }
+  return (avg(a,b)+avg(b,a))/2;
 }
-function shapeScore(segs, userPts){
-  const tpl = resampleTemplate(segs, 64);
-  const usr = resample(userPts, 64);
-  const dist = chamfer(tpl, usr);             // pixels
-  const THRESH = 18;                           // forgiving distance
-  const s = Math.exp(-dist/THRESH);           // 1.0 at 0px, ~0.57 at 10px, ~0.37 at 18px
-  return s;
+function shapeScore(segs, points){
+  const tpl = resampleSegs(segs, 64);
+  const usr = resample(points, 64);
+  const dist = chamfer(tpl, usr); // px
+  const THRESH = 18;
+  return Math.exp(-dist/THRESH); // 1.0 at perfect, ~0.37 at 18px avg
 }
 
-/* Grade button */
-document.getElementById("btnClear").onclick = ()=>{ strokes=[]; ictx.clearRect(0,0,size,size); scoreOut.textContent=""; render(); };
+/* Buttons */
+document.getElementById("btnClear").onclick = ()=>{
+  strokes=[]; ictx.clearRect(0,0,SIZE,SIZE); scoreOut.textContent=""; render();
+};
 
 document.getElementById("btnGrade").onclick = ()=>{
   const tpl = DB[target];
+  if (!tpl){ scoreOut.textContent = "Unknown character template."; return; }
+  if (strokes.length === 0){ scoreOut.textContent = "Draw the strokes first 🙂"; return; }
+
   const n = Math.min(tpl.length, strokes.length);
 
-  // per-stroke hybrid: 70% shape, 30% IoU
+  // per-stroke hybrid
   let per = 0;
   for(let i=0;i<n;i++){
-    const mTpl = maskStroke(tpl[i]);
-    const mUsr = maskUser(strokes[i].points);
+    const mTpl = maskFromStrokeSegs(tpl[i]);
+    const mUsr = maskFromPoints(strokes[i].points);
     const sIoU = iouScore(mTpl, mUsr);
     const sShape = shapeScore(tpl[i], strokes[i].points);
     per += (0.30*sIoU + 0.70*sShape);
   }
-  per = per / tpl.length; // normalize by required count
+  per = per / tpl.length; // normalize by required strokes
 
-  // penalties for missing/extra strokes and wrong order (soft)
+  // penalties for missing/extra strokes
   const missing = Math.max(0, tpl.length - strokes.length);
   const extra   = Math.max(0, strokes.length - tpl.length);
-  const orderPenalty = 1 - Math.min(0.45, missing*0.18 + extra*0.12); // cap penalty at 45%
+  const orderPenalty = 1 - Math.min(0.45, missing*0.18 + extra*0.12);
 
   const hybrid = Math.max(0, Math.min(1, per * orderPenalty));
   const score = Math.round(100 * hybrid);
 
-  // stars
   const stars = score>=90?3: score>=75?2: score>=60?1: 0;
   const prev = getJamoStars(target);
   if (stars > prev) setJamoStars(target, stars);

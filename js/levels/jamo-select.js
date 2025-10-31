@@ -1,9 +1,9 @@
-// jamo-select.js — 3–5 column level grid with animated stroke previews + ⭐ display
+// jamo-select.js — 3–5 column grid with animated traditional stroke previews + ⭐ display
 import { getJamoStars } from "../main/state.js";
 
 const GRID = document.getElementById('jamoGrid');
 
-/* Traditional stroke order DB (normalized 0..1 coords) */
+/* Traditional stroke order DB (normalized 0..1) */
 const DB = {
   'ㄱ': [[[0.20,0.25, 0.75,0.25]], [[0.75,0.25, 0.75,0.78]]],
   'ㄴ': [[[0.25,0.22, 0.25,0.78]], [[0.25,0.78, 0.78,0.78]]],
@@ -24,7 +24,7 @@ const DB = {
   'ㅡ': [[[0.22,0.55, 0.78,0.55]]],
 };
 
-// Show a 3×5-ready set (we’ll use 12 to demonstrate density; JS clamps to 3–5 columns)
+/* Show 12 entries so 5 columns fill nicely; grid clamps to 3–5 cols via CSS */
 const JAMO = [
   { ch:'ㄱ', kind:'Consonant' }, { ch:'ㄴ', kind:'Consonant' }, { ch:'ㄷ', kind:'Consonant' },
   { ch:'ㅁ', kind:'Consonant' }, { ch:'ㅂ', kind:'Consonant' }, { ch:'ㅅ', kind:'Consonant' },
@@ -34,41 +34,25 @@ const JAMO = [
 
 function starsHTML(n){ return `<span>${'⭐'.repeat(n)}${'☆'.repeat(3-n)}</span>`; }
 
-function buildGrid(){
-  GRID.innerHTML = JAMO.map(({ch,kind}) => {
-    const earned = getJamoStars(ch);
-    return `
-      <article class="aw-level-card" role="listitem" data-char="${ch}">
-        <header class="flex" style="justify-content:space-between">
-          <h3 style="margin:0">${ch}</h3>
-          <span class="badge">${kind}</span>
-        </header>
-        <div class="muted">Progress: ${starsHTML(earned)}</div>
-        <canvas width="120" height="120" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
-        <div class="flex">
-          <a class="btn" href="tracing.html?char=${encodeURIComponent(ch)}">Practice</a>
-          <button class="btn secondary" type="button" data-play>Replay</button>
-        </div>
-      </article>
-    `;
-  }).join('');
-}
-buildGrid();
+GRID.innerHTML = JAMO.map(({ch,kind}) => {
+  const earned = getJamoStars(ch);
+  return `
+    <article class="aw-level-card" role="listitem" data-char="${ch}">
+      <header class="flex" style="justify-content:space-between">
+        <h3>${ch}</h3>
+        <span class="badge">${kind}</span>
+      </header>
+      <div class="muted">Progress: ${starsHTML(earned)}</div>
+      <canvas width="120" height="120" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
+      <div class="flex">
+        <a class="btn" href="tracing.html?char=${encodeURIComponent(ch)}">Practice</a>
+        <button class="btn secondary" type="button" data-play>Replay</button>
+      </div>
+    </article>
+  `;
+}).join("");
 
-/* Enforce 3–5 columns on desktop (1–2 on small) */
-function updateGridCols(){
-  const w = GRID.clientWidth;
-  // estimate card width ~ 180–200px
-  let cols = Math.floor(w / 200);
-  if (w >= 720) cols = Math.max(3, Math.min(5, cols)); // desktop/tablet
-  else cols = Math.max(1, Math.min(2, cols));          // mobile narrow
-  GRID.style.gridTemplateColumns = `repeat(${cols}, minmax(160px,1fr))`;
-}
-window.addEventListener('resize', updateGridCols);
-window.addEventListener('load', updateGridCols);
-updateGridCols();
-
-/* Preview animations */
+/* Animated previews (always visible) */
 const canvases = [...GRID.querySelectorAll('canvas[data-char]')];
 const previews = canvases.map(cv => makePreview(cv, cv.dataset.char));
 

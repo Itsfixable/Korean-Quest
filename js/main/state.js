@@ -1,5 +1,5 @@
 /* state.js — global game state (XP, coins, badges, quests, jamo stars, RSVPs) */
-export const KQ_VERSION = "1.0.2";
+export const KQ_VERSION = "1.0.3";
 
 const DEFAULT = {
   player: {
@@ -9,8 +9,7 @@ const DEFAULT = {
   },
   progress: {
     lessonsDone: 0, quizzesDone: 0, recentLessons: [],
-    // ⭐ per jamo, e.g. { 'ㄱ':3, 'ㅏ':2 }
-    jamoStars: {}
+    jamoStars: {} // { 'ㄱ':3, ... }
   },
   quests: {
     daily: [],
@@ -28,7 +27,6 @@ export function save(){ localStorage.setItem(KEY, JSON.stringify(KQ)); }
 export function resetAll(){ KQ = structuredClone(DEFAULT); save(); }
 export function nowStr(){ return new Date().toDateString(); }
 
-/* Progression */
 export function needXP(level){ return 100 * level; }
 export function addXP(n){
   const s = load(); s.player.xp += n;
@@ -39,7 +37,6 @@ export function addXP(n){
 export function addCoins(n){ const s=load(); s.player.coins+=n; save(); }
 export function addBadge(name){ const s=load(); if(!s.player.badges.includes(name)) s.player.badges.push(name); save(); }
 
-/* Daily reset & quests */
 export function ensureDaily(){
   const s = load();
   const today = nowStr();
