@@ -1,77 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Korean Quest — Schedule</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Korean Quest — Appointments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="stylesheet" href="../css/master.css" />
-    <link rel="stylesheet" href="../css/pages/schedule.css" />
+  <!-- Your shared theme -->
+  <link rel="stylesheet" href="../css/master.css" />
+  <!-- Page styles -->
+  <link rel="stylesheet" href="../css/pages/schedule.css" />
+</head>
+<body>
+  <header class="container">
+    <nav class="nav" aria-label="Primary">
+      <div class="logo">🇰🇷 Korean Quest</div>
+      <a class="pill" href="index.html">Home</a>
+      <a class="pill" href="schedule.html">Schedule</a>
+      <a class="pill" href="dashboard.html">Dashboard</a>
+      <span class="spacer"></span>
+      <span id="userBadge" class="muted"></span>
+      <button id="loginBtn"  class="pill" type="button">Sign in</button>
+      <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
+    </nav>
+  </header>
 
-    <script defer src="../js/main/state.js"></script>
-    <script defer src="../js/main/schedule.js"></script>
-  </head>
-  <body>
-    <header class="container">
-      <nav class="nav" aria-label="Primary">
-        <div class="logo">🇰🇷 Korean Quest</div>
-        <a class="pill" href="index.html">Home</a>
-        <a class="pill" href="schedule.html" aria-current="page">Schedule</a>
-        <a class="pill" href="resources.html">Resources</a>
-        <a class="pill" href="adventure.html">Adventure</a>
-        <a class="pill" href="dashboard.html">Dashboard</a>
-      </nav>
-    </header>
+  <main class="container grid">
+    <section class="card">
+      <h1>📅 Book a Tutoring Slot</h1>
+      <p class="muted">Pick a date, then choose a time. Booked slots are greyed out.</p>
 
-    <main class="container grid">
-      <section class="card">
-        <h1>📅 Live Tutoring & Group Study</h1>
-        <p class="muted">
-          Join a session to practice Hangul, pronunciation, and beginner
-          conversation. RSVP to save your spot.
-        </p>
+      <div class="appt-layout">
+        <!-- Calendar -->
+        <div class="cal card">
+          <div class="cal-header">
+            <button class="btn secondary" id="prevMonth" type="button" aria-label="Previous month">‹</button>
+            <h2 id="monthLabel" class="cal-title" aria-live="polite"></h2>
+            <button class="btn secondary" id="nextMonth" type="button" aria-label="Next month">›</button>
+          </div>
 
-        <div class="calendar" id="kq-calendar" role="list">
-          <!-- JS will render events:
-          <article class="event" data-event-id="e1" role="listitem">
-            <div class="event-info">
-              <div class="when">Tue, Nov 12, 7:00 PM</div>
-              <div class="title">Hangul Basics: ㄱ ㄴ ㄷ ㅁ ㅂ + ㅏ</div>
-              <div class="meta">Host: Ava (11th) • Seats left: 12</div>
-            </div>
-            <div class="event-cta">
-              <button class="btn" data-rsvp="e1">RSVP</button>
-            </div>
-          </article>
-        --></div>
-      </section>
+          <div class="cal-grid" id="calGrid" role="grid" aria-label="Calendar">
+            <!-- JS renders weekday header + days -->
+          </div>
+        </div>
 
-      <section class="card">
-        <h2>Study Session Types</h2>
-        <ul>
-          <li>
-            <strong>Hangul Lab</strong> — tracing stroke order & building
-            syllables.
-          </li>
-          <li>
-            <strong>Vocab Sprint</strong> — timed practice for food, family,
-            school terms.
-          </li>
-          <li>
-            <strong>Phrase Jam</strong> — greetings, requests, likes/dislikes.
-          </li>
-          <li>
-            <strong>Grammar Mini</strong> — particles (은/는, 이/가, 을/를) &
-            word order.
-          </li>
-        </ul>
-      </section>
-    </main>
+        <!-- Time slots -->
+        <div class="slots card">
+          <h2 class="slots-title">Times on <span id="selectedDateLabel">—</span></h2>
+          <div class="slots-grid" id="slotsGrid" role="list">
+            <!-- JS renders slot buttons -->
+          </div>
+          <div class="flex">
+            <button class="btn secondary" id="clearDay" type="button">Clear my booking for this day</button>
+          </div>
+          <p class="muted" id="slotHint" style="margin-top:8px">
+            Tip: click an available time to book it. You can only hold one slot per day.
+          </p>
+        </div>
+      </div>
+    </section>
 
-    <footer class="container footer">
-      <small
-        >Tip: use the Dashboard to see your RSVPs and today’s quests.</small
-      >
-    </footer>
-  </body>
+    <section class="card">
+      <h2>📝 Your Bookings</h2>
+      <ul id="myBookings" class="my-list">
+        <!-- JS renders your upcoming bookings -->
+      </ul>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <small>All appointments are local to your device (demo). In production, sync via Supabase.</small>
+  </footer>
+
+  <!-- JS modules -->
+  <script>console.log('[appointments] schedule.html parsed');</script>
+
+  <script type="module" src="../js/main/schedule.js"></script>
+</body>
 </html>

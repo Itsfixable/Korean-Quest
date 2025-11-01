@@ -1,29 +1,100 @@
-.calendar {
+/* Appointments page — responsive calendar + slot grid */
+.appt-layout{
+  display:grid;
+  gap:12px;
+  grid-template-columns: 1.1fr .9fr;
+}
+@media (max-width: 900px){
+  .appt-layout{ grid-template-columns: 1fr; }
+}
+
+.cal .cal-header{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px; margin-bottom:10px;
+}
+.cal-title{ margin:0; font-size:1.25rem; }
+
+.cal-grid{
+  display:grid; gap:6px;
+  grid-template-columns: repeat(7, minmax(36px, 1fr));
+  align-items:stretch;
+}
+.cal-grid .weekday{
+  font-size:.9rem; color:var(--muted);
+  text-align:center; padding:6px 0;
+}
+.cal-grid button.day{
+  width:100%; aspect-ratio:1/1;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:10px; background:#0f1420; color:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:filter .15s ease, transform .15s ease;
+}
+.cal-grid button.day:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+.cal-grid button.day:disabled{
+  opacity:.45; cursor:not-allowed;
+}
+.cal-grid button.day.selected{
+  outline:2px solid var(--ring);
+  background:linear-gradient(0deg, rgba(127,170,255,.18), rgba(127,170,255,.18));
+}
+
+.slots .slots-title{
+  margin-top:0; margin-bottom:8px; font-size:1.1rem;
+}
+.slots-grid{
+  display:grid; gap:8px;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+}
+@media (max-width: 700px){
+  .slots-grid{ grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+}
+@media (max-width: 480px){
+  .slots-grid{ grid-template-columns: 1fr; }
+}
+.slots-grid button.slot{
+  border:1px solid rgba(255,255,255,.10); background:#1a2130; color:#fff;
+  border-radius:10px; padding:10px; cursor:pointer;
+  text-align:center;
+}
+.slots-grid button.slot.booked{
+  opacity:.45; cursor:not-allowed; position:relative;
+}
+.slots-grid button.slot.me{
+  outline:2px solid var(--accent);
+}
+.slots-grid button.slot:hover:not(.booked){ filter:brightness(1.05); transform:translateY(-1px); }
+/* Make the right card use rows: title | grid | actions | hint */
+.slots {
   display: grid;
-  gap: 12px;
+  grid-template-rows: auto auto auto auto;
+  row-gap: 10px;
 }
-.event {
+
+/* Ensure the grid consumes its own row */
+.slots .slots-grid {
+  grid-row: 2;
+  position: relative;   /* avoid any absolute positioning from global styles */
+  z-index: 1;
+}
+
+/* Put the Clear button on its own row below the grid */
+.slots .flex {
+  grid-row: 3;
   display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px dashed #2a3242;
-  background: rgba(255, 255, 255, 0.02);
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 0;        /* prevent it from sliding upward */
+  position: relative;   /* neutralize any global absolute rules */
+  z-index: 1;
 }
-.event-info .when {
-  font-weight: 700;
+
+/* Keep the hint in the last row */
+#slotHint {
+  grid-row: 4;
+  margin-top: 0;
 }
-.event-cta .btn {
-  white-space: nowrap;
-}
-@media (max-width: 700px) {
-  .event {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .event-cta {
-    display: flex;
-  }
-}
+
+/* Safety: guarantee slots don't overlap anything */
+.slots-grid .slot { position: relative; }
+
