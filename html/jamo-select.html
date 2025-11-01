@@ -68,5 +68,25 @@
   <!-- Modules (keep type="module") -->
   <script type="module" src="../js/main/state.js"></script>
   <script type="module" src="../js/levels/jamo-select.js"></script>
+    <div id="authModal" class="modal" hidden>
+      <div class="modal-card">
+        <h3>Sign in</h3>
+        <form id="authForm">
+          <label>Email</label>
+          <input id="authEmail" type="email" required />
+          <label>Password</label>
+          <input id="authPass" type="password" required minlength="6" />
+          <div class="row">
+            <button id="emailSignIn" class="btn primary" type="submit">Sign in</button>
+            <button id="emailSignUp" class="btn secondary" type="button">Create account</button>
+          </div>
+        </form>
+        <div class="row">
+          <button id="googleBtn" class="btn" type="button">Continue with Google</button>
+          <button id="authClose" class="btn" type="button">Close</button>
+        </div>
+        <p id="authMsg" class="muted" aria-live="polite"></p>
+      </div>
+    </div>
 </body>
 </html>

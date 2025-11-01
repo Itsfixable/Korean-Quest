@@ -269,3 +269,14 @@ header {
     scroll-behavior: auto !important;
   }
 }
+/* nav auth */
+.nav { display:flex; align-items:center; gap:12px; }
+.nav .spacer { flex: 1; min-width: 8px; }
+#userBadge { white-space: nowrap; }
+
+/* modal */
+.modal { position: fixed; inset: 0; display:grid; place-items:center; background: rgba(0,0,0,.35); z-index: 50; }
+.modal[hidden] { display:none; }
+.modal-card { background:#fff; color:#111; width:320px; padding:16px; border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.25); }
+.modal-card .row { display:flex; gap:8px; margin-top:10px; }
+.modal-card input { width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; margin:4px 0 8px; }
