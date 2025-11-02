@@ -1,5 +1,5 @@
 // ../js/main/auth.js
-// Global Firebase Auth for KQ-FBLA (no auto-open on load)
+// Firebase Auth with Google popup→redirect fallback + 4-digit email OTP verification
 
 console.log("[KQ] auth.js starting");
 
@@ -12,22 +12,39 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  setPersistence,
+  browserLocalPersistence,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFunctions,
+  httpsCallable,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 
-/* 1) Replace with your Firebase config (Project Settings → Your apps) */
+/* 1) REPLACE with your exact Web app config (Firebase Console → Project settings → General → Your apps → Web) */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID",
+  apiKey:        "YOUR_REAL_WEB_API_KEY",
+  authDomain:    "your-project-id.firebaseapp.com",
+  projectId:     "your-project-id",
+  appId:         "1:###########:web:################",
+  // optional: storageBucket, messagingSenderId, measurementId
 };
 
-if (!firebaseConfig.apiKey) {
-  console.error("[KQ] Missing Firebase config — auth will not work.");
+if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("YOUR_")) {
+  console.error("[KQ] Missing/placeholder Firebase config — auth will not work.");
 }
 
-const app = initializeApp(firebaseConfig);
+/* 2) Init Firebase */
+export const app  = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const functions = getFunctions(app);
+
+// persist login
+setPersistence(auth, browserLocalPersistence).catch(e =>
+  console.error("[KQ] persistence error:", e)
+);
+
 const provider = new GoogleAuthProvider();
 
 /* ---------- DOM helpers & modal bootstrap ---------- */
@@ -39,8 +56,12 @@ function ensureModal() {
       "beforeend",
       `
       <div id="authModal" class="modal" hidden>
-        <div class="modal-card">
+        <div class="modal-card" style="position:relative;">
+          <button id="authCloseX" aria-label="Close"
+                  style="position:absolute;top:8px;right:8px;background:none;border:none;font-size:20px;cursor:pointer;line-height:1;">✕</button>
           <h3>Sign in</h3>
+
+          <!-- EMAIL/PASSWORD -->
           <form id="authForm">
             <label>Email</label>
             <input id="authEmail" type="email" required />
@@ -51,123 +72,218 @@ function ensureModal() {
               <button id="emailSignUp" class="btn secondary" type="button">Create account</button>
             </div>
           </form>
-          <div class="row">
+
+          <!-- GOOGLE -->
+          <div class="row" style="margin-top:8px;">
             <button id="googleBtn" class="btn" type="button">Continue with Google</button>
+          </div>
+
+          <!-- OTP SECTION -->
+          <div id="otpSection" style="display:none;margin-top:12px;">
+            <hr style="opacity:.3;margin:10px 0;">
+            <h4 style="margin:8px 0;">Verify your email</h4>
+            <p class="muted" id="otpHelp">We sent a 4-digit code to your email. Enter it below.</p>
+            <div class="row">
+              <input id="otpInput" type="text" inputmode="numeric" pattern="\\d{4}"
+                     maxlength="4" placeholder="1234"
+                     style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;" />
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <button id="otpSend" class="btn secondary" type="button">Resend code</button>
+              <button id="otpVerify" class="btn primary" type="button">Verify code</button>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
             <button id="authClose" class="btn" type="button">Close</button>
           </div>
-          <p id="authMsg" class="muted" aria-live="polite"></p>
+
+          <p id="authMsg" class="muted" aria-live="polite" style="margin-top:6px;"></p>
         </div>
       </div>`
     );
   }
 }
 
-/* ---------- Public API (no auto-open) ---------- */
+/* ---------- Public API ---------- */
 export function openAuthModal() {
   const modal = $("#authModal");
-  if (modal) {
-    modal.hidden = false;
-    $("#authEmail")?.focus();
-  }
+  if (modal) { modal.hidden = false; $("#authEmail")?.focus(); }
 }
 export function closeAuthModal() {
   const modal = $("#authModal");
-  if (modal) {
-    modal.hidden = true;
-    const m = $("#authMsg");
-    if (m) m.textContent = "";
-  }
+  if (modal) { modal.hidden = true; setMsg(""); hideOtp(); }
 }
 export const getUser = () => auth.currentUser;
-
-/** Only returns a boolean. It will NOT open the modal unless you pass true. */
 export function requireAuth(shouldOpen = false) {
   if (!auth.currentUser && shouldOpen) openAuthModal();
   return !!auth.currentUser;
 }
 
-/* Optional: subscribe to auth changes from page scripts */
-const listeners = new Set();
-export function onAuth(cb) {
-  listeners.add(cb);
-  return () => listeners.delete(cb);
+/* ---------- Helpers ---------- */
+function setMsg(t) { const m = $("#authMsg"); if (m) m.textContent = t || ""; }
+function showOtp(text) {
+  const s = $("#otpSection"); const h = $("#otpHelp");
+  if (s) { s.style.display = "block"; }
+  if (h && text) h.textContent = text;
 }
-function emitAuth(u) {
-  listeners.forEach((cb) => cb(u));
+function hideOtp() { const s = $("#otpSection"); if (s) s.style.display = "none"; }
+function popupBlocked(code) {
+  return ["auth/popup-blocked","auth/popup-closed-by-user",
+          "auth/unauthorized-domain","auth/operation-not-supported-in-this-environment"].includes(code);
 }
 
-/* ---------- Wiring (runs after DOM is ready) ---------- */
+/* Callables (backend required — see functions code below) */
+const cfRequestOtp = () => httpsCallable(functions, "requestOtp")({});
+const cfVerifyOtp  = (code) => httpsCallable(functions, "verifyOtp")({ code });
+
+/* After any sign-in, start 4-digit email code verification */
+async function beginOtpVerificationFlow(user) {
+  if (!user) return;
+
+  // You can allow already-verified users to skip if you've stored status:
+  // We'll fetch a custom claim via user.reload()? (Claims need Admin SDK.)
+  // Simpler client approach: always (re)send, or you can call a "status" function.
+  setMsg("Sending verification code...");
+  try {
+    await cfRequestOtp();
+    showOtp("We sent a 4-digit code to your email. Enter it below.");
+    setMsg("Check your inbox for the code.");
+  } catch (e) {
+    console.error("[KQ] requestOtp error:", e);
+    setMsg(e?.message || "Could not send code. Try again.");
+  }
+}
+
+/* Smart Google sign-in: try popup, fallback to redirect */
+async function signInWithGoogleSmart() {
+  setMsg("");
+  try {
+    const res = await signInWithPopup(auth, provider);
+    console.log("[KQ] Google (popup):", res.user?.uid);
+    await beginOtpVerificationFlow(res.user);
+  } catch (e) {
+    console.warn("[KQ] popup failed:", e.code, e.message);
+    if (e.code === "auth/unauthorized-domain") {
+      setMsg("This domain isn’t authorized. Add it in Firebase → Auth → Settings → Authorized domains.");
+    }
+    if (popupBlocked(e.code)) {
+      setMsg("Opening Google sign-in…");
+      try { await signInWithRedirect(auth, provider); }
+      catch (e2) { console.error("[KQ] redirect error:", e2); setMsg(e2.message); }
+    } else { setMsg(e.message); }
+  }
+}
+
+/* Handle redirect result */
+async function handleRedirectResultIfAny() {
+  try {
+    const res = await getRedirectResult(auth);
+    if (res?.user) {
+      console.log("[KQ] Google (redirect):", res.user.uid);
+      await beginOtpVerificationFlow(res.user);
+    }
+  } catch (e) { console.error("[KQ] redirect result error:", e); setMsg(e.message); }
+}
+
+/* ---------- Wiring ---------- */
 function wireDOM() {
-  if (window.__kqAuthWired) { console.warn("[KQ] auth already wired"); return; }
+  if (window.__kqAuthWired) return;
   window.__kqAuthWired = true;
 
   ensureModal();
 
-  const loginBtn  = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const userBadge = document.getElementById("userBadge");
+  const loginBtn  = $("loginBtn");
+  const logoutBtn = $("logoutBtn");
+  const userBadge = $("userBadge");
 
-  const modal   = document.getElementById("authModal");
-  const form    = document.getElementById("authForm");
-  const emailEl = document.getElementById("authEmail");
-  const passEl  = document.getElementById("authPass");
-  const msgEl   = document.getElementById("authMsg");
-  const closeEl = document.getElementById("authClose");
-  const signUpEl= document.getElementById("emailSignUp");
-  const googleEl= document.getElementById("googleBtn");
+  const modal   = $("authModal");
+  const form    = $("authForm");
+  const emailEl = $("authEmail");
+  const passEl  = $("authPass");
+  const closeEl = $("authClose");
+  const closeX  = $("authCloseX");
+  const signUpEl= $("emailSignUp");
+  const googleEl= $("googleBtn");
+  const otpSend = $("otpSend");
+  const otpVerify = $("otpVerify");
+  const otpInput = $("otpInput");
 
-  const open  = () => { if (modal) { modal.hidden = false; emailEl?.focus(); } };
-  const close = () => { if (modal) { modal.hidden = true; if (msgEl) msgEl.textContent = ""; } };
+  const open  = () => { modal.hidden = false; emailEl?.focus(); };
+  const close = () => { modal.hidden = true; setMsg(""); hideOtp(); otpInput && (otpInput.value=""); };
 
-  // 1) Bind nav pills (preventDefault in case they are <a> or <button>)
-  if (loginBtn) {
-    loginBtn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); open(); });
-  }
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async (e) => {
-      e.preventDefault(); e.stopPropagation();
-      try { await signOut(auth); } catch (err) { console.error("[KQ] signOut error", err); }
-    });
-  }
-
-  // 2) Fallbacks: global event + delegated click (works if nav re-renders)
-  window.addEventListener("kq-open-auth", open);
-  document.addEventListener("click", (e) => {
-    const t = e.target;
-    if (t && (t.id === "loginBtn" || t.closest?.("#loginBtn"))) {
-      e.preventDefault(); e.stopPropagation();
-      open();
-    }
+  if (loginBtn)  loginBtn.addEventListener("click", e => { e.preventDefault(); open(); });
+  if (logoutBtn) logoutBtn.addEventListener("click", async e => {
+    e.preventDefault();
+    try { await signOut(auth); } catch (err) { console.error("[KQ] signOut error", err); }
   });
 
-  // 3) Modal controls
-  if (closeEl) closeEl.onclick = () => close();
+  window.addEventListener("kq-open-auth", open);
+  document.addEventListener("click", e => {
+    const t = e.target;
+    if (t && (t.id === "loginBtn" || t.closest?.("#loginBtn"))) { e.preventDefault(); open(); }
+  });
 
-  if (googleEl) {
-    googleEl.onclick = async () => {
-      try { const res = await signInWithPopup(auth, new GoogleAuthProvider()); console.log("[KQ] Google:", res.user?.uid); close(); }
-      catch (e) { console.error("[KQ] Google popup error:", e); if (msgEl) msgEl.textContent = e.message; }
-    };
-  }
+  if (closeEl) closeEl.onclick = () => close();
+  if (closeX)  closeX.onclick  = () => close();
+
+  if (googleEl) googleEl.onclick = () => { void signInWithGoogleSmart(); };
 
   if (form) {
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      try { const res = await signInWithEmailAndPassword(auth, emailEl.value, passEl.value); console.log("[KQ] Email:", res.user?.uid); close(); }
-      catch (e) { console.error("[KQ] Email sign-in error:", e); if (msgEl) msgEl.textContent = e.message; }
+      setMsg("");
+      try {
+        const res = await signInWithEmailAndPassword(auth, emailEl.value, passEl.value);
+        console.log("[KQ] Email:", res.user?.uid);
+        await beginOtpVerificationFlow(res.user);
+      } catch (e) { console.error("[KQ] Email sign-in error:", e); setMsg(e.message); }
     });
   }
 
   if (signUpEl) {
     signUpEl.addEventListener("click", async () => {
-      try { const res = await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value); console.log("[KQ] Created:", res.user?.uid); close(); }
-      catch (e) { console.error("[KQ] Email sign-up error:", e); if (msgEl) msgEl.textContent = e.message; }
+      setMsg("");
+      try {
+        const res = await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value);
+        console.log("[KQ] Created:", res.user?.uid);
+        await beginOtpVerificationFlow(res.user);
+      } catch (e) { console.error("[KQ] Email sign-up error:", e); setMsg(e.message); }
     });
   }
 
-  // 4) Auth state -> nav UI
+  if (otpSend) {
+    otpSend.addEventListener("click", async () => {
+      setMsg("Sending code...");
+      try { await cfRequestOtp(); setMsg("Code resent. Check your inbox."); }
+      catch (e) { console.error("[KQ] requestOtp error:", e); setMsg(e.message || "Could not resend code."); }
+    });
+  }
+  if (otpVerify) {
+    otpVerify.addEventListener("click", async () => {
+      const code = (otpInput?.value || "").trim();
+      if (!/^\d{4}$/.test(code)) { setMsg("Enter the 4-digit code from your email."); return; }
+      setMsg("Verifying code...");
+      try {
+        const res = await cfVerifyOtp(code);
+        if (res?.data?.ok) {
+          setMsg("Email verified! 🎉");
+          hideOtp();
+          close(); // close modal on success
+        } else {
+          setMsg(res?.data?.error || "Invalid code. Try again.");
+        }
+      } catch (e) {
+        console.error("[KQ] verifyOtp error:", e);
+        setMsg(e?.message || "Invalid code. Try again.");
+      }
+    });
+  }
+
   onAuthStateChanged(auth, (user) => {
     const label = user?.displayName || user?.email || "";
+    // You can decorate label with " (Not verified)" until OTP verified on backend,
+    // but that requires reading a flag from Firestore; keeping simple here.
     if (user) {
       if (userBadge) userBadge.textContent = `Signed in as ${label}`;
       if (loginBtn)  loginBtn.hidden = true;
@@ -182,10 +298,11 @@ function wireDOM() {
     console.log("[KQ] auth state:", user ? "signed-in" : "signed-out");
   });
 
-  if (modal) modal.hidden = true; // start hidden
+  modal.hidden = true;
+  void handleRedirectResultIfAny();
+  console.log("[KQ] origin:", location.origin, "authDomain:", auth.app.options.authDomain);
   console.log("[KQ] auth.js ready");
 }
-
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", wireDOM);
