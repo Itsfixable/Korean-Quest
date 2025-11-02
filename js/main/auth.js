@@ -98,99 +98,94 @@ function emitAuth(u) {
 
 /* ---------- Wiring (runs after DOM is ready) ---------- */
 function wireDOM() {
-  ensureModal(); // inject if not present
+  if (window.__kqAuthWired) { console.warn("[KQ] auth already wired"); return; }
+  window.__kqAuthWired = true;
 
-  const loginBtn = $("#loginBtn");
-  const logoutBtn = $("#logoutBtn");
-  const userBadge = $("#userBadge");
+  ensureModal();
 
-  const modal = $("#authModal");
-  const form = $("#authForm");
-  const emailEl = $("#authEmail");
-  const passEl = $("#authPass");
-  const msgEl = $("#authMsg");
-  const closeEl = $("#authClose");
-  const signUpEl = $("#emailSignUp");
-  const googleEl = $("#googleBtn");
+  const loginBtn  = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const userBadge = document.getElementById("userBadge");
 
-  // Header actions (explicit only — no auto-open)
-  if (loginBtn) loginBtn.onclick = () => openAuthModal();
+  const modal   = document.getElementById("authModal");
+  const form    = document.getElementById("authForm");
+  const emailEl = document.getElementById("authEmail");
+  const passEl  = document.getElementById("authPass");
+  const msgEl   = document.getElementById("authMsg");
+  const closeEl = document.getElementById("authClose");
+  const signUpEl= document.getElementById("emailSignUp");
+  const googleEl= document.getElementById("googleBtn");
+
+  const open  = () => { if (modal) { modal.hidden = false; emailEl?.focus(); } };
+  const close = () => { if (modal) { modal.hidden = true; if (msgEl) msgEl.textContent = ""; } };
+
+  // 1) Bind nav pills (preventDefault in case they are <a> or <button>)
+  if (loginBtn) {
+    loginBtn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); open(); });
+  }
   if (logoutBtn) {
-    logoutBtn.onclick = async () => {
-      try {
-        await signOut(auth);
-      } catch (e) {
-        console.error("[KQ] signOut error", e);
-      }
-    };
+    logoutBtn.addEventListener("click", async (e) => {
+      e.preventDefault(); e.stopPropagation();
+      try { await signOut(auth); } catch (err) { console.error("[KQ] signOut error", err); }
+    });
   }
 
-  // Modal actions
-  if (closeEl) closeEl.onclick = () => closeAuthModal();
+  // 2) Fallbacks: global event + delegated click (works if nav re-renders)
+  window.addEventListener("kq-open-auth", open);
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    if (t && (t.id === "loginBtn" || t.closest?.("#loginBtn"))) {
+      e.preventDefault(); e.stopPropagation();
+      open();
+    }
+  });
+
+  // 3) Modal controls
+  if (closeEl) closeEl.onclick = () => close();
 
   if (googleEl) {
     googleEl.onclick = async () => {
-      try {
-        const res = await signInWithPopup(auth, provider);
-        console.log("[KQ] Google signed in:", res.user?.uid);
-        closeAuthModal();
-      } catch (e) {
-        console.error("[KQ] Google popup error:", e);
-        if (msgEl) msgEl.textContent = e.message;
-      }
+      try { const res = await signInWithPopup(auth, new GoogleAuthProvider()); console.log("[KQ] Google:", res.user?.uid); close(); }
+      catch (e) { console.error("[KQ] Google popup error:", e); if (msgEl) msgEl.textContent = e.message; }
     };
   }
 
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      try {
-        const res = await signInWithEmailAndPassword(auth, emailEl.value, passEl.value);
-        console.log("[KQ] Email signed in:", res.user?.uid);
-        closeAuthModal();
-      } catch (e) {
-        console.error("[KQ] Email sign-in error:", e);
-        if (msgEl) msgEl.textContent = e.message;
-      }
+      try { const res = await signInWithEmailAndPassword(auth, emailEl.value, passEl.value); console.log("[KQ] Email:", res.user?.uid); close(); }
+      catch (e) { console.error("[KQ] Email sign-in error:", e); if (msgEl) msgEl.textContent = e.message; }
     });
   }
 
   if (signUpEl) {
     signUpEl.addEventListener("click", async () => {
-      try {
-        const res = await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value);
-        console.log("[KQ] Account created:", res.user?.uid);
-        closeAuthModal();
-      } catch (e) {
-        console.error("[KQ] Email sign-up error:", e);
-        if (msgEl) msgEl.textContent = e.message;
-      }
+      try { const res = await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value); console.log("[KQ] Created:", res.user?.uid); close(); }
+      catch (e) { console.error("[KQ] Email sign-up error:", e); if (msgEl) msgEl.textContent = e.message; }
     });
   }
 
-  // Auth state → nav UI
+  // 4) Auth state -> nav UI
   onAuthStateChanged(auth, (user) => {
     const label = user?.displayName || user?.email || "";
     if (user) {
       if (userBadge) userBadge.textContent = `Signed in as ${label}`;
-      if (loginBtn) loginBtn.hidden = true;
+      if (loginBtn)  loginBtn.hidden = true;
       if (logoutBtn) logoutBtn.hidden = false;
       document.body.classList.add("authed");
     } else {
       if (userBadge) userBadge.textContent = "";
-      if (loginBtn) loginBtn.hidden = false;
+      if (loginBtn)  loginBtn.hidden = false;
       if (logoutBtn) logoutBtn.hidden = true;
       document.body.classList.remove("authed");
     }
-    emitAuth(user);
     console.log("[KQ] auth state:", user ? "signed-in" : "signed-out");
   });
 
-  // Ensure modal starts hidden (in case CSS was overridden)
-  if (modal) modal.hidden = true;
-
+  if (modal) modal.hidden = true; // start hidden
   console.log("[KQ] auth.js ready");
 }
+
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", wireDOM);
