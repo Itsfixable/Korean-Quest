@@ -1,3 +1,47 @@
+/* ==== HOME THEME TOKENS (page-scoped) ==== */
+:root{
+  --bg:#0b0c10;
+  --panel:#111318; 
+  --text:#e6e7eb; 
+  --muted:#9aa1ad;
+  --brand:#4f8cff; 
+  --brand-2:#7aa3ff; 
+  --accent:#7bd389; 
+  --danger:#ff6b6b; 
+  --ring:rgba(79,140,255,.45);
+  --surface-1:#0f1420; 
+  --surface-2:#1a2130; 
+  --surface-3:#20304a;
+  --border-weak:rgba(255,255,255,.06);
+  --border-mid:rgba(255,255,255,.08);
+  --border-strong:rgba(255,255,255,.12);
+  --border-solid:#2a3242; 
+  --overlay:rgba(0,0,0,.35); 
+  --shadow:0 10px 30px rgba(0,0,0,.25);
+  --radius:14px; 
+  --container:1100px;
+}
+/* Optional page variants */
+:root[data-theme="light"]{
+  --bg:#f7f9fc; 
+  --panel:#fff; 
+  --text:#111318; 
+  --muted:#586071; 
+  --ring:rgba(79,140,255,.25);
+  --surface-1:#eef2f7; 
+  --surface-2:#f6f8fc; 
+  --surface-3:#e6eefb; 
+  --border-weak:rgba(0,0,0,.06); 
+  --border-mid:rgba(0,0,0,.08);
+  --border-strong:rgba(0,0,0,.12); 
+  --border-solid:#d5dbe6; 
+  --overlay:rgba(0,0,0,.25);
+}
+
+.grid-actions { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.learning-path { margin: 0; padding-left: 18px; }
+.quest-list { margin: 0; padding-left: 18px; }
+
 .grid-actions {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }

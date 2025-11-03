@@ -1,363 +1,94 @@
-/* ============ CSS Variables & Base ============ */
-:root {
-  --bg: #0b0c10;
-  --panel: #111318;
-  --text: #e6e7eb;
-  --muted: #9aa1ad;
-  --brand: #4f8cff;
-  --brand-2: #7aa3ff;
-  --accent: #7bd389;
-  --danger: #ff6b6b;
-  --ring: rgba(79, 140, 255, 0.45);
-
-  --radius: 14px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  --container: 1100px;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f7f9fc;
-    --panel: #fff;
-    --text: #111318;
-    --muted: #586071;
-    --ring: rgba(79, 140, 255, 0.25);
-  }
-}
-
-* {
-  box-sizing: border-box;
-}
-html,
-body {
-  height: 100%;
-}
+/* ====== Base (no theme tokens here) ====== */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
   margin: 0;
-  font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
-    sans-serif;
+  font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-img {
-  max-width: 100%;
-  display: block;
-}
-a {
-  color: var(--brand);
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
+img { max-width: 100%; display: block; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-/* ===== Containers & Layout ===== */
-.container {
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 20px;
-}
-.grid {
-  display: grid;
-  gap: 16px;
-}
-.flex {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
+/* Layout */
+.container { max-width: var(--container, 1100px); margin: 0 auto; padding: 20px; }
+.grid { display: grid; gap: 16px; }
+.flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-/* ===== Header / Nav ===== */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 70%);
-}
+/* Header / Nav */
+header { position: sticky; top: 0; z-index: 9999; background: linear-gradient(180deg, rgba(0,0,0,0.35), transparent 70%); }
 .nav {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  background: var(--panel);
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  position: relative; z-index: 10000;
+  display: flex; gap: 8px; align-items: center;
+  background: var(--panel); padding: 10px 12px; border-radius: var(--radius, 14px);
+  box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,0.25));
 }
-.logo {
-  font-weight: 800;
-  margin-right: auto;
-  white-space: nowrap;
-}
-.pill {
-  border: none;
-  background: transparent;
-  color: var(--text);
-  padding: 8px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-.pill[aria-current="page"] {
-  background: var(--brand);
-  color: #fff;
-}
-.pill:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
+.logo { font-weight: 800; white-space: nowrap; }
+.spacer { flex: 1; min-width: 8px; }
 
-/* ===== Cards & Common ===== */
+.pill {
+  border: none; background: transparent; color: var(--text);
+  padding: 8px 12px; border-radius: 999px; cursor: pointer; text-decoration: none;
+}
+.pill[aria-current="page"] { background: var(--brand); color: #fff; }
+.pill:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* Cards & Common */
 .card {
-  background: var(--panel);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
+  background: var(--panel); border: 1px solid var(--border-weak);
+  border-radius: var(--radius, 14px); padding: 16px;
+  box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,0.25));
 }
-.muted {
-  color: var(--muted);
-}
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #20304a;
-  color: #cfe1ff;
-  font-size: 0.85rem;
-}
+.muted { color: var(--muted); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--surface-3); color: #cfe1ff; font-size: 0.85rem; }
 
 /* Buttons */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 14px;
-  background: var(--brand);
-  color: #fff;
-  transition: transform 0.15s ease, filter 0.15s ease;
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  border: none; border-radius: 12px; padding: 10px 14px;
+  background: var(--brand); color: #fff; transition: transform .15s ease, filter .15s ease;
 }
-.btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
-.btn.secondary {
-  background: #202635;
-  color: #e7ecff;
-}
-.btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.btn.secondary { background: var(--surface-2); color: var(--text); }
+.btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
-/* KPI / Progress */
-.kpi {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, 1fr);
-}
-.metric {
-  background: #0f1420;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 12px;
-}
-.kpi-value {
-  font-size: 1.6rem;
-  font-weight: 800;
-}
+/* KPIs */
+.kpi { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); }
+.metric { background: var(--surface-1); border: 1px solid var(--border-weak); border-radius: 12px; padding: 12px; }
+.kpi-value { font-size: 1.6rem; font-weight: 800; }
 
-.progress {
-  height: 10px;
-  background: #2a3242;
-  border-radius: 999px;
-  overflow: hidden;
-}
-.progress > i {
-  display: block;
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--brand), var(--brand-2));
-  transition: width 0.4s ease;
-}
+.progress { height: 10px; background: var(--border-solid); border-radius: 999px; overflow: hidden; }
+.progress > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); transition: width .4s ease; }
 
-/* Modal shell (used by auth) */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  background: rgba(0, 0, 0, 0.55);
+/* Modal (hidden-attribute model) */
+.modal[hidden] { display: none !important; }
+.modal { position: fixed; inset: 0; display: grid; place-items: center; background: var(--overlay); z-index: 50; }
+.modal-card {
+  background: #fff; color: #111; width: 320px; padding: 16px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,.25);
 }
-.modal.open {
-  display: block;
-}
-.modal-content {
-  margin: 10% auto;
-  width: min(480px, 92%);
-  background: var(--panel);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-.modal-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.modal-body {
-  padding: 16px;
-}
-.modal-close {
-  background: #1c2332;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  cursor: pointer;
-}
+.modal-card .row { display: flex; gap: 8px; margin-top: 10px; }
+.modal-card input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px; margin: 4px 0 8px; }
 
 /* Accessibility helpers */
-.text-muted {
-  color: var(--muted);
-}
-.hidden {
-  display: none !important;
-}
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+.text-muted { color: var(--muted); }
+.hidden { display: none !important; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 /* Footer */
-.footer {
-  opacity: 0.75;
-  margin: 24px auto;
-}
+.footer { opacity: .75; margin: 24px auto; }
 
-/* ===== Responsive ===== */
+/* Responsive */
 @media (max-width: 900px) {
-  .kpi {
-    grid-template-columns: 1fr;
-  }
-  .nav {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .logo {
-    width: 100%;
-  }
+  .kpi { grid-template-columns: 1fr; }
+  .nav { flex-wrap: wrap; gap: 6px; }
+  .logo { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+  * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
-/* nav auth */
-.nav { display:flex; align-items:center; gap:12px; }
-.nav .spacer { flex: 1; min-width: 8px; }
 #userBadge { white-space: nowrap; }
+#loginBtn, #logoutBtn { cursor: pointer; }
 
-/* modal */
-.modal { position: fixed; inset: 0; display:grid; place-items:center; background: rgba(0,0,0,.35); z-index: 50; }
-.modal[hidden] { display:none; }
-.modal-card { background:#fff; color:#111; width:320px; padding:16px; border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.25); }
-.modal-card .row { display:flex; gap:8px; margin-top:10px; }
-.modal-card input { width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; margin:4px 0 8px; }
-/* ========== Global Auth Modal Styling ========== */
-
-/* Keep modal hidden unless explicitly opened via JS */
-.modal[hidden] {
-  display: none !important;
-}
-
-/* Default modal container */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 999;
-  transition: opacity 0.25s ease;
-}
-
-/* Modal card layout */
-.modal-card {
-  background: #fff;
-  color: #111;
-  width: 320px;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-  font-family: inherit;
-}
-
-/* Modal form controls */
-.modal-card input {
-  width: 100%;
-  padding: 8px;
-  margin: 4px 0 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.95rem;
-}
-
-/* Buttons inside modal */
-.modal-card .row {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* Compact button tweaks for modal */
-.modal-card .btn {
-  flex: 1 1 auto;
-  text-align: center;
-  padding: 8px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-/* Accessibility and hover states */
-.modal-card .btn:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  transition: all 0.15s ease;
-}
-
-/* Optional: Dim text message at bottom */
-.modal-card #authMsg {
-  font-size: 0.9rem;
-  color: #333;
-  text-align: center;
-  margin-top: 6px;
-}
-
-/* Make sure nav buttons align nicely */
-.nav .spacer {
-  flex: 1;
-}
-
-#loginBtn, #logoutBtn {
-  cursor: pointer;
-}

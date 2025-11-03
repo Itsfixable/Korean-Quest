@@ -1,3 +1,59 @@
+/* ==== ADVENTURE THEME TOKENS (page-scoped) ==== */
+:root{
+  --bg:#0b0c10; 
+  --panel:#10131a; 
+  --text:#e6e7eb; 
+  --muted:#9aa1ad;
+  --brand:#ff6b6b; 
+  --brand-2:#ff8ea1; 
+  --accent:#ffd166; 
+  --danger:#ff6b6b; 
+  --ring:rgba(255,107,107,.35);
+  --surface-1:#141722;
+  --surface-2:#1b2231; 
+  --surface-3:#24324a;
+  --border-weak:rgba(255,255,255,.06);
+  --border-mid:rgba(255,255,255,.08); 
+  --border-strong:rgba(255,255,255,.12);
+  --border-solid:#2a3242; 
+  --overlay:rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --bg: #f7f9fc;
+  --panel: #ffffff;
+  --text: #111318;
+  --muted: #586071;
+
+  --brand: #4f8cff;
+  --brand-2: #7aa3ff;
+  --accent: #7bd389;
+  --danger: #ff6b6b;
+  --ring: rgba(79, 140, 255, 0.25);
+
+  --surface-1: #eef2f7;
+  --surface-2: #f6f8fc;
+  --surface-3: #e6eefb;
+  --border-weak: rgba(0,0,0,0.06);
+  --border-mid: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.12);
+  --border-solid: #d5dbe6;
+  --overlay: rgba(0,0,0,0.25);
+  --shadow: 0 10px 30px rgba(0,0,0,0.1);
+  --radius: 14px;
+  --container: 1100px;
+}
+
+.map { display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); }
+.map-node {
+  background:var(--surface-2); color:var(--text); border:1px solid var(--border-strong);
+  padding:12px; border-radius:12px; cursor:pointer; text-align:center;
+}
+.map-node.locked { opacity:.55; cursor:not-allowed; }
+.hp-row { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; }
+.bar { height:10px; background:var(--border-solid); border-radius:999px; overflow:hidden; }
+.bar i { display:block; height:100%; background:linear-gradient(90deg, var(--brand), var(--brand-2)); }
+#questionMount .btn { margin-top:8px; }
+
 .map {
   display: grid;
   gap: 10px;
@@ -36,3 +92,15 @@
 #questionMount .btn {
   margin-top: 8px;
 }
+
+/* Fun battle polish (keeps your page tokens) */
+.battle .sprite { filter: drop-shadow(0 6px 16px rgba(0,0,0,.25)); }
+.bar { height: 10px; background: var(--border-solid); border-radius: 999px; overflow: hidden; }
+.bar i { display:block; height:100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); transition: width .25s ease; }
+#qChoices .btn {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-mid);
+}
+#qChoices .btn.correct { outline: 2px solid var(--accent); }
+#qChoices .btn.wrong   { outline: 2px solid var(--danger); }

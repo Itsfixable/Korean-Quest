@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/master.css" />
   <!-- Page styles -->
   <link rel="stylesheet" href="../css/pages/schedule.css" />
+  <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
 </head>
 <body>
   <header class="container">
@@ -22,6 +23,12 @@
       <a class="pill" href="shop.html">Shop</a>
       <a class="pill" href="leaderboard.html">Leaderboard</a>
       <a class="pill" href="about.html">About</a>
+      <label class="kq-switch" aria-label="Toggle theme">
+          <input id="themeToggle" type="checkbox" />
+          <span class="kq-track"></span>
+          <span class="kq-thumb" aria-hidden="true"></span>
+          <span class="kq-switch-label">Theme</span>
+      </label>
 
       <span class="spacer"></span>
       <span id="userBadge" class="muted"></span>
@@ -82,6 +89,8 @@
 
   <script type="module" src="../js/main/auth.js"></script>
   <script type="module" src="../js/main/schedule.js"></script>
+  <script type="module" src="../js/main/theme.js"></script>
+
 
     <div id="authModal" class="modal" hidden>
       <div class="modal-card">
