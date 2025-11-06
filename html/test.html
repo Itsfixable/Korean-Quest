@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Korean Quest — Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Global + page CSS -->
+  <link rel="stylesheet" href="../css/master.css" />
+  <link rel="stylesheet" href="../css/pages/home.css" />
+  <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
+  <link rel="stylesheet" href="../css/pages/test.css" />
+</head>
+<body>
+  <!-- Header / Nav -->
+  <header class="container">
+    <nav class="nav" aria-label="Primary">
+      <div class="logo">🇰🇷 Korean Quest</div>
+
+      <a class="pill" href="index.html" aria-current="page">Home</a>
+      <a class="pill" href="schedule.html">Schedule</a>
+      <a class="pill" href="resources.html">Resources</a>
+      <a class="pill" href="adventure.html">Adventure</a>
+      <a class="pill" href="dashboard.html">Dashboard</a>
+      <a class="pill" href="shop.html">Shop</a>
+      <a class="pill" href="leaderboard.html">Leaderboard</a>
+      <a class="pill" href="about.html">About</a>
+      <a class="pill" href="test.html">test</a>
+      <label class="kq-switch" aria-label="Toggle theme">
+          <input id="themeToggle" type="checkbox" />
+          <span class="kq-track"></span>
+          <span class="kq-thumb" aria-hidden="true"></span>
+          <span class="kq-switch-label">Theme</span>
+      </label>
+
+      <span class="spacer"></span>
+      <span id="userBadge" class="muted"></span>
+      <button id="loginBtn"  class="pill" type="button">Sign in</button>
+      <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
+    </nav>
+  </header>
+
+  <!-- Main -->
+  <div class="square"></div>
+
+  <!-- Scripts (auth first). Modules auto-defer; place at end for stable DOM. -->
+  <script type="module" src="../js/main/auth.js?v=2"></script>
+  <script type="module" src="../js/main/router.js?v=2"></script>
+  <script type="module" src="../js/main/state.js?v=2"></script>
+  <script type="module" src="../js/main/theme.js"></script>
+
+</body>
+</html>

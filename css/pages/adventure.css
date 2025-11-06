@@ -1,106 +1,97 @@
-/* ==== ADVENTURE THEME TOKENS (page-scoped) ==== */
+/* ==== ADVENTURE THEME TOKENS ==== */
 :root{
-  --bg:#0b0c10; 
-  --panel:#10131a; 
-  --text:#e6e7eb; 
+  --bg:#0b0c10;
+  --panel:#10131a;
+  --text:#e6e7eb;
   --muted:#9aa1ad;
-  --brand:#ff6b6b; 
-  --brand-2:#ff8ea1; 
-  --accent:#ffd166; 
-  --danger:#ff6b6b; 
+
+  --brand:#ff6b6b;
+  --brand-2:#ff8ea1;
+  --accent:#ffd166;
+  --danger:#ff6b6b;
   --ring:rgba(255,107,107,.35);
+
   --surface-1:#141722;
-  --surface-2:#1b2231; 
+  --surface-2:#1b2231;
   --surface-3:#24324a;
+
   --border-weak:rgba(255,255,255,.06);
-  --border-mid:rgba(255,255,255,.08); 
+  --border-mid:rgba(255,255,255,.08);
   --border-strong:rgba(255,255,255,.12);
-  --border-solid:#2a3242; 
+  --border-solid:#2a3242;
+
   --overlay:rgba(0,0,0,.35);
-}
-:root[data-theme="light"] {
-  --bg: #f7f9fc;
-  --panel: #ffffff;
-  --text: #111318;
-  --muted: #586071;
+  --shadow: 0 10px 30px rgba(0,0,0,0.25);
+  --radius:14px;
+  --container:1100px;
 
-  --brand: #4f8cff;
-  --brand-2: #7aa3ff;
-  --accent: #7bd389;
-  --danger: #ff6b6b;
-  --ring: rgba(79, 140, 255, 0.25);
-
-  --surface-1: #eef2f7;
-  --surface-2: #f6f8fc;
-  --surface-3: #e6eefb;
-  --border-weak: rgba(0,0,0,0.06);
-  --border-mid: rgba(0,0,0,0.08);
-  --border-strong: rgba(0,0,0,0.12);
-  --border-solid: #d5dbe6;
-  --overlay: rgba(0,0,0,0.25);
-  --shadow: 0 10px 30px rgba(0,0,0,0.1);
-  --radius: 14px;
-  --container: 1100px;
+  /* currency chips */
+  --coin:#f7c845;   --coin-border:#d39a00;
+  --gem:#5be0e5;    --gem-border:#1aa2b3;
+  --xp:#b07cff;     --xp-border:#7a4ed8;
 }
 
-.map { display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); }
-.map-node {
-  background:var(--surface-2); color:var(--text); border:1px solid var(--border-strong);
-  padding:12px; border-radius:12px; cursor:pointer; text-align:center;
+/* Layout */
+.currency-bar{ display:flex; gap:.5rem; padding:8px 20px 0; }
+.cur.chip{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.35rem .6rem; background:var(--surface-2);
+  border:1px solid var(--border-mid); border-radius:.6rem; font-weight:700;
 }
-.map-node.locked { opacity:.55; cursor:not-allowed; }
-.hp-row { display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; }
-.bar { height:10px; background:var(--border-solid); border-radius:999px; overflow:hidden; }
-.bar i { display:block; height:100%; background:linear-gradient(90deg, var(--brand), var(--brand-2)); }
-#questionMount .btn { margin-top:8px; }
-
-.map {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+.cur.coin::before{
+  content:""; width:16px; height:16px; display:inline-block;
+  background:radial-gradient(circle at 30% 30%, #fff8, transparent 40%), linear-gradient(#ffe27a,var(--coin));
+  border:2px solid var(--coin-border); border-radius:50%; image-rendering: pixelated;
 }
-.map-node {
-  background: #1a2130;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: center;
+.cur.gem::before{
+  content:""; width:16px; height:16px; display:inline-block;
+  background:linear-gradient(135deg,#bff6ff,var(--gem) 60%,#1dbad0);
+  clip-path: polygon(50% 0%, 100% 35%, 78% 100%, 22% 100%, 0% 35%);
+  border:2px solid var(--gem-border); image-rendering: pixelated;
 }
-.map-node.locked {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.hp-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
-  align-items: center;
-}
-.bar {
-  height: 10px;
-  background: #2a3242;
-  border-radius: 999px;
-  overflow: hidden;
-}
-.bar i {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, var(--brand), var(--brand-2));
-}
-#questionMount .btn {
-  margin-top: 8px;
+.cur.xp::before{
+  content:""; width:16px; height:16px; display:inline-block;
+  background:linear-gradient(#e7d0ff,var(--xp)); border:2px solid var(--xp-border);
+  border-radius:4px; image-rendering: pixelated;
 }
 
-/* Fun battle polish (keeps your page tokens) */
-.battle .sprite { filter: drop-shadow(0 6px 16px rgba(0,0,0,.25)); }
-.bar { height: 10px; background: var(--border-solid); border-radius: 999px; overflow: hidden; }
-.bar i { display:block; height:100%; background: linear-gradient(90deg, var(--brand), var(--brand-2)); transition: width .25s ease; }
-#qChoices .btn {
-  background: var(--surface-2);
-  color: var(--text);
-  border: 1px solid var(--border-mid);
+.game-root{ display:grid; gap:12px; }
+.quest-card .quest-line{ display:flex; gap:8px; align-items:center; }
+.progress > i{ transition: width .25s ease; }
+
+.canvas-card .canvas-wrap{
+  background:#000; border:1px solid var(--border-strong);
+  border-radius:var(--radius); padding:10px; display:flex; justify-content:center;
 }
-#qChoices .btn.correct { outline: 2px solid var(--accent); }
-#qChoices .btn.wrong   { outline: 2px solid var(--danger); }
+canvas{
+  width:768px; height:576px; /* 3x upscale */
+  image-rendering: pixelated; image-rendering: crisp-edges;
+  border-radius:10px; cursor: crosshair;
+}
+
+.dock{ display:flex; gap:8px; flex-wrap:wrap; }
+
+.panel.hidden{ display:none; }
+.equip-grid{ display:grid; gap:12px; grid-template-columns: 2fr 1fr; align-items:start; }
+.badge-grid{ display:grid; gap:8px; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); }
+
+.shop-grid{ display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); }
+.shop-item{ background:var(--panel); border:1px solid var(--border-mid); border-radius:12px; padding:12px; }
+
+.wheel-grid{ display:grid; gap:10px; }
+.wheel{ display:grid; grid-template-columns: repeat(4,1fr); gap:6px; }
+.wheel .slice{ padding:14px; background:var(--surface-2); border:1px dashed var(--border-mid); border-radius:10px; text-align:center; }
+
+.toast{
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  background: var(--surface-2); border: 1px solid var(--border-mid);
+  padding: .6rem .9rem; border-radius: .6rem; z-index: 50;
+}
+.toast.hidden{ display:none; }
+
+/* Arena */
+.arena{ display:grid; gap:12px; }
+.arena .stat{ display:grid; grid-template-columns: auto 1fr auto; gap:8px; align-items:center; }
+.arena .bar{ height:10px; background:var(--border-solid); border-radius:999px; overflow:hidden; }
+.arena .bar > i{ display:block; height:100%; background:linear-gradient(90deg,var(--brand),var(--brand-2)); transition:width .25s; }
+.qwrap button.btn{ margin-top:6px; }

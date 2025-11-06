@@ -1,20 +1,368 @@
-// js/main/adventure.js
-// Prodigy-style battles: answer -> attack. Miss -> enemy attacks.
-// Integrates with state.js: addXP, addCoins, incQuest, etc.
+/* KQ — Adventure (Pixel) v3
+   - Smooth grid tweening (one tile per step)
+   - Interconnected regions (attempting to step off-screen loads neighbor and spawns you at opposite border)
+   - In-canvas parchment world map (locked areas, keys, fast travel)
+   - Arena overlay (Prodigy-style quiz battles with HP + Stamina)
+*/
+import { addXP, addCoins } from "./state.js";
 
-import { addXP, addCoins, incQuest } from "./state.js";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const L = "kq-adv-overworld-v3";
+const mem = {
+  get:(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } },
+  set:(k,v)=>localStorage.setItem(k, JSON.stringify(v))
+};
 
-// --------------------- Data: letters & vocab ---------------------
+// ---------- Persistent page state ----------
+const S = mem.get(L, {
+  coins: 120, gems: 2, xp: 0,
+  skin: "Default",
+  inv: [],            // {id,name,kind:'item'|'skin'}
+  keys: 0,            // boss keys
+  discovered: ["Town"],
+  unlocked: ["Town"], // fast travel to these
+  wheelLast: 0,
+  quest: { id:"q1", title:"Meet the Merchant", desc:"Walk to a shop (red roof) and press E.", progress:0, target:1, done:false },
+  world: { rx:0, ry:0 } // region coords
+});
+const save=()=>mem.set(L,S);
 
-// Hangul consonants (initial sounds). No answer leaks in prompt.
+// ---------- Currency + Quest ----------
+const coinsEl=$("#coins"), gemsEl=$("#gems"), xpEl=$("#xp");
+function updCurrency(){ coinsEl.textContent=S.coins; gemsEl.textContent=S.gems; xpEl.textContent=S.xp; }
+
+const qTitle=$("#questTitle"), qDesc=$("#questDesc"), qInner=$("#progressInner"), qTxt=$("#progressText");
+function updQuest(){
+  qTitle.textContent=`Quest: ${S.quest.title}`;
+  qDesc.textContent=S.quest.desc;
+  const pct=Math.min(100, Math.floor(100*(S.quest.progress/S.quest.target)));
+  qInner.style.width=pct+"%";
+  qTxt.textContent=S.quest.done?"Done!":`${pct}%`;
+}
+function completeIfReady(){
+  if(!S.quest.done && S.quest.progress>=S.quest.target){
+    S.quest.done=true; S.coins+=50; S.xp+=25; addCoins(50); addXP(25);
+    toast("Quest complete! +25 XP +50🪙");
+    setTimeout(()=>{ S.quest={id:"q2",title:"Collect 5 Coins",desc:"Pick up 5 ground coins on Market Row.",progress:0,target:5,done:false}; save(); updQuest(); },800);
+  }
+}
+
+// ---------- Panels ----------
+const close = sel => $(sel).classList.add("hidden");
+$("#btnEquip").onclick = ()=>{ $("#panelEquip").classList.remove("hidden"); renderEquip(); };
+$("#btnBackpack").onclick=()=>{ $("#panelBackpack").classList.remove("hidden"); renderBackpack(); };
+$("#btnWheel").onclick   =()=>{ $("#panelWheel").classList.remove("hidden"); updWheel(); };
+$("#btnHelp").onclick    =()=>  $("#panelHelp").classList.remove("hidden");
+$("#btnMap").onclick     =()=>  toggleMapOverlay();
+$$(".panel .btn.secondary[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
+
+// ---------- Equip / Backpack ----------
+function renderBackpack(){
+  const el=$("#backpackGrid"); el.innerHTML="";
+  if(!S.inv.length){ el.innerHTML=`<div class="muted">Your backpack is empty.</div>`; return; }
+  for(const it of S.inv){ const d=document.createElement("div"); d.className="chip"; d.textContent=(it.kind==="skin"?"Skin: ":"")+it.name; el.appendChild(d); }
+}
+function renderEquip(){
+  const list=$("#skinList"), cur=$("#equippedSkin"); list.innerHTML="";
+  const skins=S.inv.filter(i=>i.kind==="skin").map(i=>i.name);
+  if(!skins.length) list.innerHTML=`<div class="muted">No extra skins yet.</div>`;
+  for(const name of skins){
+    const b=document.createElement("button"); b.className="btn secondary"; b.textContent=name;
+    b.onclick=()=>{ S.skin=name; save(); cur.textContent=name; toast(`Equipped ${name}`); };
+    list.appendChild(b);
+  }
+  cur.textContent=S.skin||"Default";
+}
+
+// ---------- Shop ----------
+const STOCK=[
+  {id:"potion_s",name:"Small Potion",price:30,kind:"item",desc:"+20 XP now",effect:{xp:20}},
+  {id:"skin_mint",name:"Skin: Mint",price:120,kind:"skin",desc:"Minty fresh fit"},
+  {id:"skin_violet",name:"Skin: Violet",price:160,kind:"skin",desc:"Royal vibes"},
+  {id:"loot_bag",name:"Loot Bag",price:80,kind:"item",desc:"Random +25~100🪙",effect:{rngCoins:[25,100]}},
+  {id:"gem_trade",name:"Gem → 200🪙",priceGem:1,kind:"item",desc:"Spend 1💎 for 200🪙",effect:{coins:200,costGem:1}},
+];
+function populateShop(){
+  const grid=$("#shopItems"); if(!grid) return;
+  grid.innerHTML="";
+  for(const s of STOCK){
+    const card=document.createElement("div"); card.className="card shop-item";
+    card.innerHTML=`<h4>${s.name}</h4><div class="muted">${s.desc||""}</div>
+      <div class="muted" style="margin-top:6px;">${s.price? s.price+"🪙": s.priceGem+"💎"}</div>
+      <button class="btn" type="button">Buy</button>`;
+    card.querySelector("button").onclick=()=>buyItem(s);
+    grid.appendChild(card);
+  }
+}
+function buyItem(s){
+  const owns = s.kind==="skin" && S.inv.some(i=>i.kind==="skin"&&i.name===s.name.replace("Skin: ",""));
+  if(owns) return toast("You already own that skin.");
+  if(s.priceGem){ if(S.gems<s.priceGem) return toast("Not enough gems."); S.gems-=s.priceGem; }
+  else { if(S.coins<s.price) return toast("Not enough coins."); S.coins-=s.price; }
+  if(s.kind==="skin"){ const nm=s.name.replace("Skin: ",""); S.inv.push({id:s.id,name:nm,kind:"skin"}); toast(`Purchased skin: ${nm}`); }
+  else{
+    if(s.effect?.xp){ S.xp+=s.effect.xp; addXP(s.effect.xp); }
+    if(s.effect?.coins){ S.coins+=s.effect.coins; addCoins(s.effect.coins); }
+    if(s.effect?.rngCoins){ const [lo,hi]=s.effect.rngCoins; const v=lo+Math.floor(Math.random()*(hi-lo+1)); S.coins+=v; toast(`Loot: +${v}🪙`); }
+    S.inv.push({id:s.id,name:s.name,kind:"item"});
+  }
+  save(); updCurrency(); renderBackpack(); renderEquip();
+}
+
+// ---------- Wheel ----------
+const wheelBtn=$("#spinWheel"), wheelStatus=$("#wheelStatus");
+function updWheel(){ const can=Date.now()-S.wheelLast>=86400000; wheelBtn.disabled=!can; wheelStatus.textContent=can?"You can spin now!":"Come back tomorrow."; }
+wheelBtn?.addEventListener("click",()=>{
+  const R=[{t:"+50🪙",coins:50},{t:"+1💎",gems:1},{t:"+100🪙",coins:100},{t:"+200🪙",coins:200},{t:"+2💎",gems:2},{t:"+500🪙",coins:500},{t:"Skin",skin:"Mint"},{t:"+1000🪙",coins:1000}];
+  const r=R[Math.floor(Math.random()*R.length)];
+  if(r.coins){ S.coins+=r.coins; addCoins(r.coins); }
+  if(r.gems){ S.gems+=r.gems; }
+  if(r.skin){
+    if(!S.inv.some(i=>i.kind==="skin"&&i.name===r.skin)){ S.inv.push({id:"skin_"+r.skin,name:r.skin,kind:"skin"}); toast("Won skin: "+r.skin); }
+    else { S.coins+=200; addCoins(200); toast("Duplicate skin → +200🪙"); }
+  } else toast("Wheel reward: "+r.t);
+  S.wheelLast=Date.now(); save(); updCurrency(); updWheel(); renderBackpack(); renderEquip();
+});
+
+// ---------- Toast ----------
+const toastEl=$("#toast");
+function toast(t,ms=1400){ toastEl.textContent=t; toastEl.classList.remove("hidden"); setTimeout(()=>toastEl.classList.add("hidden"),ms); }
+
+// ---------- Canvas + World ----------
+const canvas=$("#game"), ctx=canvas.getContext("2d"); ctx.imageSmoothingEnabled=false;
+const TW=16, TH=16, W=16, H=12; // tiles across canvas
+
+// Areas (grid of regions)
+const AREAS = [
+  { name:"Town",   rx:0,  ry:0,  boss:{x:12,y:8}, flavor:"Safe hub" },
+  { name:"Market", rx:-1, ry:0,  boss:{x:3,y:6},  flavor:"Shops & coins" },
+  { name:"Forest", rx:1,  ry:0,  boss:{x:8,y:3},  flavor:"Creaky pines" },
+  { name:"Ruins",  rx:0,  ry:-1, boss:{x:10,y:4}, flavor:"Echoing halls" },
+  { name:"Harbor", rx:0,  ry:1,  boss:{x:5,y:9},  flavor:"Salty breeze" },
+];
+const areaBy = (rx,ry)=>AREAS.find(a=>a.rx===rx && a.ry===ry);
+
+// Tiles: 0 grass, 1 path, 2 water, 3 shop roof, 4 monument, 5 boss
+function makeRegionMap(rx,ry){
+  const a=Array.from({length:H},()=>Array(W).fill(0));
+  for(let x=0;x<W;x++) a[6][x]=1;
+  for(let y=0;y<H;y++) a[y][8]=1;
+  const area=areaBy(rx,ry);
+  if(area?.name==="Town"){ a[8][12]=4; [[3,6],[5,6],[10,6]].forEach(([x,y])=>a[y-1][x]=3); }
+  if(area?.name==="Market"){ [[2,6],[4,6],[6,6],[9,6],[12,6]].forEach(([x,y])=>a[y-1][x]=3); }
+  if(area?.name==="Forest"){ for(let y=2;y<=4;y++) for(let x=11;x<=14;x++) a[y][x]=2; }
+  if(area?.name==="Ruins"){ a[3][12]=4; }
+  if(area?.name==="Harbor"){ for(let x=1;x<=14;x++) a[10][x]=2; }
+  if(area?.boss){ const {x,y}=area.boss; a[y][x]=5; }
+  return a;
+}
+let map = makeRegionMap(S.world.rx,S.world.ry);
+
+// Player + coins
+const player={ x:8, y:6, facing:"down", tx:8, ty:6, moving:false, t0:0 };
+const STEP_MS = 140; // step tween duration (ms)
+function regionCoins(rx,ry){
+  const arr=[]; const base=(rx+5)*13 + (ry+5)*17;
+  for(let i=0;i<5;i++){ const x=3+((base+i*7)%10), y=4+((base+i*11)%4); arr.push({x,y,taken:false}); }
+  return arr;
+}
+let coinsGround=regionCoins(S.world.rx,S.world.ry);
+
+// Drawing
+function rect(x,y,w,h,f,st){ if(f){ctx.fillStyle=f; ctx.fillRect(x,y,w,h);} if(st){ctx.strokeStyle=st; ctx.strokeRect(x,y,w,h);} }
+function drawTile(tx,ty,t){
+  const x=tx*TW,y=ty*TH;
+  if(t===0){ rect(x,y,TW,TH,"#1e3b22"); ctx.fillStyle="#254b2a"; for(let i=0;i<8;i++) ctx.fillRect(x+((i*2)%TW), y+((i*3)%TH), 1,1); }
+  if(t===1){ rect(x,y,TW,TH,"#6e5a3a"); ctx.fillStyle="#8a6d47"; for(let i=0;i<5;i++) ctx.fillRect(x+2*i, y+(i%2?8:6), 6,2); }
+  if(t===2){ rect(x,y,TW,TH,"#1c3b7a"); ctx.fillStyle="#2b56b0"; for(let i=0;i<6;i++) ctx.fillRect(x+((i*3)%TW), y+((i*2)%TH), 2,1); }
+  if(t===3){ rect(x,y,TW,TH,"#a32020","#6c1414"); rect(x+5,y+10,6,3,"#ffe3a6","#c8a35f"); }
+  if(t===4){ rect(x,y,TW,TH,"#2b2b3e","#454565"); rect(x+5,y+5,6,6,"#7cc2ff","#375a7e"); }
+  if(t===5){ rect(x,y,TW,TH,"#3b1f3f","#5a2a64"); rect(x+6,y+6,4,4,"#ffd166","#b88400"); }
+}
+function drawPlayer(){
+  const fx = player.x*TW + (player.tx-player.x)*TW*ease();
+  const fy = player.y*TH + (player.ty-player.y)*TH*ease();
+  const pal = ({
+    "Default":["#ffd19c","#2a2a2a","#4a9eff"],
+    "Mint":["#d6fff2","#1e2a28","#67e6c5"],
+    "Violet":["#f0dcff","#2a2238","#a57cff"]
+  })[S.skin] || ["#ffd19c","#2a2a2a","#4a9eff"];
+  rect(fx+6,fy+2,4,4,pal[0],"#000");
+  rect(fx+5,fy+6,6,6,pal[2],"#000");
+  rect(fx+5,fy+12,2,3,pal[1],"#000"); rect(fx+9,fy+12,2,3,pal[1],"#000");
+  if(player.facing==="up") rect(fx+7,fy+1,2,1,"#000");
+  if(player.facing==="down") rect(fx+7,fy+6,2,1,"#000");
+  if(player.facing==="left") rect(fx+5,fy+4,1,2,"#000");
+  if(player.facing==="right") rect(fx+10,fy+4,1,2,"#000");
+}
+function ease(){ // cubic ease-out progress for tween
+  if(!player.moving) return 1;
+  const t = (performance.now()-player.t0)/STEP_MS;
+  const clamped = Math.min(1,Math.max(0,t));
+  return 1 - Math.pow(1-clamped,3);
+}
+function drawCoin(cx,cy){ const x=cx*TW,y=cy*TH; rect(x+6,y+5,4,4,"#f7c845","#d39a00"); rect(x+7,y+6,2,2,"#fff6"); }
+function drawHUDHints(){
+  const tx=player.tx, ty=player.ty;
+  if(ty-1>=0 && map[ty-1][tx]===3){ ctx.fillStyle="#fff"; ctx.font="6px monospace"; ctx.fillText("Press E to Shop", tx*TW+2, ty*TH-2); }
+  if(map[ty][tx]===5){ ctx.fillStyle="#ffd166"; ctx.font="6px monospace"; ctx.fillText("Press E to Fight", tx*TW-6, ty*TH-2); }
+}
+
+// Movement (smooth step tweening) + region transition on attempted off-screen
+const keys=new Set();
+window.addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase();
+  if(["arrowup","w"].includes(k)) keys.add("up");
+  if(["arrowdown","s"].includes(k)) keys.add("down");
+  if(["arrowleft","a"].includes(k)) keys.add("left");
+  if(["arrowright","d"].includes(k)) keys.add("right");
+  if(k==="e") interact();
+  if(k==="m") toggleMapOverlay();
+  if(k==="i") $("#panelBackpack").classList.remove("hidden");
+  if(k==="o") $("#panelEquip").classList.remove("hidden");
+});
+window.addEventListener("keyup",e=>{
+  const k=e.key.toLowerCase();
+  if(["arrowup","w"].includes(k)) keys.delete("up");
+  if(["arrowdown","s"].includes(k)) keys.delete("down");
+  if(["arrowleft","a"].includes(k)) keys.delete("left");
+  if(["arrowright","d"].includes(k)) keys.delete("right");
+});
+
+function tickMovement(){
+  if(player.moving) {
+    if (performance.now()-player.t0 >= STEP_MS) {
+      player.x = player.tx; player.y = player.ty; player.moving = false;
+      afterStep(); // random encounters / coin pickup after we land
+    }
+    return;
+  }
+  // single-direction priority
+  let dir=null;
+  if(keys.has("up")) dir="up";
+  else if(keys.has("down")) dir="down";
+  else if(keys.has("left")) dir="left";
+  else if(keys.has("right")) dir="right";
+  if(!dir) return;
+
+  let dx=0,dy=0;
+  if(dir==="up") dy=-1; else if(dir==="down") dy=1; else if(dir==="left") dx=-1; else if(dir==="right") dx=1;
+  if(dx<0) player.facing="left"; if(dx>0) player.facing="right";
+  if(dy<0) player.facing="up";   if(dy>0) player.facing="down";
+
+  const nx = player.x + dx;
+  const ny = player.y + dy;
+
+  // Attempted off-screen → transition BEFORE move; spawn at opposite border
+  if (nx < 0)         return transitionTo(S.world.rx-1, S.world.ry, "right", player.y);
+  if (nx >= W)        return transitionTo(S.world.rx+1, S.world.ry, "left",  player.y);
+  if (ny < 0)         return transitionTo(S.world.rx,   S.world.ry-1,"bottom",player.x);
+  if (ny >= H)        return transitionTo(S.world.rx,   S.world.ry+1,"top",   player.x);
+
+  // Normal in-bounds step
+  if (canWalk(nx,ny)) {
+    player.tx = nx; player.ty = ny; player.t0 = performance.now(); player.moving = true;
+  }
+}
+function canWalk(x,y){ const t=map[y]?.[x]; return t!==undefined && t!==2 && t!==4; }
+
+function transitionTo(newRx,newRy,fromEdge, preserve){
+  S.world.rx=newRx; S.world.ry=newRy;
+  map=makeRegionMap(S.world.rx,S.world.ry);
+  coinsGround=regionCoins(S.world.rx,S.world.ry);
+  // spawn at opposite border, same row/col
+  if (fromEdge==="right"){ player.x=W-1; player.y=preserve; }
+  if (fromEdge==="left") { player.x=0;   player.y=preserve; }
+  if (fromEdge==="bottom"){player.y=H-1; player.x=preserve; }
+  if (fromEdge==="top")  { player.y=0;   player.x=preserve; }
+  player.tx=player.x; player.ty=player.y; player.moving=false;
+  const area=areaBy(S.world.rx,S.world.ry) || {name:"Wilderness"};
+  if(!S.discovered.includes(area.name)) S.discovered.push(area.name);
+  toast(`${area.name}`);
+  save();
+}
+
+function afterStep(){
+  // pick coins if landed on them
+  for(const c of coinsGround){
+    if(!c.taken && c.x===player.x && c.y===player.y){
+      c.taken=true; S.coins+=10; addCoins(10); toast("+10🪙");
+      if(S.quest.id==="q2" && !S.quest.done){ S.quest.progress+=1; completeIfReady(); }
+    }
+  }
+  // random encounter on GRASS (tile 0)
+  if (map[player.y][player.x]===0 && Math.random() < 0.12) {
+    startBattle({ name: pickEnemyName(), sprite: pickEnemySprite(), hp: 22 });
+  }
+  save(); updCurrency(); updQuest();
+}
+
+// Interact
+function interact(){
+  const tx=player.tx, ty=player.ty;
+  if(ty-1>=0 && map[ty-1][tx]===3){ // shop
+    $("#panelShop").classList.remove("hidden"); populateShop();
+    if(S.quest.id==="q1" && !S.quest.done){ S.quest.progress=1; completeIfReady(); }
+    return;
+  }
+  if(map[ty][tx]===5){ // boss tile
+    startBattle({ name:"Boss", sprite:"👹", hp: 30, boss:true });
+  }
+}
+
+// ---------- Parchment Map (overlay) ----------
+let mapOverlay=false;
+const areaRects=[];
+function toggleMapOverlay(){ mapOverlay=!mapOverlay; }
+canvas.addEventListener("click",(e)=>{
+  if(!mapOverlay) return;
+  const r=canvas.getBoundingClientRect();
+  const x=(e.clientX-r.left), y=(e.clientY-r.top);
+  const hit=areaRects.find(a=>x>=a.x && x<=a.x+a.w && y>=a.y && y<=a.y+a.h);
+  if(!hit) return;
+  if(!S.unlocked.includes(hit.name)){ toast("Locked — defeat its boss to get a key."); return; }
+  transitionTo(hit.rx, hit.ry, "teleport", 6);
+  mapOverlay=false;
+});
+function drawParchmentMap(){
+  ctx.fillStyle="#3a2e21"; ctx.fillRect(16,16, canvas.width-32, canvas.height-32);
+  ctx.strokeStyle="#ceb788"; ctx.strokeRect(16,16, canvas.width-32, canvas.height-32);
+  ctx.fillStyle="#e8d6b0"; ctx.font="12px monospace";
+  ctx.fillText("WORLD MAP — click unlocked area to travel", 28, 36);
+  areaRects.length=0;
+  let y=60;
+  for(const a of AREAS){
+    const unlocked=S.unlocked.includes(a.name);
+    const label=`${unlocked?"🔓":"🔒"} ${a.name}`;
+    const x=40; const w=ctx.measureText(label).width+12; const h=18;
+    ctx.fillStyle= unlocked ? "#f0e4c6" : "#c6b89b";
+    ctx.fillRect(x-6,y-12,w,h);
+    ctx.strokeStyle="#7a674e"; ctx.strokeRect(x-6,y-12,w,h);
+    ctx.fillStyle="#2a2218"; ctx.fillText(label,x,y);
+    areaRects.push({x:x-6,y:y-12,w,h,name:a.name,rx:a.rx,ry:a.ry});
+    y+=24;
+  }
+  ctx.fillStyle="#2a2218"; ctx.fillText(`🔑 Keys: ${S.keys}`, canvas.width-140, 36);
+}
+
+// ---------- Arena (Prodigy-style) ----------
+const arena = {
+  el: $("#panelArena"),
+  title: $("#arenaTitle"),
+  pHP: $("#pHP"), pHPt: $("#pHPt"),
+  pST: $("#pST"), pSTt: $("#pSTt"),
+  eHP: $("#eHP"), eHPt: $("#eHPt"),
+  qTitle: $("#qTitle"), qPrompt: $("#qPrompt"), qChoices: $("#qChoices"),
+  speedFill: $("#speedFill"), qMsg: $("#qMsg"),
+  state: null
+};
+
 const CONSONANTS = [
   { roman: "g/k", char: "ㄱ" }, { roman: "n", char: "ㄴ" }, { roman: "d/t", char: "ㄷ" }, { roman: "r/l", char: "ㄹ" },
-  { roman: "m", char: "ㅁ" }, { roman: "b/p", char: "ㅂ" }, { roman: "s", char: "ㅅ" }, { roman: "", char: "ㅇ" }, // ㅇ initial is silent
+  { roman: "m", char: "ㅁ" }, { roman: "b/p", char: "ㅂ" }, { roman: "s", char: "ㅅ" }, { roman: "", char: "ㅇ" },
   { roman: "j", char: "ㅈ" }, { roman: "ch", char: "ㅊ" }, { roman: "k", char: "ㅋ" }, { roman: "t", char: "ㅌ" },
   { roman: "p", char: "ㅍ" }, { roman: "h", char: "ㅎ" }
 ];
-
-// Light starter vocab. You can expand freely.
 const VOCAB = [
   { ko: "학교", en: "school" }, { ko: "선생님", en: "teacher" }, { ko: "학생", en: "student" },
   { ko: "책", en: "book" }, { ko: "물", en: "water" }, { ko: "사과", en: "apple" },
@@ -25,261 +373,136 @@ const VOCAB = [
   { ko: "내일", en: "tomorrow" }, { ko: "어제", en: "yesterday" }
 ];
 
-// --------------------- Utilities ---------------------
-
-const $ = (id)=>document.getElementById(id);
-const shuffle = (a)=>a.sort(()=>Math.random()-0.5);
-const sample = (arr, n)=>shuffle(arr.slice()).slice(0,n);
-const clamp = (x,min,max)=>Math.max(min,Math.min(max,x));
-
-// --------------------- Map Generation ---------------------
-
-const mapGrid = $("mapGrid");
-const topicSelect = $("topicSelect");
-const diffSelect  = $("difficultySelect");
-
-function buildMap() {
-  mapGrid.innerHTML = "";
-  // 12 nodes with escalating enemy HP
-  for (let i=1;i<=12;i++){
-    const node = document.createElement("button");
-    node.className = "map-node";
-    node.type = "button";
-    node.textContent = `Node ${i}`;
-    node.dataset.hp = 14 + Math.floor(i*1.5);
-    node.dataset.level = i;
-    node.addEventListener("click", ()=>startBattle({
-      name: pickEnemyName(i),
-      hp: Number(node.dataset.hp),
-      sprite: pickEnemySprite(i),
-      level: Number(node.dataset.level),
-      topic: topicSelect.value,
-      difficulty: diffSelect.value
-    }));
-    mapGrid.appendChild(node);
-  }
-}
-
-function pickEnemyName(i){
-  const names = ["Slime","Imp","Mushling","Bat","Goblin","Golem","Wisp","Oni","Wolf","Kappa","Drake","Sentinel"];
-  return names[(i-1)%names.length];
-}
-function pickEnemySprite(i){
-  const sprites = ["👾","🧟","🦇","🧌","🪵","🌀","👹","🐺","🐉","💀"];
-  return sprites[(i-1)%sprites.length];
-}
-
-// --------------------- Battle State ---------------------
-
-const mapCard = $("mapCard");
-const battleCard = $("battleCard");
-
-const enemyNameEl = $("enemyName");
-const enemySpriteEl = $("enemySprite");
-const enemyHPBar = $("enemyHPBar");
-const enemyHPText = $("enemyHPText");
-const playerHPBar = $("playerHPBar");
-const playerHPText = $("playerHPText");
-const qTitle = $("qTitle");
-const qPrompt = $("qPrompt");
-const qChoices = $("qChoices");
-const qFeedback = $("qFeedback");
-const speedFill = $("speedFill");
-const exitBattleBtn = $("exitBattleBtn");
-const turnHint = $("turnHint");
-const encounterTitle = $("encounterTitle");
-
-let state = null;
-// state = { playerHP, playerHPMax, enemyHP, enemyHPMax, topic, difficulty, streak, fastWindow, turnTimerId }
+function pickEnemyName(){ return ["Slime","Imp","Bat","Goblin","Golem","Wisp"][Math.floor(Math.random()*6)]; }
+function pickEnemySprite(){ return ["👾","🧟","🦇","🧌","🪵","🌀"][Math.floor(Math.random()*6)]; }
 
 function startBattle(cfg){
-  mapCard.hidden = true;
-  battleCard.hidden = false;
-
-  state = {
-    playerHPMax: 22, playerHP: 22,
-    enemyHPMax: cfg.hp, enemyHP: cfg.hp,
-    topic: cfg.topic, difficulty: cfg.difficulty,
-    streak: 0, fastWindow: 4000, // 4s for crit
+  arena.el.classList.remove("hidden");
+  arena.title.textContent = `${cfg.name} appears!`;
+  arena.state = {
+    pHP:22, pHPMax:22, pST:10, pSTMax:10,
+    eHP:cfg.hp||22, eHPMax:cfg.hp||22,
+    streak:0, fastWindow:4000, boss: !!cfg.boss
   };
-  enemyNameEl.textContent = cfg.name;
-  enemySpriteEl.textContent = cfg.sprite;
-  encounterTitle.textContent = `Lv.${cfg.level} ${cfg.name}`;
-  updateBars();
+  renderBars();
   nextQuestion();
 }
-
 function endBattle(win){
   if (win){
-    const xp = 15 + Math.floor(state.streak*1.5);
-    const coins = 10 + Math.floor(state.streak/2);
-    addXP(xp);
-    addCoins(coins);
-    incQuest?.("battle-1", 1);
-    qFeedback.textContent = `✅ Victory! +${xp} XP, +${coins} coins`;
+    const xp = 18 + Math.floor(arena.state.streak*1.25);
+    const coins = 12 + Math.floor(arena.state.streak/2);
+    addXP(xp); addCoins(coins);
+    if (arena.state.boss){
+      S.keys += 1;
+      S.unlocked.includes(areaBy(S.world.rx,S.world.ry)?.name) || S.unlocked.push(areaBy(S.world.rx,S.world.ry)?.name);
+      toast(`Boss defeated! +${xp} XP, +${coins}🪙, +1 🔑`);
+    } else {
+      toast(`Victory! +${xp} XP, +${coins}🪙`);
+    }
   } else {
-    qFeedback.textContent = `💥 You were defeated. Try an easier node or topic!`;
+    toast("You were defeated. Try again!");
   }
-  setTimeout(()=>{
-    battleCard.hidden = true;
-    mapCard.hidden = false;
-    buildMap();
-  }, 1200);
+  save(); updCurrency();
+  setTimeout(()=>arena.el.classList.add("hidden"), 800);
 }
 
-exitBattleBtn.addEventListener("click", ()=>{
-  battleCard.hidden = true;
-  mapCard.hidden = false;
-});
-
-// --------------------- Question Engine ---------------------
+function renderBars(){
+  const s=arena.state;
+  arena.pHP.style.width = `${Math.round(100*s.pHP/s.pHPMax)}%`;
+  arena.pHPt.textContent = `${s.pHP}/${s.pHPMax}`;
+  arena.pST.style.width = `${Math.round(100*s.pST/s.pSTMax)}%`;
+  arena.pSTt.textContent = `${s.pST}/${s.pSTMax}`;
+  arena.eHP.style.width = `${Math.round(100*s.eHP/s.eHPMax)}%`;
+  arena.eHPt.textContent = `${s.eHP}/${s.eHPMax}`;
+}
 
 function nextQuestion(){
-  qFeedback.textContent = "";
-  qChoices.innerHTML = "";
-  turnHint.textContent = "Answer to attack!";
-  // start speed timer (crit if quick)
+  arena.qMsg.textContent = "";
+  arena.qChoices.innerHTML = "";
   startSpeedBar();
-  const q = makeQuestion(state.topic, state.difficulty);
-  qTitle.textContent = q.title;
-  qPrompt.textContent = q.prompt;
-
-  const answers = shuffle(q.choices.map((c,i)=>({text:c, correct: c===q.answer})));
-  for (const ans of answers){
-    const b = document.createElement("button");
-    b.className = "btn";
-    b.type = "button";
-    b.textContent = ans.text;
-    b.addEventListener("click", ()=>onAnswer(ans.correct, q));
-    qChoices.appendChild(b);
-  }
+  const q = makeQuestion();
+  arena.qTitle.textContent = q.title;
+  arena.qPrompt.textContent = q.prompt;
+  shuffle(q.choices).forEach(txt=>{
+    const b=document.createElement("button"); b.className="btn"; b.textContent=txt;
+    b.onclick=()=>answer(txt===q.answer, q);
+    arena.qChoices.appendChild(b);
+  });
 }
-
-function onAnswer(correct, q){
-  stopSpeedBar();
-  // disable buttons
-  [...qChoices.children].forEach((b)=>b.disabled = true);
-  // mark chosen (visual)
-  event?.target?.classList?.add(correct ? "correct" : "wrong");
-  if (correct){
-    state.streak++;
-    const base = dmgFor(state.difficulty);
-    const streakBonus = Math.min(state.streak-1, 4); // up to +4
-    const crit = speedPercent > 70 ? 4 : 0;          // fast answer bonus
-    const dmg = base + streakBonus + crit;
-    qFeedback.textContent = `⚔️ Correct! -${dmg} HP ${crit? "(crit!)":""} ${streakBonus? `(+${streakBonus} streak bonus)`: ""}`;
-    state.enemyHP = clamp(state.enemyHP - dmg, 0, state.enemyHPMax);
-    updateBars();
-    if (state.enemyHP <= 0) return endBattle(true);
-    // next question soon
-    setTimeout(nextQuestion, 600);
-  } else {
-    state.streak = 0;
-    const edmg = enemyDmgFor(state.difficulty);
-    qFeedback.textContent = `😵 Wrong. The enemy hits you for ${edmg}. ${explain(q)}`;
-    state.playerHP = clamp(state.playerHP - edmg, 0, state.playerHPMax);
-    updateBars();
-    if (state.playerHP <= 0) return endBattle(false);
-    setTimeout(nextQuestion, 800);
-  }
-}
-
-function dmgFor(diff){
-  if (diff==="easy") return 6;
-  if (diff==="normal") return 7;
-  return 8; // hard
-}
-function enemyDmgFor(diff){
-  if (diff==="easy") return 5;
-  if (diff==="normal") return 6;
-  return 7;
-}
-
-// Explain correct answer without leaking beforehand
-function explain(q){
-  if (q.kind==="roman_to_hangul"){
-    return `Correct mapping: ${q.answer} represents /${q.meta.roman}/.`;
-  }
-  if (q.kind==="ko_to_en"){
-    return `“${q.meta.ko}” means “${q.meta.en}”.`;
-  }
-  return "";
-}
-
-// Question builder that NEVER uses the answer text in the prompt.
-function makeQuestion(topic, diff){
-  // pick one of 2 safe types, or mix
-  const pool = topic==="hangul" ? ["roman_to_hangul"]
-              : topic==="vocab" ? ["ko_to_en"]
-              : ["roman_to_hangul","ko_to_en"];
-  const kind = pool[Math.floor(Math.random()*pool.length)];
+function makeQuestion(){
+  const types = ["roman_to_hangul","ko_to_en"];
+  const kind = types[Math.floor(Math.random()*types.length)];
   if (kind==="roman_to_hangul"){
-    // Ask: which Hangul jamo matches romanized sound X?
-    const choices = sample(CONSONANTS, 4);
-    const pick = choices[Math.floor(Math.random()*choices.length)];
-    // Ensure roman text isn't empty (ㅇ initial is silent). If so, re-pick pool without ㅇ.
-    let target = pick;
-    if (!target.roman) {
-      const withoutSilent = CONSONANTS.filter(c=>c.roman);
-      const c2 = sample(withoutSilent, 4);
-      target = c2[Math.floor(Math.random()*c2.length)];
-      return {
-        kind, title:"Sounds → Hangul", prompt:`Which Hangul letter represents the romanized sound “${target.roman}”?`,
-        choices: c2.map(c=>c.char), answer: target.char, meta: target
-      };
-    }
-    return {
-      kind, title:"Sounds → Hangul",
-      prompt:`Which Hangul letter represents the romanized sound “${target.roman}”?`,
-      choices: choices.map(c=>c.char), answer: target.char, meta: target
-    };
+    let pool = CONSONANTS.filter(c=>c.roman);
+    const choices = sample(pool,4);
+    const ans = choices[Math.floor(Math.random()*choices.length)];
+    return { kind, title:"Sounds → Hangul", prompt:`Which Hangul letter represents “${ans.roman}”?`, choices:choices.map(c=>c.char), answer:ans.char, meta:ans };
   }
-  // ko_to_en: show a Korean word; ask for English meaning (no romanization in prompt)
-  if (kind==="ko_to_en"){
-    const choices = sample(VOCAB, 4);
-    const target = choices[Math.floor(Math.random()*choices.length)];
-    return {
-      kind, title:"Vocabulary → Meaning",
-      prompt:`What does this Hangul word mean in English?  “${target.ko}”`,
-      choices: choices.map(v=>v.en), answer: target.en, meta: target
-    };
+  const choices = sample(VOCAB,4);
+  const ans = choices[Math.floor(Math.random()*choices.length)];
+  return { kind:"ko_to_en", title:"Vocabulary → Meaning", prompt:`What does “${ans.ko}” mean in English?`, choices:choices.map(v=>v.en), answer:ans.en, meta:ans };
+}
+function answer(ok,q){
+  stopSpeedBar();
+  [...arena.qChoices.children].forEach(b=>b.disabled=true);
+  if (ok){
+    if (arena.state.pST<=0){ arena.qMsg.textContent="You’re winded! (no stamina)"; setTimeout(nextQuestion,600); return; }
+    arena.state.pST = Math.max(0, arena.state.pST-2);
+    arena.state.streak++;
+    const base=7, streak=Math.min(arena.state.streak-1,4), crit = speedPct>70?4:0;
+    const dmg = base + streak + crit;
+    arena.qMsg.textContent = `⚔️ Correct! -${dmg} HP ${crit?"(crit!)":""} ${streak?`(+${streak} streak)`: ""}`;
+    arena.state.eHP = Math.max(0, arena.state.eHP - dmg);
+    renderBars();
+    if (arena.state.eHP<=0) return endBattle(true);
+    setTimeout(nextQuestion, 500);
+  } else {
+    arena.state.streak=0;
+    arena.state.pST = Math.min(arena.state.pSTMax, arena.state.pST+1);
+    const edmg = 6;
+    arena.state.pHP = Math.max(0, arena.state.pHP - edmg);
+    arena.qMsg.textContent = q.kind==="roman_to_hangul"
+      ? `😵 Wrong. ${q.answer} maps to /${q.meta.roman}/`
+      : `😵 Wrong. “${q.meta.ko}” means “${q.meta.en}”`;
+    renderBars();
+    if (arena.state.pHP<=0) return endBattle(false);
+    setTimeout(nextQuestion, 650);
   }
 }
+function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
+function sample(arr,n){ return shuffle(arr.slice()).slice(0,n); }
 
-// --------------------- UI: HP bars & speed timer ---------------------
-
-function updateBars(){
-  playerHPBar.style.width = `${Math.round(100*state.playerHP/state.playerHPMax)}%`;
-  enemyHPBar.style.width  = `${Math.round(100*state.enemyHP/state.enemyHPMax)}%`;
-  playerHPText.textContent = `${state.playerHP}/${state.playerHPMax}`;
-  enemyHPText.textContent = `${state.enemyHP}/${state.enemyHPMax}`;
-}
-
-// simple “answer fast” bar: starts full, drains to 0 over state.fastWindow ms
-let speedTimer = null;
-let speedStart = 0;
-let speedPercent = 100;
-
+// speed timer
+let spRAF=null, spStart=0, speedPct=100;
 function startSpeedBar(){
-  speedStart = performance.now();
-  speedPercent = 100;
-  speedFill.style.width = "100%";
-  if (speedTimer) cancelAnimationFrame(speedTimer);
-  const loop = (t)=>{
-    const dt = t - speedStart;
-    speedPercent = clamp(100 - Math.round(100*dt/state.fastWindow), 0, 100);
-    speedFill.style.width = `${speedPercent}%`;
-    speedTimer = speedPercent>0 ? requestAnimationFrame(loop) : null;
+  spStart=performance.now(); speedPct=100; arena.speedFill.style.width="100%";
+  if (spRAF) cancelAnimationFrame(spRAF);
+  const loop=(t)=>{ const dt=t-spStart; speedPct=Math.max(0,100-Math.round(100*dt/arena.state.fastWindow));
+    arena.speedFill.style.width=`${speedPct}%`;
+    spRAF = speedPct>0 ? requestAnimationFrame(loop) : null;
   };
-  speedTimer = requestAnimationFrame(loop);
+  spRAF = requestAnimationFrame(loop);
 }
-function stopSpeedBar(){
-  if (speedTimer) cancelAnimationFrame(speedTimer);
-  speedTimer = null;
+function stopSpeedBar(){ if(spRAF) cancelAnimationFrame(spRAF); spRAF=null; }
+
+// ---------- Render loop ----------
+function render(){
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++) drawTile(x,y,map[y][x]);
+  for(const c of coinsGround){ if(!c.taken) drawCoin(c.x,c.y); }
+  drawPlayer(); drawHUDHints();
+  if(mapOverlay) drawParchmentMap();
 }
+function loop(){ tickMovement(); render(); requestAnimationFrame(loop); }
 
-// --------------------- Boot ---------------------
+// ---------- Boot ----------
+function init(){ updCurrency(); updQuest(); populateShop(); renderBackpack(); renderEquip(); updWheel(); loop(); }
+document.readyState==="loading" ? document.addEventListener("DOMContentLoaded",init) : init();
 
-buildMap();
-topicSelect.addEventListener("change", buildMap);
-diffSelect.addEventListener("change", buildMap);
+// ---------- Map overlay toggle & click areas ----------
+let mapOverlay=false;
+function toggleMapOverlay(){ mapOverlay=!mapOverlay; }
+const areaRects=[]; // reused in drawParchmentMap()
+
+// ---------- Helpers ----------
+function canWalk(x,y){ const t=map[y]?.[x]; return t!==undefined && t!==2 && t!==4; }
