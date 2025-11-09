@@ -1,9 +1,15 @@
-// jamo-select.js — 3–5 column grid with animated traditional stroke previews + ⭐ display
+// jamo-select.js — 3–5 column grid with animated stroke previews + ⭐ display
 import { getJamoStars } from "../main/state.js";
 
-const GRID = document.getElementById('jamoGrid');
+const GRID = document.getElementById("jamoGrid");
+if (!GRID) {
+  console.warn("[jamo-select] #jamoGrid not found on this page.");
+}
 
-/* Traditional stroke order DB (normalized 0..1) */
+// If your tracing page is in the same folder as jamo-select.html, this is fine.
+// If it lives elsewhere, adjust (e.g., '../pages/tracing.html').
+const TRACE_URL = "tracing.html";
+
 const DB = {
   'ㄱ': [[[0.20,0.25, 0.75,0.25]], [[0.75,0.25, 0.75,0.78]]],
   'ㄴ': [[[0.25,0.22, 0.25,0.78]], [[0.25,0.78, 0.78,0.78]]],
@@ -13,15 +19,15 @@ const DB = {
   'ㅅ': [[[0.28,0.28, 0.50,0.60]], [[0.72,0.28, 0.50,0.60]]],
   'ㅇ': [[[0.65,0.50, 0.50,0.35],[0.50,0.35, 0.35,0.50],[0.35,0.50, 0.50,0.65],[0.50,0.65, 0.65,0.50]]],
   'ㅏ': [[[0.45,0.18, 0.45,0.82]], [[0.45,0.50, 0.65,0.50]]],
-  'ㅓ': [[[0.55,0.18, 0.55,0.82]], [[0.55,0.50, 0.35,0.50]]],
-  'ㅗ': [[[0.22,0.55, 0.78,0.55]], [[0.50,0.55, 0.50,0.35]]],
-  'ㅣ': [[[0.55,0.18, 0.55,0.82]]],
   'ㅑ': [[[0.45,0.16, 0.45,0.84]], [[0.45,0.40, 0.65,0.40]], [[0.45,0.60, 0.65,0.60]]],
+  'ㅓ': [[[0.55,0.18, 0.55,0.82]], [[0.55,0.50, 0.35,0.50]]],
   'ㅕ': [[[0.55,0.16, 0.55,0.84]], [[0.55,0.40, 0.35,0.40]], [[0.55,0.60, 0.35,0.60]]],
+  'ㅗ': [[[0.22,0.55, 0.78,0.55]], [[0.50,0.55, 0.50,0.35]]],
   'ㅛ': [[[0.22,0.60, 0.78,0.60]], [[0.40,0.60, 0.40,0.40]], [[0.60,0.60, 0.60,0.40]]],
   'ㅠ': [[[0.22,0.40, 0.78,0.40]], [[0.40,0.40, 0.40,0.60]], [[0.60,0.40, 0.60,0.60]]],
   'ㅜ': [[[0.22,0.45, 0.78,0.45]], [[0.50,0.45, 0.50,0.65]]],
   'ㅡ': [[[0.22,0.55, 0.78,0.55]]],
+  'ㅣ': [[[0.55,0.18, 0.55,0.82]]],
 };
 
 /* Show 12 entries so 5 columns fill nicely; grid clamps to 3–5 cols via CSS */
@@ -34,36 +40,59 @@ const JAMO = [
 
 function starsHTML(n){ return `<span>${'⭐'.repeat(n)}${'☆'.repeat(3-n)}</span>`; }
 
-GRID.innerHTML = JAMO.map(({ch,kind}) => {
-  const earned = getJamoStars(ch);
-  return `
-    <article class="aw-level-card" role="listitem" data-char="${ch}">
-      <header class="flex" style="justify-content:space-between">
-        <h3>${ch}</h3>
-        <span class="badge">${kind}</span>
-      </header>
-      <div class="muted">Progress: ${starsHTML(earned)}</div>
-      <canvas width="120" height="120" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
-      <div class="flex">
-        <a class="btn" href="tracing.html?char=${encodeURIComponent(ch)}">Practice</a>
-        <button class="btn secondary" type="button" data-play>Replay</button>
-      </div>
-    </article>
-  `;
-}).join("");
+if (GRID) {
+  GRID.innerHTML = JAMO.map(({ch,kind}) => {
+    const earned = getJamoStars(ch);
+    return `
+      <article class="aw-level-card" role="button" tabindex="0" data-char="${ch}" aria-label="Practice ${ch}">
+        <header class="flex" style="justify-content:space-between">
+          <h3>${ch}</h3>
+          <span class="badge">${kind}</span>
+        </header>
+        <div class="muted">Progress: ${starsHTML(earned)}</div>
+        <canvas width="120" height="120" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
+        <div class="flex">
+          <a class="btn" href="${TRACE_URL}?char=${encodeURIComponent(ch)}">Practice</a>
+          <button class="btn secondary" type="button" data-play>Replay</button>
+        </div>
+      </article>
+    `;
+  }).join("");
 
-/* Animated previews (always visible) */
-const canvases = [...GRID.querySelectorAll('canvas[data-char]')];
-const previews = canvases.map(cv => makePreview(cv, cv.dataset.char));
+  /* Make the whole card (and canvas) navigate to tracing */
+  GRID.querySelectorAll(".aw-level-card").forEach(card => {
+    const ch = card.dataset.char;
 
-GRID.querySelectorAll('button[data-play]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const card = btn.closest('.aw-level-card');
-    const pv = previews.find(p => p.char === card.dataset.char);
-    pv?.restart();
+    // click anywhere except the Replay button
+    card.addEventListener("click", (e) => {
+      if (e.target.closest?.('[data-play]')) return; // keep Replay behavior
+      location.href = `${TRACE_URL}?char=${encodeURIComponent(ch)}`;
+    });
+
+    // keyboard accessibility
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        location.href = `${TRACE_URL}?char=${encodeURIComponent(ch)}`;
+      }
+    });
   });
-});
 
+  /* Animated previews (kept from your code) */
+  const canvases = [...GRID.querySelectorAll('canvas[data-char]')];
+  const previews = canvases.map(cv => makePreview(cv, cv.dataset.char));
+
+  GRID.querySelectorAll('button[data-play]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation(); // don’t trigger card navigation
+      const card = btn.closest('.aw-level-card');
+      const pv = previews.find(p => p.char === card.dataset.char);
+      pv?.restart();
+    });
+  });
+}
+
+/* ======== Preview animation (unchanged from your behavior) ======== */
 function makePreview(canvas, ch){
   const ctx = canvas.getContext('2d'), W=canvas.width, H=canvas.height, lw=10;
   const tplColor='rgba(255,255,255,.12)', drawColor='#e6e7eb';

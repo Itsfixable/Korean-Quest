@@ -1,10 +1,31 @@
 // js/main/adventure.js
-// Prodigy-style battles: answer -> attack. Miss -> enemy attacks.
-// Integrates with state.js: addXP, addCoins, incQuest, etc.
+// Prodigy-style battles + Locked Level Select with Keys
+// Integrates with state.js: addXP, addCoins, incQuest
 
 import { addXP, addCoins, incQuest } from "./state.js";
 
-// --------------------- Data: letters & vocab ---------------------
+/* ========================= Persisted Progress ========================= */
+const STORE_KEY = "kq_node_adv_progress_v1";
+/* shape:
+{
+  keys: number,
+  unlocked: number,         // highest level unlocked (>=1)
+  cleared: { [level]: true } // levels beaten at least once
+}
+*/
+const P = loadProgress();
+function loadProgress(){
+  try{
+    const d = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (!d) return { keys: 0, unlocked: 1, cleared: {} };
+    return { keys: d.keys|0, unlocked: Math.max(1, d.unlocked|0), cleared: d.cleared || {} };
+  }catch{ return { keys: 0, unlocked: 1, cleared: {} }; }
+}
+function saveProgress(){ localStorage.setItem(STORE_KEY, JSON.stringify(P)); }
+
+/* ============================= Data ============================= */
+
+const BOSS_LEVELS = new Set([4, 8, 12]); // bosses at L4, L8, L12
 
 // Hangul consonants (initial sounds). No answer leaks in prompt.
 const CONSONANTS = [
@@ -14,7 +35,7 @@ const CONSONANTS = [
   { roman: "p", char: "ㅍ" }, { roman: "h", char: "ㅎ" }
 ];
 
-// Light starter vocab. You can expand freely.
+// Starter vocab
 const VOCAB = [
   { ko: "학교", en: "school" }, { ko: "선생님", en: "teacher" }, { ko: "학생", en: "student" },
   { ko: "책", en: "book" }, { ko: "물", en: "water" }, { ko: "사과", en: "apple" },
@@ -25,37 +46,83 @@ const VOCAB = [
   { ko: "내일", en: "tomorrow" }, { ko: "어제", en: "yesterday" }
 ];
 
-// --------------------- Utilities ---------------------
-
+/* ============================= Utilities ============================= */
 const $ = (id)=>document.getElementById(id);
 const shuffle = (a)=>a.sort(()=>Math.random()-0.5);
 const sample = (arr, n)=>shuffle(arr.slice()).slice(0,n);
 const clamp = (x,min,max)=>Math.max(min,Math.min(max,x));
 
-// --------------------- Map Generation ---------------------
+/* ========================== Map Generation =========================== */
 
 const mapGrid = $("mapGrid");
 const topicSelect = $("topicSelect");
 const diffSelect  = $("difficultySelect");
 
+const keyBadgeId = "kqKeyBadge";
+
 function buildMap() {
+  // header key badge (non-intrusive)
+  let badge = document.getElementById(keyBadgeId);
+  if (!badge) {
+    const header = mapGrid?.closest("section")?.querySelector("header");
+    if (header) {
+      badge = document.createElement("span");
+      badge.id = keyBadgeId;
+      badge.className = "badge";
+      badge.style.marginLeft = "8px";
+      header.querySelector("h2")?.appendChild(badge);
+    }
+  }
+  if (badge) badge.textContent = `🔑 Keys: ${P.keys}`;
+
   mapGrid.innerHTML = "";
-  // 12 nodes with escalating enemy HP
-  for (let i=1;i<=12;i++){
+
+  // We’ll render 12 nodes with lock state.
+  for (let level=1; level<=12; level++){
     const node = document.createElement("button");
     node.className = "map-node";
     node.type = "button";
-    node.textContent = `Node ${i}`;
-    node.dataset.hp = 14 + Math.floor(i*1.5);
-    node.dataset.level = i;
-    node.addEventListener("click", ()=>startBattle({
-      name: pickEnemyName(i),
-      hp: Number(node.dataset.hp),
-      sprite: pickEnemySprite(i),
-      level: Number(node.dataset.level),
-      topic: topicSelect.value,
-      difficulty: diffSelect.value
-    }));
+
+    const isBoss = BOSS_LEVELS.has(level);
+    const hp = 14 + Math.floor(level*1.8);
+    const locked = level > P.unlocked;
+
+    // visual label
+    node.innerHTML = `
+      <div style="font-weight:800; margin-bottom:4px;">${isBoss ? `Boss ${level}` : `Level ${level}`}</div>
+      <div class="muted" style="font-size:.9rem">${locked ? "🔒 Locked" : (P.cleared[level] ? "✅ Cleared" : "Ready")}</div>
+      <div class="muted" style="margin-top:4px;">HP: ${hp}</div>
+    `;
+
+    if (locked) {
+      node.classList.add("locked");
+      node.addEventListener("click", ()=> {
+        // try to unlock with a key
+        if (P.keys > 0) {
+          const ok = confirm(`Use 1 key to unlock Level ${level}?`);
+          if (ok) {
+            P.keys -= 1;
+            P.unlocked = Math.max(P.unlocked, level);
+            saveProgress();
+            buildMap();
+          }
+        } else {
+          alert("Locked. Defeat earlier levels or obtain a key from battles.");
+        }
+      });
+    } else {
+      // clicking starts the battle
+      node.addEventListener("click", ()=>startBattle({
+        name: pickEnemyName(level),
+        hp,
+        sprite: pickEnemySprite(level),
+        level,
+        topic: topicSelect?.value || "mixed",
+        difficulty: diffSelect?.value || "easy",
+        boss: isBoss
+      }));
+    }
+
     mapGrid.appendChild(node);
   }
 }
@@ -65,11 +132,11 @@ function pickEnemyName(i){
   return names[(i-1)%names.length];
 }
 function pickEnemySprite(i){
-  const sprites = ["👾","🧟","🦇","🧌","🪵","🌀","👹","🐺","🐉","💀"];
+  const sprites = ["👾","🧟","🦇","🧌","🪵","🌀","👹","🐺","🐉","💀","🔥","🪨"];
   return sprites[(i-1)%sprites.length];
 }
 
-// --------------------- Battle State ---------------------
+/* =========================== Battle State ============================ */
 
 const mapCard = $("mapCard");
 const battleCard = $("battleCard");
@@ -90,7 +157,9 @@ const turnHint = $("turnHint");
 const encounterTitle = $("encounterTitle");
 
 let state = null;
-// state = { playerHP, playerHPMax, enemyHP, enemyHPMax, topic, difficulty, streak, fastWindow, turnTimerId }
+// state = { playerHP, playerHPMax, enemyHP, enemyHPMax, topic, difficulty, streak, fastWindow, level, boss }
+
+/* ============================== Battle ============================== */
 
 function startBattle(cfg){
   mapCard.hidden = true;
@@ -100,26 +169,42 @@ function startBattle(cfg){
     playerHPMax: 22, playerHP: 22,
     enemyHPMax: cfg.hp, enemyHP: cfg.hp,
     topic: cfg.topic, difficulty: cfg.difficulty,
+    level: cfg.level, boss: !!cfg.boss,
     streak: 0, fastWindow: 4000, // 4s for crit
   };
   enemyNameEl.textContent = cfg.name;
   enemySpriteEl.textContent = cfg.sprite;
-  encounterTitle.textContent = `Lv.${cfg.level} ${cfg.name}`;
+  encounterTitle.textContent = `${cfg.boss ? "Boss" : "Lv." + cfg.level} ${cfg.name}`;
   updateBars();
   nextQuestion();
 }
 
 function endBattle(win){
   if (win){
-    const xp = 15 + Math.floor(state.streak*1.5);
-    const coins = 10 + Math.floor(state.streak/2);
-    addXP(xp);
-    addCoins(coins);
-    incQuest?.("battle-1", 1);
-    qFeedback.textContent = `✅ Victory! +${xp} XP, +${coins} coins`;
+    // Rewards scale a bit with streak; bosses give guaranteed key
+    const baseXP = state.boss ? 22 : 15;
+    const xp = baseXP + Math.floor(state.streak*1.2);
+    const coins = (state.boss ? 16 : 10) + Math.floor(state.streak/2);
+    addXP(xp); addCoins(coins); incQuest?.("battle-1", 1);
+
+    let keyMsg = "";
+    if (state.boss) {
+      P.keys += 1;
+      keyMsg = " + 🔑1 (boss)";
+    } else {
+      if (Math.random() < 0.30){ P.keys += 1; keyMsg = " + 🔑1 (drop)"; }
+    }
+
+    // Mark cleared, unlock next level automatically
+    P.cleared[state.level] = true;
+    P.unlocked = Math.max(P.unlocked, state.level + 1);
+    saveProgress();
+
+    qFeedback.textContent = `✅ Victory! +${xp} XP, +${coins} coins${keyMsg}`;
   } else {
-    qFeedback.textContent = `💥 You were defeated. Try an easier node or topic!`;
+    qFeedback.textContent = `💥 You were defeated. Try an easier node or use keys to unlock.`;
   }
+
   setTimeout(()=>{
     battleCard.hidden = true;
     mapCard.hidden = false;
@@ -132,19 +217,19 @@ exitBattleBtn.addEventListener("click", ()=>{
   mapCard.hidden = false;
 });
 
-// --------------------- Question Engine ---------------------
+/* ========================== Question Engine ========================= */
 
 function nextQuestion(){
   qFeedback.textContent = "";
   qChoices.innerHTML = "";
   turnHint.textContent = "Answer to attack!";
-  // start speed timer (crit if quick)
   startSpeedBar();
+
   const q = makeQuestion(state.topic, state.difficulty);
   qTitle.textContent = q.title;
   qPrompt.textContent = q.prompt;
 
-  const answers = shuffle(q.choices.map((c,i)=>({text:c, correct: c===q.answer})));
+  const answers = shuffle(q.choices.map((c)=>({text:c, correct: c===q.answer})));
   for (const ans of answers){
     const b = document.createElement("button");
     b.className = "btn";
@@ -161,22 +246,22 @@ function onAnswer(correct, q){
   [...qChoices.children].forEach((b)=>b.disabled = true);
   // mark chosen (visual)
   event?.target?.classList?.add(correct ? "correct" : "wrong");
+
   if (correct){
     state.streak++;
     const base = dmgFor(state.difficulty);
     const streakBonus = Math.min(state.streak-1, 4); // up to +4
     const crit = speedPercent > 70 ? 4 : 0;          // fast answer bonus
     const dmg = base + streakBonus + crit;
-    qFeedback.textContent = `⚔️ Correct! -${dmg} HP ${crit? "(crit!)":""} ${streakBonus? `(+${streakBonus} streak bonus)`: ""}`;
+    qFeedback.textContent = `⚔️ Correct! -${dmg} HP ${crit? "(crit!)":""} ${streakBonus? `(+${streakBonus} streak)`: ""}`;
     state.enemyHP = clamp(state.enemyHP - dmg, 0, state.enemyHPMax);
     updateBars();
     if (state.enemyHP <= 0) return endBattle(true);
-    // next question soon
     setTimeout(nextQuestion, 600);
   } else {
     state.streak = 0;
     const edmg = enemyDmgFor(state.difficulty);
-    qFeedback.textContent = `😵 Wrong. The enemy hits you for ${edmg}. ${explain(q)}`;
+    qFeedback.textContent = `😵 Wrong. Enemy hits for ${edmg}. ${explain(q)}`;
     state.playerHP = clamp(state.playerHP - edmg, 0, state.playerHPMax);
     updateBars();
     if (state.playerHP <= 0) return endBattle(false);
@@ -184,69 +269,36 @@ function onAnswer(correct, q){
   }
 }
 
-function dmgFor(diff){
-  if (diff==="easy") return 6;
-  if (diff==="normal") return 7;
-  return 8; // hard
-}
-function enemyDmgFor(diff){
-  if (diff==="easy") return 5;
-  if (diff==="normal") return 6;
-  return 7;
-}
+function dmgFor(diff){ if (diff==="easy") return 6; if (diff==="normal") return 7; return 8; }
+function enemyDmgFor(diff){ if (diff==="easy") return 5; if (diff==="normal") return 6; return 7; }
 
-// Explain correct answer without leaking beforehand
 function explain(q){
-  if (q.kind==="roman_to_hangul"){
-    return `Correct mapping: ${q.answer} represents /${q.meta.roman}/.`;
-  }
-  if (q.kind==="ko_to_en"){
-    return `“${q.meta.ko}” means “${q.meta.en}”.`;
-  }
+  if (q.kind==="roman_to_hangul"){ return `Correct mapping: ${q.answer} represents /${q.meta.roman}/.`; }
+  if (q.kind==="ko_to_en"){ return `“${q.meta.ko}” means “${q.meta.en}”.`; }
   return "";
 }
 
-// Question builder that NEVER uses the answer text in the prompt.
-function makeQuestion(topic, diff){
-  // pick one of 2 safe types, or mix
+function makeQuestion(topic){
   const pool = topic==="hangul" ? ["roman_to_hangul"]
-              : topic==="vocab" ? ["ko_to_en"]
-              : ["roman_to_hangul","ko_to_en"];
+            : topic==="vocab" ? ["ko_to_en"]
+            : ["roman_to_hangul","ko_to_en"];
   const kind = pool[Math.floor(Math.random()*pool.length)];
   if (kind==="roman_to_hangul"){
-    // Ask: which Hangul jamo matches romanized sound X?
     const choices = sample(CONSONANTS, 4);
-    const pick = choices[Math.floor(Math.random()*choices.length)];
-    // Ensure roman text isn't empty (ㅇ initial is silent). If so, re-pick pool without ㅇ.
-    let target = pick;
-    if (!target.roman) {
-      const withoutSilent = CONSONANTS.filter(c=>c.roman);
-      const c2 = sample(withoutSilent, 4);
+    let target = choices[Math.floor(Math.random()*choices.length)];
+    if (!target.roman) { // avoid silent ㅇ in prompt
+      const c2 = sample(CONSONANTS.filter(c=>c.roman), 4);
       target = c2[Math.floor(Math.random()*c2.length)];
-      return {
-        kind, title:"Sounds → Hangul", prompt:`Which Hangul letter represents the romanized sound “${target.roman}”?`,
-        choices: c2.map(c=>c.char), answer: target.char, meta: target
-      };
+      return { kind, title:"Sounds → Hangul", prompt:`Which Hangul letter represents “${target.roman}”?`, choices:c2.map(c=>c.char), answer:target.char, meta:target };
     }
-    return {
-      kind, title:"Sounds → Hangul",
-      prompt:`Which Hangul letter represents the romanized sound “${target.roman}”?`,
-      choices: choices.map(c=>c.char), answer: target.char, meta: target
-    };
+    return { kind, title:"Sounds → Hangul", prompt:`Which Hangul letter represents “${target.roman}”?`, choices:choices.map(c=>c.char), answer:target.char, meta:target };
   }
-  // ko_to_en: show a Korean word; ask for English meaning (no romanization in prompt)
-  if (kind==="ko_to_en"){
-    const choices = sample(VOCAB, 4);
-    const target = choices[Math.floor(Math.random()*choices.length)];
-    return {
-      kind, title:"Vocabulary → Meaning",
-      prompt:`What does this Hangul word mean in English?  “${target.ko}”`,
-      choices: choices.map(v=>v.en), answer: target.en, meta: target
-    };
-  }
+  const choices = sample(VOCAB, 4);
+  const target = choices[Math.floor(Math.random()*choices.length)];
+  return { kind:"ko_to_en", title:"Vocabulary → Meaning", prompt:`What does this Hangul word mean in English? “${target.ko}”`, choices:choices.map(v=>v.en), answer:target.en, meta:target };
 }
 
-// --------------------- UI: HP bars & speed timer ---------------------
+/* ====================== UI: HP bars & speed timer ===================== */
 
 function updateBars(){
   playerHPBar.style.width = `${Math.round(100*state.playerHP/state.playerHPMax)}%`;
@@ -255,7 +307,6 @@ function updateBars(){
   enemyHPText.textContent = `${state.enemyHP}/${state.enemyHPMax}`;
 }
 
-// simple “answer fast” bar: starts full, drains to 0 over state.fastWindow ms
 let speedTimer = null;
 let speedStart = 0;
 let speedPercent = 100;
@@ -278,8 +329,8 @@ function stopSpeedBar(){
   speedTimer = null;
 }
 
-// --------------------- Boot ---------------------
+/* ============================== Boot ============================== */
 
 buildMap();
-topicSelect.addEventListener("change", buildMap);
-diffSelect.addEventListener("change", buildMap);
+topicSelect?.addEventListener("change", buildMap);
+diffSelect?.addEventListener("change", buildMap);

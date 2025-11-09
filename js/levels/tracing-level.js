@@ -1,15 +1,46 @@
-// tracing-level.js — tracer with robust grading + ⭐ (no OffscreenCanvas)
+// tracing-level.js — tracer with robust grading + ⭐ (safe & scale-aware)
 import { addXP, addCoins, addBadge, setJamoStars, getJamoStars } from "../main/state.js";
 
-const canvas = document.getElementById("traceCanvas");
+const canvas   = document.getElementById("traceCanvas");
 const scoreOut = document.getElementById("traceScore");
-const legend = document.getElementById("strokeLegend");
+const legend   = document.getElementById("strokeLegend");
 const charSpan = document.getElementById("traceChar");
+const btnClear = document.getElementById("btnClear");
+const btnGrade = document.getElementById("btnGrade");
 
-const ctx = canvas.getContext("2d");
-const SIZE = 320, LW = 16;
+// Hard guards so nothing explodes silently
+if (!canvas) {
+  console.error("[trace] Missing #traceCanvas"); 
+}
+const ctx  = canvas?.getContext("2d");
+if (!ctx) {
+  console.error("[trace] 2D context unavailable");
+}
 
-/* Traditional stroke order DB (synced with jamo-select) */
+const CSS_SIZE = 320;            // logical design size
+const DPR = window.devicePixelRatio || 1;
+
+// Normalize canvas backing store to CSS_SIZE with DPR for crisp ink
+function setupCanvas() {
+  if (!canvas) return;
+  // read actual CSS size
+  const rect = canvas.getBoundingClientRect();
+  const cssW = Math.round(rect.width)  || CSS_SIZE;
+  const cssH = Math.round(rect.height) || CSS_SIZE;
+
+  canvas.width  = Math.round(cssW * DPR);
+  canvas.height = Math.round(cssH * DPR);
+
+  // paint using scale so our math stays in [0..CSS_SIZE] space
+  ctx.setTransform(canvas.width / CSS_SIZE, 0, 0, canvas.height / CSS_SIZE, 0, 0);
+}
+setupCanvas();
+window.addEventListener("resize", () => { setupCanvas(); render(); });
+
+const SIZE = CSS_SIZE;           // we draw in this logical size
+const LW   = 16;                 // logical stroke width
+
+/* Traditional stroke order DB (synced with jamo-select) — segments: [x1,y1,x2,y2] in 0..1 */
 const DB = {
   'ㄱ': [[[0.20,0.25, 0.75,0.25]], [[0.75,0.25, 0.75,0.78]]],
   'ㄴ': [[[0.25,0.22, 0.25,0.78]], [[0.25,0.78, 0.78,0.78]]],
@@ -32,38 +63,61 @@ const DB = {
 
 let target = decodeURIComponent(new URLSearchParams(location.search).get("char") || "ㄱ");
 if (!DB[target]) target = "ㄱ";
-charSpan.textContent = target;
-legend.innerHTML = DB[target].map((_,i)=>`<li>Stroke ${i+1}</li>`).join("");
+if (charSpan) charSpan.textContent = target;
+if (legend)   legend.innerHTML = DB[target].map((_,i)=>`<li>Stroke ${i+1}</li>`).join("");
 
 /* Template draw */
 function N(v){ return Math.round(v*SIZE); }
 function drawTemplate(){
+  if (!ctx) return;
   ctx.clearRect(0,0,SIZE,SIZE);
   ctx.strokeStyle = 'rgba(79,140,255,.25)';
   ctx.lineWidth = LW; ctx.lineCap='round'; ctx.lineJoin='round';
-  DB[target].forEach(segs => {
+  const tpl = DB[target] || [];
+  tpl.forEach(segs => {
     segs.forEach(s => { const [x1,y1,x2,y2]=s.map(N); ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); });
   });
 }
 
-/* Ink layer (no OffscreenCanvas) */
+/* Ink layer (own canvas) */
 const ink = document.createElement("canvas"); ink.width=SIZE; ink.height=SIZE;
-const ictx = ink.getContext("2d"); ictx.lineWidth=LW; ictx.lineCap='round'; ictx.lineJoin='round'; ictx.strokeStyle='#e6e7eb';
+const ictx = ink.getContext("2d");
+if (ictx){
+  ictx.lineWidth=LW; ictx.lineCap='round'; ictx.lineJoin='round'; ictx.strokeStyle='#e6e7eb';
+}
 let drawing=false,last=null,strokes=[];
 
-function pos(e){ const r=canvas.getBoundingClientRect(); const c=e.touches?e.touches[0]:e; return {x:c.clientX-r.left, y:c.clientY-r.top}; }
-canvas.addEventListener("mousedown", e=>{ drawing=true; last=pos(e); strokes.push({points:[last]}); });
-canvas.addEventListener("mousemove", e=>{ if(!drawing) return; const p=pos(e); ictx.beginPath(); ictx.moveTo(last.x,last.y); ictx.lineTo(p.x,p.y); ictx.stroke(); last=p; strokes[strokes.length-1].points.push(p); render(); });
-window.addEventListener("mouseup", ()=>drawing=false);
-canvas.addEventListener("touchstart", e=>{ e.preventDefault(); drawing=true; last=pos(e); strokes.push({points:[last]}); }, {passive:false});
-canvas.addEventListener("touchmove", e=>{ e.preventDefault(); if(!drawing)return; const p=pos(e); ictx.beginPath(); ictx.moveTo(last.x,last.y); ictx.lineTo(p.x,p.y); ictx.stroke(); last=p; strokes[strokes.length-1].points.push(p); render(); }, {passive:false});
-canvas.addEventListener("touchend", ()=>drawing=false, {passive:false});
+/* Pointer → canvas coordinate (scale-aware) */
+function toCanvasXY(e){
+  const r=canvas.getBoundingClientRect();
+  const c=e.touches? e.touches[0] : e;
+  const x = (c.clientX - r.left) * (SIZE / r.width);
+  const y = (c.clientY - r.top)  * (SIZE / r.height);
+  return { x, y };
+}
 
-function render(){ drawTemplate(); ctx.drawImage(ink,0,0); }
+// Events
+if (canvas){
+  canvas.addEventListener("mousedown", e=>{ drawing=true; last=toCanvasXY(e); strokes.push({points:[last]}); });
+  canvas.addEventListener("mousemove", e=>{
+    if(!drawing) return; const p=toCanvasXY(e);
+    ictx.beginPath(); ictx.moveTo(last.x,last.y); ictx.lineTo(p.x,p.y); ictx.stroke(); last=p; 
+    strokes[strokes.length-1].points.push(p); render();
+  });
+  window.addEventListener("mouseup", ()=>drawing=false);
+
+  canvas.addEventListener("touchstart", e=>{ e.preventDefault(); drawing=true; last=toCanvasXY(e); strokes.push({points:[last]}); }, {passive:false});
+  canvas.addEventListener("touchmove",  e=>{ e.preventDefault(); if(!drawing)return; const p=toCanvasXY(e);
+    ictx.beginPath(); ictx.moveTo(last.x,last.y); ictx.lineTo(p.x,p.y); ictx.stroke(); last=p; 
+    strokes[strokes.length-1].points.push(p); render();
+  }, {passive:false});
+  canvas.addEventListener("touchend", ()=>{ drawing=false; }, {passive:false});
+}
+
+function render(){ if(!ctx) return; drawTemplate(); ctx.drawImage(ink,0,0,SIZE,SIZE); }
 render();
 
 /* ---------- Scoring ---------- */
-/* IoU on raster */
 function maskFromStrokeSegs(segs){
   const c=document.createElement('canvas'); c.width=SIZE; c.height=SIZE; const cx=c.getContext('2d');
   cx.lineWidth=LW; cx.lineCap='round'; cx.lineJoin='round'; cx.strokeStyle='#000';
@@ -83,7 +137,7 @@ function iouScore(a,b){
   const iou=ov/(ca+cb-ov+1e-6), cov=ov/(ca+1e-6); return 0.7*iou+0.3*cov;
 }
 
-/* Chamfer on resampled polylines */
+// resampling & chamfer distance
 function resample(points, n=64){
   if (!points || points.length<2){ return Array.from({length:n}, ()=>points?.[0]||{x:0,y:0}); }
   let L=[0]; for(let i=1;i<points.length;i++){ L[i]=L[i-1]+Math.hypot(points[i].x-points[i-1].x, points[i].y-points[i-1].y); }
@@ -113,24 +167,24 @@ function chamfer(a,b){
 function shapeScore(segs, points){
   const tpl = resampleSegs(segs, 64);
   const usr = resample(points, 64);
-  const dist = chamfer(tpl, usr); // px
+  const dist = chamfer(tpl, usr); // px at SIZE basis
   const THRESH = 18;
   return Math.exp(-dist/THRESH); // 1.0 at perfect, ~0.37 at 18px avg
 }
 
 /* Buttons */
-document.getElementById("btnClear").onclick = ()=>{
-  strokes=[]; ictx.clearRect(0,0,SIZE,SIZE); scoreOut.textContent=""; render();
-};
+btnClear?.addEventListener("click", ()=>{
+  strokes=[]; ictx.clearRect(0,0,SIZE,SIZE); if(scoreOut) scoreOut.textContent=""; render();
+});
 
-document.getElementById("btnGrade").onclick = ()=>{
+btnGrade?.addEventListener("click", ()=>{
   const tpl = DB[target];
-  if (!tpl){ scoreOut.textContent = "Unknown character template."; return; }
-  if (strokes.length === 0){ scoreOut.textContent = "Draw the strokes first 🙂"; return; }
+  if (!tpl){ if(scoreOut) scoreOut.textContent = "Unknown character template."; return; }
+  if (strokes.length === 0){ if(scoreOut) scoreOut.textContent = "Draw the strokes first 🙂"; return; }
 
   const n = Math.min(tpl.length, strokes.length);
 
-  // per-stroke hybrid
+  // per-stroke hybrid score
   let per = 0;
   for(let i=0;i<n;i++){
     const mTpl = maskFromStrokeSegs(tpl[i]);
@@ -153,6 +207,6 @@ document.getElementById("btnGrade").onclick = ()=>{
   const prev = getJamoStars(target);
   if (stars > prev) setJamoStars(target, stars);
 
-  scoreOut.innerHTML = `Score: <strong>${score}</strong>/100 &nbsp; ${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}`;
+  if (scoreOut) scoreOut.innerHTML = `Score: <strong>${score}</strong>/100 &nbsp; ${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}`;
   if (score>=80){ addXP(10); addCoins(5); addBadge('✍️ Tracing Starter'); }
-};
+});
