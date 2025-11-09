@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Korean Quest — Video Call</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Shared global styles -->
+  <link rel="stylesheet" href="../css/master.css" />
+  <link rel="stylesheet" href="../css/components/theme-toggle.css" />
+
+  <!-- Page-specific -->
+  <link rel="stylesheet" href="../css/pages/video.css" />
+
+  <!-- Scripts -->
+  <script type="module" src="../js/main/theme.js"></script>
+  <script type="module" src="../js/main/video.js"></script>
+</head>
+
+<body>
+  <header class="container">
+    <nav class="nav" aria-label="Primary">
+      <div class="logo">🇰🇷 Korean Quest</div>
+      <a class="pill" href="index.html">Home</a>
+      <a class="pill" href="schedule.html">Schedule</a>
+      <a class="pill" href="resources.html">Resources</a>
+      <a class="pill" href="adventure.html">Adventure</a>
+      <a class="pill" href="dashboard.html">Dashboard</a>
+      <a class="pill" href="leaderboard.html">Leaderboard</a>
+      <a class="pill" href="about.html">About</a>
+      <label class="kq-switch" aria-label="Toggle theme">
+        <input id="themeToggle" type="checkbox" />
+        <span class="kq-track"></span>
+        <span class="kq-thumb" aria-hidden="true"></span>
+        <span class="kq-switch-label">Theme</span>
+      </label>
+    </nav>
+  </header>
+
+  <main class="container grid">
+    <section class="card">
+      <h1>🎥 Video Room</h1>
+      <p class="muted">Room: <code id="roomName">—</code></p>
+      <div class="meet-wrap"><div id="meet"></div></div>
+    </section>
+  </main>
+</body>
+</html>

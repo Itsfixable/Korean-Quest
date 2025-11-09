@@ -43,7 +43,24 @@ header { position: sticky; top: 0; z-index: 9999; background: linear-gradient(18
   box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,0.25));
 }
 .muted { color: var(--muted); }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--surface-3); color: #cfe1ff; font-size: 0.85rem; }
+
+/* BADGES — improved contrast in light mode, solid brand inside headings */
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: var(--surface-3);
+  color: color-mix(in srgb, var(--brand-2) 70%, #ffffff 30%);
+  font-size: 0.85rem;
+}
+/* Headings: always brand pill with white text */
+h1 .badge, h2 .badge, h3 .badge {
+  background: var(--brand);
+  color: #fff;
+}
+/* Light theme: brighten background and switch text to white for contrast */
+:root[data-theme="light"] .badge {
+  background: color-mix(in srgb, var(--brand) 18%, #ffffff);
+  color: #fff;
+}
 
 /* Buttons */
 .btn {
@@ -92,3 +109,15 @@ header { position: sticky; top: 0; z-index: 9999; background: linear-gradient(18
 #userBadge { white-space: nowrap; }
 #loginBtn, #logoutBtn { cursor: pointer; }
 
+/* Normalize Sign in/Sign out buttons so they match nav links */
+button.pill {
+  appearance: none; -webkit-appearance: none;
+  border: none; background: transparent;
+  font: inherit; color: inherit;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 8px 12px; cursor: pointer; white-space: nowrap;
+}
+.nav .pill:hover { background: color-mix(in srgb, var(--text) 10%, transparent); text-decoration: none; }
+
+/* Guarantee hidden elements are actually hidden */
+[hidden] { display: none !important; }
