@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+
     <link rel="stylesheet" href="../css/pages/tracing.css" />
     <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
 
@@ -35,20 +37,20 @@
           <span class="kq-thumb" aria-hidden="true"></span>
           <span class="kq-switch-label">Theme</span>
         </label>
-
+<!-- 
         <span class="spacer"></span>
         <span id="userBadge" class="muted"></span>
         <button id="loginBtn"  class="pill" type="button">Sign in</button>
-        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
+        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button> -->
       </nav>
     </header>
 
     <main class="container grid">
       <section class="card">
         <h1>✍️ Tracing Practice</h1>
-        <p class="muted">
+        <!-- <p class="muted">
           Follow correct stroke order. Score ≥80 to earn a badge.
-        </p>
+        </p> -->
 
         <div class="trace-wrap">
           <canvas
@@ -63,11 +65,11 @@
               Character: <strong id="traceChar">ㄱ</strong>
             </div>
             <button class="btn" id="btnClear" type="button">Clear</button>
-            <button class="btn" id="btnGrade" type="button">Grade</button>
-            <details class="trace-legend">
+            <!-- <button class="btn" id="btnGrade" type="button">Grade</button> -->
+            <!-- <details class="trace-legend">
               <summary>Stroke Order</summary>
               <ol id="strokeLegend"></ol>
-            </details>
+            </details> -->
             <div id="traceScore" class="muted"></div>
           </div>
         </div>

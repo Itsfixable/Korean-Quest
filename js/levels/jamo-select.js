@@ -1,15 +1,13 @@
-// jamo-select.js — 3–5 column grid with animated stroke previews + ⭐ display
+// ../js/levels/jamo-select.js — theme-aware previews + ⭐ display
 import { getJamoStars } from "../main/state.js";
 
 const GRID = document.getElementById("jamoGrid");
-if (!GRID) {
-  console.warn("[jamo-select] #jamoGrid not found on this page.");
-}
+if (!GRID) console.warn("[jamo-select] #jamoGrid not found.");
 
-// If your tracing page is in the same folder as jamo-select.html, this is fine.
-// If it lives elsewhere, adjust (e.g., '../pages/tracing.html').
+/* Where the tracing page lives */
 const TRACE_URL = "tracing.html";
 
+/* Stroke DB: [x1,y1,x2,y2] coords in 0..1 */
 const DB = {
   'ㄱ': [[[0.20,0.25, 0.75,0.25]], [[0.75,0.25, 0.75,0.78]]],
   'ㄴ': [[[0.25,0.22, 0.25,0.78]], [[0.25,0.78, 0.78,0.78]]],
@@ -30,7 +28,7 @@ const DB = {
   'ㅣ': [[[0.55,0.18, 0.55,0.82]]],
 };
 
-/* Show 12 entries so 5 columns fill nicely; grid clamps to 3–5 cols via CSS */
+/* Show 12 entries to fill 5-wide nicely */
 const JAMO = [
   { ch:'ㄱ', kind:'Consonant' }, { ch:'ㄴ', kind:'Consonant' }, { ch:'ㄷ', kind:'Consonant' },
   { ch:'ㅁ', kind:'Consonant' }, { ch:'ㅂ', kind:'Consonant' }, { ch:'ㅅ', kind:'Consonant' },
@@ -47,29 +45,25 @@ if (GRID) {
       <article class="aw-level-card" role="button" tabindex="0" data-char="${ch}" aria-label="Practice ${ch}">
         <header class="flex" style="justify-content:space-between">
           <h3>${ch}</h3>
-          <span class="badge">${kind}</span>
+          <span class="btn id-badge">${kind}</span>
         </header>
         <div class="muted">Progress: ${starsHTML(earned)}</div>
-        <canvas width="120" height="120" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
+        <canvas width="128" height="128" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
         <div class="flex">
           <a class="btn" href="${TRACE_URL}?char=${encodeURIComponent(ch)}">Practice</a>
-          <button class="btn secondary" type="button" data-play>Replay</button>
+          
         </div>
       </article>
     `;
   }).join("");
 
-  /* Make the whole card (and canvas) navigate to tracing */
+  /* Whole card navigates to tracing (except Replay button) */
   GRID.querySelectorAll(".aw-level-card").forEach(card => {
     const ch = card.dataset.char;
-
-    // click anywhere except the Replay button
     card.addEventListener("click", (e) => {
-      if (e.target.closest?.('[data-play]')) return; // keep Replay behavior
+      if (e.target.closest?.('[data-play]')) return;
       location.href = `${TRACE_URL}?char=${encodeURIComponent(ch)}`;
     });
-
-    // keyboard accessibility
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -78,30 +72,39 @@ if (GRID) {
     });
   });
 
-  /* Animated previews (kept from your code) */
+  /* Theme-aware animated previews */
   const canvases = [...GRID.querySelectorAll('canvas[data-char]')];
   const previews = canvases.map(cv => makePreview(cv, cv.dataset.char));
 
   GRID.querySelectorAll('button[data-play]').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
-      e.stopPropagation(); // don’t trigger card navigation
+      e.stopPropagation();
       const card = btn.closest('.aw-level-card');
       const pv = previews.find(p => p.char === card.dataset.char);
       pv?.restart();
     });
   });
+
+  /* Keep previews synced if theme toggles */
+  const mo = new MutationObserver(() => previews.forEach(p => p.restart(true)));
+  mo.observe(document.documentElement, { attributes:true, attributeFilter:["data-theme"] });
 }
 
-/* ======== Preview animation (unchanged from your behavior) ======== */
+/* ======== Preview animation (theme-aware colors) ======== */
+function isLight(){ return document.documentElement.getAttribute("data-theme") === "light"; }
+function tplColor(){ return getCSS('--preview-template') || (isLight() ? '#a0acc2' : '#6e7da3'); }
+function drawColor(){ return getCSS('--preview-draw')     || (isLight() ? '#101318' : '#ffffff'); }
+function getCSS(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
 function makePreview(canvas, ch){
-  const ctx = canvas.getContext('2d'), W=canvas.width, H=canvas.height, lw=10;
-  const tplColor='rgba(255,255,255,.12)', drawColor='#e6e7eb';
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, lw=10;
   const strokes = DB[ch] || [];
 
   function drawTemplate(){
     ctx.clearRect(0,0,W,H);
     ctx.lineWidth = lw; ctx.lineCap='round'; ctx.lineJoin='round';
-    ctx.strokeStyle = tplColor;
+    ctx.strokeStyle = tplColor();
     for (const segs of strokes){ for (const s of segs) segLine(s, 1); }
   }
   function segLine(seg, t){
@@ -112,7 +115,7 @@ function makePreview(canvas, ch){
   }
 
   let raf=0, t0=0;
-  const STROKE_TIME=550, GAP=220, N=strokes.length;
+  const STROKE_TIME=520, GAP=220, N=strokes.length;
 
   function frame(ts){
     if(!t0) t0 = ts;
@@ -128,7 +131,7 @@ function makePreview(canvas, ch){
     }
 
     drawTemplate();
-    ctx.strokeStyle = drawColor;
+    ctx.strokeStyle = drawColor();
     ctx.lineWidth = lw; ctx.lineCap='round'; ctx.lineJoin='round';
 
     for (let s=0; s<idx; s++) for (const seg of strokes[s]) segLine(seg,1);
@@ -137,7 +140,7 @@ function makePreview(canvas, ch){
     raf = requestAnimationFrame(frame);
   }
   function start(){ cancelAnimationFrame(raf); t0=0; drawTemplate(); raf=requestAnimationFrame(frame); }
-  function restart(){ start(); }
+  function restart(force){ if(force){ cancelAnimationFrame(raf); } start(); }
   start();
   return { char: ch, restart, destroy(){ cancelAnimationFrame(raf); } };
 }

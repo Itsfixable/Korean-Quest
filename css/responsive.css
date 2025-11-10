@@ -1,0 +1,199 @@
+/* =========================
+   Global Responsive Pack
+   Works across all pages
+   ========================= */
+
+/* Fluid type: scales slightly across devices */
+html {
+  /* ~15–18px depending on viewport */
+  font-size: clamp(15px, 1.2vw + 0.25rem, 18px);
+}
+
+/* Safer body line-length and padding on small screens */
+.container {
+  padding: clamp(12px, 2.4vw, 20px);
+  max-width: min(var(--container, 1100px), 96vw);
+}
+
+/* Touch targets & pill/buttons are finger-friendly */
+.pill,
+.btn {
+  min-height: 40px;
+}
+
+/* ===== Navigation: wrap cleanly on tablets/phones ===== */
+@media (max-width: 960px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .logo { width: 100%; }
+  .spacer { display: none; }
+}
+
+/* ===== Cards: reduce padding a bit on small screens ===== */
+@media (max-width: 600px) {
+  .card { padding: 12px; }
+}
+
+/* ===== Grids & utilities ===== */
+
+/* Make any grid that's using explicit columns degrade nicely */
+.grid { gap: clamp(10px, 1.8vw, 16px); }
+
+/* Generic auto-fit helper (if used) */
+.grid.auto-fit-220 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+}
+
+/* KPI widget: stack on phones */
+@media (max-width: 900px) {
+  .kpi { grid-template-columns: 1fr; }
+}
+
+/* ===== Tables (Leaderboard): horizontal scroll on phones) ===== */
+table,
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+@media (max-width: 640px) {
+  .lb-table,
+  table[role="grid"],
+  table[aria-label] {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border-mid);
+    border-radius: 10px;
+  }
+  .lb-table thead { background: var(--surface-2); }
+}
+
+/* ===== Video players (homepage/resources): 16:9 responsive ===== */
+.video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-mid);
+}
+.video-wrap iframe,
+.video-wrap video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+
+/* ===== Tracing canvas: scale down gracefully ===== */
+.trace-canvas {
+  width: min(92vw, 360px); /* responsive width, capped for big screens */
+  height: auto;            /* keep square via aspect-ratio */
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin-inline: auto;
+}
+
+/* ===== Jamo Select (Alphabet World) ===== */
+.aw-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+  gap: clamp(10px, 2vw, 14px);
+}
+@media (max-width: 1200px) {
+  .aw-grid { grid-template-columns: repeat(3, minmax(160px, 1fr)); }
+}
+@media (max-width: 820px) {
+  .aw-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+}
+@media (max-width: 520px) {
+  .aw-grid { grid-template-columns: 1fr; }
+}
+.aw-level-card canvas {
+  width: clamp(96px, 28vw, 140px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+
+/* Make the kind label (btn-styled) compact on phones */
+.id-badge {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  box-shadow: none;
+}
+
+/* ===== Adventure Map ===== */
+.map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+  gap: clamp(8px, 2vw, 12px);
+}
+@media (max-width: 520px) {
+  .battle { grid-template-columns: 1fr !important; } /* stack player/enemy */
+}
+
+/* ===== Resources: lesson list & quiz blocks ===== */
+.lesson-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: clamp(10px, 2vw, 14px);
+}
+.quiz .q { border-radius: 12px; }
+
+/* ===== Schedule (Appointments) ===== */
+.appt-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.1fr .9fr;
+}
+@media (max-width: 900px) {
+  .appt-layout { grid-template-columns: 1fr; }
+}
+.cal-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(7, minmax(36px,1fr));
+}
+.cal-grid button.day {
+  min-height: 40px;
+  border-radius: 10px;
+}
+.slots-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(120px,1fr));
+}
+@media (max-width: 700px) {
+  .slots-grid { grid-template-columns: repeat(2, minmax(120px,1fr)); }
+}
+@media (max-width: 480px) {
+  .slots-grid { grid-template-columns: 1fr; }
+}
+.slots-grid .slot {
+  min-height: 42px;               /* touch-friendly */
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* ===== Shop grid ===== */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: clamp(10px, 2vw, 12px);
+}
+
+/* ===== Dashboard lists ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 8px;
+}
+#questList, #rsvpList, #recentLessons {
+  padding-left: clamp(14px, 2vw, 18px);
+}
+
+/* ===== Footer breathing room on phones ===== */
+@media (max-width: 520px) {
+  .footer { margin: 16px auto; }
+}

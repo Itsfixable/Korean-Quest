@@ -121,3 +121,30 @@ button.pill {
 
 /* Guarantee hidden elements are actually hidden */
 [hidden] { display: none !important; }
+
+/* ===== Mobile nav comfort without changing HTML ===== */
+@media (max-width: 640px) {
+  .nav {
+    gap: 6px;
+    padding: 8px 10px;
+    flex-wrap: wrap;                 /* let items wrap cleanly */
+  }
+
+  /* shrink pills a bit */
+  .nav .pill { padding: 6px 10px; min-height: 36px; }
+
+  /* hide the "Theme" label to save room; keep the switch */
+  .kq-switch .kq-switch-label { display: none; }
+
+  /* put the auth buttons on their own row at the end */
+  #loginBtn, #logoutBtn, #userBadge {
+    order: 3;                        /* shove to last row */
+  }
+
+  /* let the link row scroll horizontally if it still overflows */
+  .nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+}
