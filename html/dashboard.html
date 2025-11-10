@@ -1,107 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Korean Quest — Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Korean Quest — Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="stylesheet" href="../css/master.css" />
-    <link rel="stylesheet" href="../css/contrast-overrides.css" />
+  <link rel="stylesheet" href="../css/master.css" />
+  <link rel="stylesheet" href="../css/pages/dashboard.css" />
+  <link rel="stylesheet" href="../css/components/theme-toggle.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/contrast-overrides.css" />
 
-    <link rel="stylesheet" href="../css/responsive.css" />
+  <!-- (comment out auth if disabled) -->
+  <!-- <script type="module" src="../js/main/auth.js"></script> -->
+  <script type="module" src="../js/main/state.js"></script>
+  <script type="module" src="../js/main/dashboard.js"></script>
+  <script type="module" src="../js/main/theme.js"></script>
+  <script type="module" src="../js/main/router.js?v=3"></script>
+</head>
+<body>
+  <header class="container">
+    <nav class="nav" aria-label="Primary">
+      <div class="logo">🇰🇷 Korean Quest</div>
+      <a class="pill" href="index.html">Home</a>
+      <a class="pill" href="schedule.html">Schedule</a>
+      <a class="pill" href="resources.html">Resources</a>
+      <a class="pill" href="adventure.html">Adventure</a>
+      <a class="pill" href="dashboard.html">Dashboard</a>
+      <a class="pill" href="leaderboard.html">Leaderboard</a>
+      <a class="pill" href="about.html">About</a>
+      <label class="kq-switch" aria-label="Toggle theme">
+        <input id="themeToggle" type="checkbox" />
+        <span class="kq-track"></span>
+        <span class="kq-thumb" aria-hidden="true"></span>
+        <span class="kq-switch-label">Theme</span>
+      </label>
 
-    <link rel="stylesheet" href="../css/pages/dashboard.css" />
-    <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
+      <span class="spacer"></span>
+      <!-- auth intentionally hidden/removed -->
+      <span id="userBadge" class="muted" hidden></span>
+      <button id="loginBtn"  class="pill" type="button" hidden>Sign in</button>
+      <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
+    </nav>
+  </header>
 
-    <script type="module" src="../js/main/auth.js"></script>
-    <script defer src="../js/main/state.js"></script>
-    <script defer src="../js/main/dashboard.js"></script>
-    <script type="module" src="../js/main/theme.js"></script>
-
-    
-  </head>
-  <body>
-    <header class="container">
-      <nav class="nav" aria-label="Primary">
-        <div class="logo">🇰🇷 Korean Quest</div>
-        <a class="pill" href="index.html">Home</a>
-        <a class="pill" href="schedule.html">Schedule</a>
-        <a class="pill" href="resources.html">Resources</a>
-        <a class="pill" href="adventure.html">Adventure</a>
-        <a class="pill" href="dashboard.html" aria-current="page">Dashboard</a>
-        <!-- <a class="pill" href="shop.html">Shop</a> -->
-        <a class="pill" href="leaderboard.html">Leaderboard</a>
-        <a class="pill" href="about.html">About</a>
-        <!-- <a class="pill" href="test.html">test</a> -->
-        <label class="kq-switch" aria-label="Toggle theme">
-          <input id="themeToggle" type="checkbox" />
-          <span class="kq-track"></span>
-          <span class="kq-thumb" aria-hidden="true"></span>
-          <span class="kq-switch-label">Theme</span>
-        </label>
-<!-- 
-        <span class="spacer"></span>
-        <span id="userBadge" class="muted"></span>
-        <button id="loginBtn"  class="pill" type="button">Sign in</button>
-        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button> -->
-      </nav>
-    </header>
-
-    <main class="container grid">
-      <section class="card">
-        <h1>🎯 Student Dashboard</h1>
-        <ul class="stats">
-          <li>Level: <strong id="dLevel">1</strong></li>
-          <li>XP: <strong id="dXP">0</strong> / <span id="dNext">100</span></li>
-          <li>Streak: <strong id="dStreak">0</strong> days</li>
-          <li>Coins: <strong id="dCoins">0</strong></li>
-          <li>Badges: <span id="dBadges">—</span></li>
-        </ul>
-        <div class="progress" aria-label="Overall progress">
-          <i id="dBar" style="width: 0%"></i>
-        </div>
-      </section>
-
-      <!-- <section class="card">
-        <h2>🔥 Daily Quests</h2>
-        <ul id="questList">
-           JS renders: Earn 30 XP today, Complete 1 lesson, Win 1 battle
-        </ul>
-      </section> -->
-
-      <section class="card">
-        <h2>📝 Your RSVPs</h2>
-        <ul id="rsvpList">
-          <!-- JS populates from schedule -->
-        </ul>
-      </section>
-
-      <section class="card">
-        <h2>Recent Work</h2>
-        <ul id="recentLessons"></ul>
-      </section>
-    </main>
-
-   
-    <div id="authModal" class="modal" hidden>
-      <div class="modal-card">
-        <h3>Sign in</h3>
-        <form id="authForm">
-          <label>Email</label>
-          <input id="authEmail" type="email" required />
-          <label>Password</label>
-          <input id="authPass" type="password" required minlength="6" />
-          <div class="row">
-            <button id="emailSignIn" class="btn primary" type="submit">Sign in</button>
-            <button id="emailSignUp" class="btn secondary" type="button">Create account</button>
-          </div>
-        </form>
-        <div class="row">
-          <button id="googleBtn" class="btn" type="button">Continue with Google</button>
-          <button id="authClose" class="btn" type="button">Close</button>
-        </div>
-        <p id="authMsg" class="muted" aria-live="polite"></p>
+  <main class="container grid">
+    <section class="card">
+      <h1>🎯 Student Dashboard</h1>
+      <ul class="stats">
+        <li>Level: <strong id="dLevel">1</strong></li>
+        <li>XP: <strong id="dXP">0</strong> / <span id="dNext">100</span></li>
+        <li>Streak: <strong id="dStreak">0</strong> days</li>
+        <li>Coins: <strong id="dCoins">0</strong></li>
+        <li>Badges: <span id="dBadges">—</span></li>
+      </ul>
+      <div class="progress" aria-label="XP to next level">
+        <i id="dBar" style="width: 0%"></i>
       </div>
-    </div>
-  </body>
+    </section>
+
+    <section class="card">
+      <h2>🔥 Daily Quests</h2>
+      <ul id="questList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>📝 Recent Work</h2>
+      <ul id="recentWork"></ul>
+    </section>
+  </main>
+</body>
 </html>

@@ -1,48 +1,38 @@
-import {
-  getPlayer,
-  getQuests,
-  getRSVPs,
-  getProgress,
-  needXP,
-} from "./state.js";
+// js/main/dashboard.js — uses recentWork feed and live XP bar
+import { getPlayer, getQuests, getProgress, needXP } from "./state.js";
+
+function setText(id, val){ const el = document.getElementById(id); if (el) el.textContent = val; }
 
 const p = getPlayer();
 const quests = getQuests();
-const rsvps = getRSVPs();
 const prog = getProgress();
 
-document.getElementById("dLevel").textContent = p.level;
-document.getElementById("dXP").textContent = p.xp;
-document.getElementById("dNext").textContent = needXP(p.level);
-document.getElementById("dStreak").textContent = p.streak;
-document.getElementById("dCoins").textContent = p.coins;
-document.getElementById("dBadges").textContent = p.badges.join(" ") || "—";
+/* Header stats */
+setText("dLevel",  p.level);
+setText("dXP",     p.xp);
+setText("dNext",   needXP(p.level));
+setText("dStreak", p.streak);
+setText("dCoins",  p.coins);
+document.getElementById("dBadges").textContent = (p.badges || []).join(" ") || "—";
 
-const percent = Math.min(
-  100,
-  Math.round((((prog.lessonsDone || 0) + (prog.quizzesDone || 0)) / 2) * 100)
-);
-document.getElementById("dBar").style.width = percent + "%";
+/* XP bar fill (live) */
+const pct = Math.min(100, Math.round(100 * (p.xp / needXP(p.level))));
+document.getElementById("dBar").style.width = pct + "%";
 
+/* Daily quests list */
 const qList = document.getElementById("questList");
-qList.innerHTML = quests.daily
-  .map(
-    (q) => `
-  <li>${q.done ? "✅" : "⬜️"} ${q.desc} — ${Math.min(q.progress, q.target)}/${
-      q.target
-    }</li>
-`
-  )
-  .join("");
+qList.innerHTML = (quests.daily || []).map(q => `
+  <li>${q.done ? "✅" : "⬜️"} ${q.desc} — ${Math.min(q.progress, q.target)}/${q.target}</li>
+`).join("") || '<li class="muted">No quests.</li>';
 
-const rList = document.getElementById("rsvpList");
-const going = Object.entries(rsvps).filter(([, v]) => v.going);
-rList.innerHTML = going.length
-  ? going.map(([id]) => `<li>${id} — going</li>`).join("")
-  : '<li class="muted">No RSVPs yet.</li>';
-
-const recent = document.getElementById("recentLessons");
-recent.innerHTML =
-  (prog.recentLessons || [])
-    .map((l) => `<li>${new Date(l.ts).toLocaleString()} — ${l.title}</li>`)
-    .join("") || '<li class="muted">No lessons yet.</li>';
+/* Recent Work feed */
+const workList = document.getElementById("recentWork");
+workList.innerHTML =
+  (prog.recentWork || [])
+    .map(w => `
+      <li>
+        <span class="badge">${w.type}</span>
+        ${new Date(w.ts).toLocaleString()} — ${w.title}
+      </li>
+    `)
+    .join("") || '<li class="muted">No work recorded yet.</li>';

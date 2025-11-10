@@ -1,16 +1,16 @@
 // js/main/adventure.js
 // Prodigy-style battles + Locked Level Select with Keys
-// Integrates with state.js: addXP, addCoins, incQuest
+// Integrates with state.js: addXP, addCoins, incQuest, addRecentWork
 
-import { addXP, addCoins, incQuest } from "./state.js";
+import { addXP, addCoins, incQuest, addRecentWork } from "./state.js";
 
 /* ========================= Persisted Progress ========================= */
 const STORE_KEY = "kq_node_adv_progress_v1";
 /* shape:
 {
   keys: number,
-  unlocked: number,         // highest level unlocked (>=1)
-  cleared: { [level]: true } // levels beaten at least once
+  unlocked: number,
+  cleared: { [level]: true }
 }
 */
 const P = loadProgress();
@@ -24,18 +24,15 @@ function loadProgress(){
 function saveProgress(){ localStorage.setItem(STORE_KEY, JSON.stringify(P)); }
 
 /* ============================= Data ============================= */
+const BOSS_LEVELS = new Set([4, 8, 12]);
 
-const BOSS_LEVELS = new Set([4, 8, 12]); // bosses at L4, L8, L12
-
-// Hangul consonants (initial sounds). No answer leaks in prompt.
 const CONSONANTS = [
   { roman: "g/k", char: "ㄱ" }, { roman: "n", char: "ㄴ" }, { roman: "d/t", char: "ㄷ" }, { roman: "r/l", char: "ㄹ" },
-  { roman: "m", char: "ㅁ" }, { roman: "b/p", char: "ㅂ" }, { roman: "s", char: "ㅅ" }, { roman: "", char: "ㅇ" }, // ㅇ initial is silent
+  { roman: "m", char: "ㅁ" }, { roman: "b/p", char: "ㅂ" }, { roman: "s", char: "ㅅ" }, { roman: "", char: "ㅇ" },
   { roman: "j", char: "ㅈ" }, { roman: "ch", char: "ㅊ" }, { roman: "k", char: "ㅋ" }, { roman: "t", char: "ㅌ" },
   { roman: "p", char: "ㅍ" }, { roman: "h", char: "ㅎ" }
 ];
 
-// Starter vocab
 const VOCAB = [
   { ko: "학교", en: "school" }, { ko: "선생님", en: "teacher" }, { ko: "학생", en: "student" },
   { ko: "책", en: "book" }, { ko: "물", en: "water" }, { ko: "사과", en: "apple" },
@@ -53,7 +50,6 @@ const sample = (arr, n)=>shuffle(arr.slice()).slice(0,n);
 const clamp = (x,min,max)=>Math.max(min,Math.min(max,x));
 
 /* ========================== Map Generation =========================== */
-
 const mapGrid = $("mapGrid");
 const topicSelect = $("topicSelect");
 const diffSelect  = $("difficultySelect");
@@ -61,27 +57,25 @@ const diffSelect  = $("difficultySelect");
 const keyBadgeId = "kqKeyBadge";
 
 function buildMap() {
-  // header key badge (non-intrusive)
+  // header key "badge" — we style it as a compact button pill
   let badge = document.getElementById(keyBadgeId);
   if (!badge) {
     const header = mapGrid?.closest("section")?.querySelector("header");
     if (header) {
       badge = document.createElement("span");
       badge.id = keyBadgeId;
-      badge.className = "badge";
+      badge.className = "btn id-badge";   // ← use button styling, not badge
       badge.style.marginLeft = "8px";
       header.querySelector("h2")?.appendChild(badge);
     }
   }
   if (badge) {
-  badge.className = "btn id-badge";      // use button styling
-  badge.textContent = `🔑 Keys: ${P.keys}`;
-  }   
-
+    badge.className = "btn id-badge";
+    badge.textContent = `🔑 Keys: ${P.keys}`;
+  }
 
   mapGrid.innerHTML = "";
 
-  // We’ll render 12 nodes with lock state.
   for (let level=1; level<=12; level++){
     const node = document.createElement("button");
     node.className = "map-node";
@@ -91,7 +85,6 @@ function buildMap() {
     const hp = 14 + Math.floor(level*1.8);
     const locked = level > P.unlocked;
 
-    // visual label
     node.innerHTML = `
       <div style="font-weight:800; margin-bottom:4px;">${isBoss ? `Boss ${level}` : `Level ${level}`}</div>
       <div class="muted" style="font-size:.9rem">${locked ? "🔒 Locked" : (P.cleared[level] ? "✅ Cleared" : "Ready")}</div>
@@ -101,7 +94,6 @@ function buildMap() {
     if (locked) {
       node.classList.add("locked");
       node.addEventListener("click", ()=> {
-        // try to unlock with a key
         if (P.keys > 0) {
           const ok = confirm(`Use 1 key to unlock Level ${level}?`);
           if (ok) {
@@ -115,7 +107,6 @@ function buildMap() {
         }
       });
     } else {
-      // clicking starts the battle
       node.addEventListener("click", ()=>startBattle({
         name: pickEnemyName(level),
         hp,
@@ -141,7 +132,6 @@ function pickEnemySprite(i){
 }
 
 /* =========================== Battle State ============================ */
-
 const mapCard = $("mapCard");
 const battleCard = $("battleCard");
 
@@ -161,10 +151,8 @@ const turnHint = $("turnHint");
 const encounterTitle = $("encounterTitle");
 
 let state = null;
-// state = { playerHP, playerHPMax, enemyHP, enemyHPMax, topic, difficulty, streak, fastWindow, level, boss }
 
 /* ============================== Battle ============================== */
-
 function startBattle(cfg){
   mapCard.hidden = true;
   battleCard.hidden = false;
@@ -174,7 +162,7 @@ function startBattle(cfg){
     enemyHPMax: cfg.hp, enemyHP: cfg.hp,
     topic: cfg.topic, difficulty: cfg.difficulty,
     level: cfg.level, boss: !!cfg.boss,
-    streak: 0, fastWindow: 4000, // 4s for crit
+    streak: 0, fastWindow: 4000,
   };
   enemyNameEl.textContent = cfg.name;
   enemySpriteEl.textContent = cfg.sprite;
@@ -185,11 +173,15 @@ function startBattle(cfg){
 
 function endBattle(win){
   if (win){
-    // Rewards scale a bit with streak; bosses give guaranteed key
     const baseXP = state.boss ? 22 : 15;
     const xp = baseXP + Math.floor(state.streak*1.2);
     const coins = (state.boss ? 16 : 10) + Math.floor(state.streak/2);
-    addXP(xp); addCoins(coins); incQuest?.("battle-1", 1);
+    addXP(xp);
+    addCoins(coins);
+    incQuest?.("battle-1", 1);
+
+    // Log to Recent Work
+    addRecentWork(`Cleared ${state.boss ? "Boss" : "Level"} ${state.level}`, "Adventure");
 
     let keyMsg = "";
     if (state.boss) {
@@ -199,7 +191,6 @@ function endBattle(win){
       if (Math.random() < 0.30){ P.keys += 1; keyMsg = " + 🔑1 (drop)"; }
     }
 
-    // Mark cleared, unlock next level automatically
     P.cleared[state.level] = true;
     P.unlocked = Math.max(P.unlocked, state.level + 1);
     saveProgress();
@@ -222,7 +213,6 @@ exitBattleBtn.addEventListener("click", ()=>{
 });
 
 /* ========================== Question Engine ========================= */
-
 function nextQuestion(){
   qFeedback.textContent = "";
   qChoices.innerHTML = "";
@@ -246,16 +236,14 @@ function nextQuestion(){
 
 function onAnswer(correct, q){
   stopSpeedBar();
-  // disable buttons
   [...qChoices.children].forEach((b)=>b.disabled = true);
-  // mark chosen (visual)
   event?.target?.classList?.add(correct ? "correct" : "wrong");
 
   if (correct){
     state.streak++;
     const base = dmgFor(state.difficulty);
-    const streakBonus = Math.min(state.streak-1, 4); // up to +4
-    const crit = speedPercent > 70 ? 4 : 0;          // fast answer bonus
+    const streakBonus = Math.min(state.streak-1, 4);
+    const crit = speedPercent > 70 ? 4 : 0;
     const dmg = base + streakBonus + crit;
     qFeedback.textContent = `⚔️ Correct! -${dmg} HP ${crit? "(crit!)":""} ${streakBonus? `(+${streakBonus} streak)`: ""}`;
     state.enemyHP = clamp(state.enemyHP - dmg, 0, state.enemyHPMax);
@@ -275,7 +263,6 @@ function onAnswer(correct, q){
 
 function dmgFor(diff){ if (diff==="easy") return 6; if (diff==="normal") return 7; return 8; }
 function enemyDmgFor(diff){ if (diff==="easy") return 5; if (diff==="normal") return 6; return 7; }
-
 function explain(q){
   if (q.kind==="roman_to_hangul"){ return `Correct mapping: ${q.answer} represents /${q.meta.roman}/.`; }
   if (q.kind==="ko_to_en"){ return `“${q.meta.ko}” means “${q.meta.en}”.`; }
@@ -290,7 +277,7 @@ function makeQuestion(topic){
   if (kind==="roman_to_hangul"){
     const choices = sample(CONSONANTS, 4);
     let target = choices[Math.floor(Math.random()*choices.length)];
-    if (!target.roman) { // avoid silent ㅇ in prompt
+    if (!target.roman) {
       const c2 = sample(CONSONANTS.filter(c=>c.roman), 4);
       target = c2[Math.floor(Math.random()*c2.length)];
       return { kind, title:"Sounds → Hangul", prompt:`Which Hangul letter represents “${target.roman}”?`, choices:c2.map(c=>c.char), answer:target.char, meta:target };
@@ -303,7 +290,6 @@ function makeQuestion(topic){
 }
 
 /* ====================== UI: HP bars & speed timer ===================== */
-
 function updateBars(){
   playerHPBar.style.width = `${Math.round(100*state.playerHP/state.playerHPMax)}%`;
   enemyHPBar.style.width  = `${Math.round(100*state.enemyHP/state.enemyHPMax)}%`;
@@ -334,7 +320,6 @@ function stopSpeedBar(){
 }
 
 /* ============================== Boot ============================== */
-
 buildMap();
 topicSelect?.addEventListener("change", buildMap);
 diffSelect?.addEventListener("change", buildMap);
