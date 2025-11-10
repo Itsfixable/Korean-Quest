@@ -104,3 +104,14 @@
 }
 #qChoices .btn.correct { outline: 2px solid var(--accent); }
 #qChoices .btn.wrong   { outline: 2px solid var(--danger); }
+/* Make the Keys counter match other buttons but stay compact */
+.id-badge {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+.id-badge:hover {
+  filter: none;
+}

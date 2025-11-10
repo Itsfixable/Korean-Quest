@@ -73,7 +73,11 @@ function buildMap() {
       header.querySelector("h2")?.appendChild(badge);
     }
   }
-  if (badge) badge.textContent = `🔑 Keys: ${P.keys}`;
+  if (badge) {
+  badge.className = "btn id-badge";      // use button styling
+  badge.textContent = `🔑 Keys: ${P.keys}`;
+  }   
+
 
   mapGrid.innerHTML = "";
 

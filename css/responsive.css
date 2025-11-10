@@ -197,3 +197,15 @@ table,
 @media (max-width: 520px) {
   .footer { margin: 16px auto; }
 }
+/* Ensure white text on brand-colored buttons meets AA in dark theme */
+:root:not([data-theme="light"]) {
+  --btn-on-brand: color-mix(in srgb, var(--brand) 70%, #000); /* ~30% darker */
+}
+:root[data-theme="light"] {
+  --btn-on-brand: var(--brand);
+}
+.btn,
+.pill[aria-current="page"] {
+  background: var(--btn-on-brand);  /* was var(--brand) */
+  color: #fff;
+}
