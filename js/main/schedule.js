@@ -182,6 +182,7 @@ if (EL.clearDay){
   });
 }
 
+
 /* ---------- Month controls ---------- */
 if (EL.prevMonth) EL.prevMonth.addEventListener("click", ()=>{
   viewMonth--; if (viewMonth<0){ viewMonth=11; viewYear--; }
