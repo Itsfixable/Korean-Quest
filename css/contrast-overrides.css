@@ -1,0 +1,99 @@
+/* =========================================
+   Korean Quest — WCAG AA Contrast Overrides
+   Load this AFTER page CSS + responsive.css
+   ========================================= */
+
+/* Base text vs backgrounds */
+:root {
+  /* Dark theme (default tokens are already good).
+     Just ensure muted text is readable on dark panels. */
+  --text: #e9ecf2;            /* bright text */
+  --muted: #b5bdca;           /* lighter than before for readability */
+}
+
+/* Light theme: ensure all text, pills, and icons clear AA (≥4.5:1 normal) */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --text: #0f1218;            /* very dark body text */
+  --muted: #424b5a;           /* darker muted (still AA on white) */
+
+  /* Brand family — darken so WHITE text passes AA */
+  /* #4f8cff (old) was borderline for white; this set is deeper blues */
+  --brand:   #2d5bff;         /* primary buttons / active pill */
+  --brand-2: #5179ff;         /* gradients / progress */
+  --ring:    rgba(45, 91, 255, .35);
+
+  /* Surfaces (card backgrounds) need clear separation from page bg */
+  --surface-1: #f1f5fb;       /* subtle tint, still passes against text */
+  --surface-2: #e8eef9;
+  --surface-3: #dfe8f8;
+
+  /* Borders strong enough to define edges on bright screens */
+  --border-weak:   rgba(0,0,0,.08);
+  --border-mid:    rgba(0,0,0,.14);
+  --border-strong: rgba(0,0,0,.22);
+  --border-solid:  #cbd6e8;
+
+  /* Template/preview line colors (for jamo preview/tracing) */
+  --preview-template: #6b7ea0; /* visible on light */
+  --preview-draw:     #0f1218; /* dark ink on light */
+}
+
+/* Buttons: ensure AA on both themes */
+.btn,
+.pill[aria-current="page"] {
+  color: #fff;                          /* white text */
+  background: var(--brand);
+}
+
+/* Secondary buttons: text must be --text on contrasting surface */
+.btn.secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-mid);
+}
+
+/* “Consonant / Vowel” kind badge: match Practice button for contrast */
+.aw-level-card .badge,
+.id-badge {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+/* Nav pills hover state should not drop contrast */
+.nav .pill:hover {
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Table header rows (leaderboard) — foreground on header bg AA */
+.lb-table thead th {
+  color: var(--text);
+}
+
+/* Tracing: canvas border should be visible in both themes */
+.trace-canvas {
+  border: 1px solid var(--border-solid);
+}
+
+/* Progress bars: use the deeper brand gradient */
+.progress > i {
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+
+/* Video placeholder frame (if any) */
+.video-wrap {
+  border: 1px solid var(--border-mid);
+  border-radius: 12px;
+}
+
+/* Small captions / subtle text must remain AA atop surfaces */
+.muted {
+  color: var(--muted);
+}
