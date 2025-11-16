@@ -2,20 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Korean Quest — Leaderboard</title>
+    <title>Korean Quest — Tracing</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="stylesheet" href="../css/master.css" />
-    <link rel="stylesheet" href="../css/contrast-overrides.css" />
-    <link rel="stylesheet" href="../css/responsive.css" />
+    <link rel="stylesheet" href="css/master.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
 
-    <link rel="stylesheet" href="../css/pages/leaderboard.css" />
-    <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
+    <link rel="stylesheet" href="css/pages/tracing.css" />
+    <link rel="stylesheet" href="css/components/theme-toggle.css" /> 
 
-    <script type="module" src="../js/main/auth.js"></script>
-    <script defer src="../js/main/state.js"></script>
-    <script defer src="../js/main/leaderboard.js"></script>
-    <script type="module" src="../js/main/theme.js"></script>
+    <script type="module" src="js/main/auth.js"></script>
+    <script defer src="js/main/state.js"></script>
+    <script type="module" defer src="js/levels/tracing-level.js"></script>
+    <script type="module" src="js/main/theme.js"></script>
+
 
   </head>
   <body>
@@ -24,11 +24,11 @@
         <div class="logo">🇰🇷 Korean Quest</div>
         <a class="pill" href="index.html" >Home</a>
         <a class="pill" href="schedule.html">Schedule</a>
-        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="resources.html" aria-current="page">Resources</a>
         <a class="pill" href="adventure.html">Adventure</a>
         <a class="pill" href="dashboard.html">Dashboard</a>
         <!-- <a class="pill" href="shop.html">Shop</a> -->
-        <a class="pill" href="leaderboard.html" aria-current="page">Leaderboard</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
         <a class="pill" href="about.html">About</a>
         <!-- <a class="pill" href="test.html">test</a> -->
         <label class="kq-switch" aria-label="Toggle theme">
@@ -47,25 +47,36 @@
 
     <main class="container grid">
       <section class="card">
-        <h1>🏆 Leaderboard</h1>
-        <p class="muted">
-          Weekly XP standings motivate consistency and friendly competition.
-        </p>
-        <table class="lb-table" id="lbTable" aria-label="Leaderboard">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Student</th>
-              <th>XP</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- JS injects rows -->
-          </tbody>
-        </table>
+        <h1>✍️ Tracing Practice</h1>
+        <!-- <p class="muted">
+          Follow correct stroke order. Score ≥80 to earn a badge.
+        </p> -->
+
+        <div class="trace-wrap">
+          <canvas
+            id="traceCanvas"
+            width="320"
+            height="320"
+            class="trace-canvas"
+            aria-label="Tracing canvas"
+          ></canvas>
+          <div class="trace-controls">
+            <div class="muted">
+              Character: <strong id="traceChar">ㄱ</strong>
+            </div>
+            <button class="btn" id="btnClear" type="button">Clear</button>
+            <!-- <button class="btn" id="btnGrade" type="button">Grade</button> -->
+            <!-- <details class="trace-legend">
+              <summary>Stroke Order</summary>
+              <ol id="strokeLegend"></ol>
+            </details> -->
+            <div id="traceScore" class="muted"></div>
+          </div>
+        </div>
       </section>
     </main>
 
+   
     <div id="authModal" class="modal" hidden>
       <div class="modal-card">
         <h3>Sign in</h3>

@@ -2,21 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Korean Quest — Shop</title>
+    <title>Korean Quest — Syllable Builder</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="stylesheet" href="../css/master.css" />
-    <link rel="stylesheet" href="../css/contrast-overrides.css" />
-    <link rel="stylesheet" href="../css/responsive.css" />
+    <link rel="stylesheet" href="css/master.css" />
+    <link rel="stylesheet" href="css/contrast-overrides.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
 
-    <link rel="stylesheet" href="../css/pages/shop.css" />
-    <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
+    <link rel="stylesheet" href="css/pages/jamo.css" />
+    <link rel="stylesheet" href="css/components/theme-toggle.css" /> 
 
-    <script type="module" src="../js/main/auth.js"></script>
-    <script defer src="../js/main/state.js"></script>
-    <script defer src="../js/main/shop.js"></script>
-    <script type="module" src="../js/main/theme.js"></script>
-
+    <script type="module" src="js/main/auth.js"></script>
+    <script defer src="js/main/state.js"></script>
+    <script type="module" src="js/levels/jamo-level.js"></script>
+    <script type="module" src="js/main/theme.js"></script>
 
   </head>
   <body>
@@ -25,20 +24,19 @@
         <div class="logo">🇰🇷 Korean Quest</div>
         <a class="pill" href="index.html" >Home</a>
         <a class="pill" href="schedule.html">Schedule</a>
-        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="resources.html" aria-current="page">Resources</a>
         <a class="pill" href="adventure.html">Adventure</a>
         <a class="pill" href="dashboard.html">Dashboard</a>
-        <!-- <a class="pill" href="shop.html" aria-current="page">Shop</a> -->
+        <!-- <a class="pill" href="shop.html">Shop</a> -->
         <a class="pill" href="leaderboard.html">Leaderboard</a>
         <a class="pill" href="about.html">About</a>
-        <!-- <a class="pill" href="test.html">test</a>  -->
+        <!-- <a class="pill" href="test.html">test</a> -->
         <label class="kq-switch" aria-label="Toggle theme">
           <input id="themeToggle" type="checkbox" />
           <span class="kq-track"></span>
           <span class="kq-thumb" aria-hidden="true"></span>
           <span class="kq-switch-label">Theme</span>
         </label>
-        
 <!-- 
         <span class="spacer"></span>
         <span id="userBadge" class="muted"></span>
@@ -48,26 +46,32 @@
     </header>
 
     <main class="container grid">
-      <section class="card">
-        <h1>🛍️ Shop</h1>
-        <p>Your coins: <strong id="coinCount">0</strong></p>
+      <section class="card jamo-builder">
+        <h1>🧱 Build a Syllable</h1>
+        <p class="muted">Pick 초성/중성/종성 to form a valid Hangul block.</p>
 
-        <div class="shop-grid" id="shopGrid" role="list">
-          <!-- JS renders items:
-          <div class="shop-item" role="listitem">
-            <span>🎓 Study Hat</span>
-            <button class="btn" data-item="hat1" data-cost="30">Buy — 30</button>
-          </div>
-        --></div>
-      </section>
+        <div class="jamo-row">
+          <label
+            >초성
+            <select id="selCho"></select>
+          </label>
+          <label
+            >중성
+            <select id="selJung"></select>
+          </label>
+          <label
+            >종성
+            <select id="selJong"></select>
+          </label>
+          <button class="btn" id="btnCompose" type="button">Compose</button>
+        </div>
 
-      <section class="card">
-        <h2>Equipped</h2>
-        <ul id="equippedList">
-          <!-- JS shows current cosmetics -->
-        </ul>
+        <div class="jamo-output" id="syllableOut" aria-live="polite">—</div>
+        <p class="muted" id="syllableMeta"></p>
       </section>
     </main>
+
+  
     <div id="authModal" class="modal" hidden>
       <div class="modal-card">
         <h3>Sign in</h3>
