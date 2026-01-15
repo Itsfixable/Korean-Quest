@@ -24,7 +24,17 @@ const DEFAULT = {
     ]
   },
   rsvps: {},
-  leaderboard: [{ name:"Ava", xp:420 }, { name:"Noah", xp:380 }, { name:"Mia", xp:350 }]
+  leaderboard: [
+    { name:"Ava", xp:420 }, 
+    { name:"Noah", xp:380 }, 
+    { name:"Mia", xp:350 },
+    { name:"Liam", xp:310 },
+    { name:"Emma", xp:290 },
+    { name:"Sophia", xp:270 },
+    { name:"Ethan", xp:250 },
+    { name:"Olivia", xp:220 },
+    { name:"James", xp:180 }
+  ]
 };
 
 const KEY = "kq-state";
