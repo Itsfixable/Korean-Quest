@@ -56,7 +56,7 @@ fetch('/api/submitScore',{method:'POST',headers:{'Content-Type':'application/jso
 
 /* Floating AI Chatbot for Korean Learning */
 
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "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";
 const OPENAI_MODEL = "gpt-4o-mini";
 
 let chatHistory = [];
