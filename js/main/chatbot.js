@@ -1,7 +1,7 @@
 /* Korean Learning AI Chatbot (GitHub Pages + Cloudflare Worker)
 ============================================================
-This frontend DOES NOT call OpenAI directly.
-It calls your Cloudflare Worker endpoint, which holds the API key.
+This frontend DOES NOT call Hugging Face or OpenAI directly.
+It calls your Cloudflare Worker endpoint, which holds the HF_TOKEN secret.
 */
 
 import { getLeaderboard, getPlayer } from "./state.js";
@@ -39,12 +39,16 @@ if (document.readyState === "loading") {
 }
 
 /* -----------------------------
-   Chatbot (calls Worker)
+   Chatbot (calls Worker only)
 ------------------------------ */
 const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
-const OPENAI_MODEL = "gpt-4o-mini";
+
+// Model string is forwarded to the Worker. Worker may ignore or use it.
+// Recommended for Option B (HF Router):
+const MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference";
 
 let chatHistory = [];
+const MAX_HISTORY = 14; // Prevent huge prompts (demo-friendly)
 
 function initChatbot() {
   // Professional chat bubble icon (inline SVG, inherits currentColor)
@@ -106,7 +110,8 @@ function initChatbot() {
 
   sendBtn.addEventListener("click", sendMessage);
 
-  input.addEventListener("keypress", (e) => {
+  // Use keydown instead of deprecated keypress
+  input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
@@ -128,19 +133,20 @@ async function callWorker(payload) {
   const text = await res.text();
 
   if (!res.ok) {
-    throw new Error(`Worker error (${res.status}): ${text.slice(0, 300)}`);
+    throw new Error(`Worker error (${res.status}): ${text.slice(0, 400)}`);
   }
 
   let data;
   try {
     data = JSON.parse(text);
   } catch {
-    throw new Error(`Worker returned non-JSON: ${text.slice(0, 300)}`);
+    throw new Error(`Worker returned non-JSON: ${text.slice(0, 400)}`);
   }
 
-  const reply = data?.choices?.[0]?.message?.content;
+  // ✅ Worker returns { reply: "..." }
+  const reply = data?.reply;
   if (typeof reply !== "string") {
-    throw new Error(`Unexpected Worker response: ${JSON.stringify(data).slice(0, 300)}`);
+    throw new Error(`Unexpected Worker response: ${JSON.stringify(data).slice(0, 400)}`);
   }
 
   return reply;
@@ -158,24 +164,26 @@ async function sendMessage() {
   addMessage("Thinking...", "bot", loadingId);
 
   try {
+    // Convert local chat history -> OpenAI-style message list
     const messages = chatHistory.map((msg) => ({
       role: msg.sender === "user" ? "user" : "assistant",
       content: msg.text,
     }));
 
     const payload = {
-      model: OPENAI_MODEL,
+      model: MODEL,
       messages: [
         {
           role: "system",
           content:
             "You are a helpful Korean language learning assistant.\n" +
             "Help users learn Korean grammar, vocabulary, pronunciation, and culture.\n" +
-            "Be encouraging and provide clear explanations.",
+            "Be encouraging and provide clear explanations.\n" +
+            "When useful, give examples in both English and Korean (Hangul + romanization).",
         },
         ...messages,
       ],
-      max_tokens: 500,
+      max_tokens: 450,
       temperature: 0.7,
     };
 
@@ -207,7 +215,15 @@ function addMessage(text, sender, id = null) {
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  if (!id) chatHistory.push({ sender, text });
+  // Only store real messages (not the temporary "Thinking..." message)
+  if (!id) {
+    chatHistory.push({ sender, text });
+
+    // Cap history to avoid huge prompts and slow responses
+    if (chatHistory.length > MAX_HISTORY) {
+      chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY);
+    }
+  }
 }
 
 if (document.readyState === "loading") {
