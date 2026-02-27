@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Korean Quest — Flashcards</title>
+
+    <link rel="stylesheet" href="./css/master.css" />
+    <link rel="stylesheet" href="./css/contrast-overrides.css" />
+    <link rel="stylesheet" href="./css/responsive.css" />
+    <link rel="stylesheet" href="./css/components/theme-toggle.css" />
+    <link rel="stylesheet" href="./css/pages/flashcards.css" />
+  </head>
+
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="logo pill" href="index.html">Korean Quest</a>
+
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
+        <a class="pill" href="about.html">About</a>
+
+        <!-- No spacer (keeps Theme close to About) -->
+        <label class="kq-switch" aria-label="Toggle theme">
+            <input id="themeToggle" type="checkbox" />
+            <span class="kq-track"></span>
+            <span class="kq-thumb" aria-hidden="true"></span>
+            <span class="kq-switch-label">Theme</span>
+        </label>
+      </nav>
+    </header>
+
+    <main class="container">
+      <div class="grid flash-layout">
+        <section class="card">
+          <div class="flex flash-top">
+            <div>
+              <h1>Flashcards <span class="badge">Quizlet Mode</span></h1>
+              <p class="muted" id="setDesc">Flip, mark “Know”, and track progress.</p>
+            </div>
+
+            <div class="flex flash-controls">
+              <label class="muted" for="setSelect">Set</label>
+              <select id="setSelect" class="select"></select>
+
+              <button class="btn secondary" id="shuffleBtn" type="button">Shuffle</button>
+              <button class="btn secondary" id="resetBtn" type="button">Reset progress</button>
+            </div>
+          </div>
+
+          <div
+            class="card flashcard"
+            id="flashcard"
+            role="button"
+            tabindex="0"
+            aria-label="Flashcard (click to flip)"
+          >
+            <div class="flash-meta">
+              <span class="badge" id="cardSide">TERM</span>
+              <span class="muted" id="cardCount">1 / 1</span>
+            </div>
+
+            <!-- 3D flip container -->
+            <div class="flash-3d" id="flash3d" aria-hidden="true">
+              <div class="flash-face flash-front">
+                <div class="flash-text" id="termText">—</div>
+              </div>
+              <div class="flash-face flash-back">
+                <div class="flash-text" id="defText">—</div>
+              </div>
+            </div>
+
+            <div class="muted flash-hint">Click / press Space to flip</div>
+          </div>
+          <div class="flex flash-actions">
+            <button class="btn secondary" id="prevBtn" type="button">← Prev</button>
+            <button class="btn" id="flipBtn" type="button">Flip</button>
+            <button class="btn secondary" id="nextBtn" type="button">Next →</button>
+
+            <span class="spacer"></span>
+
+            <button class="btn secondary" id="learnBtn" type="button">Still learning</button>
+            <button class="btn" id="knowBtn" type="button">Know</button>
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Progress</h2>
+          <div class="kpi" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="metric">
+              <div class="muted">Known</div>
+              <div class="kpi-value" id="knownCount">0</div>
+            </div>
+            <div class="metric">
+              <div class="muted">Still learning</div>
+              <div class="kpi-value" id="learningCount">0</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 12px;">
+            <div class="muted" style="margin-bottom: 6px;">Completion</div>
+            <div class="progress"><i id="progressBar"></i></div>
+            <div class="muted" id="progressText" style="margin-top: 6px;">0%</div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--border-weak); margin: 16px 0;" />
+
+          <h3>Next</h3>
+          <p class="muted">Ready to test yourself?</p>
+          <a class="btn" href="test.html">Go to Test</a>
+        </aside>
+      </div>
+    </main>
+
+    <script type="module" src="./js/main/theme.js"></script>
+    <script type="module" src="./js/main/router.js"></script>
+    <script type="module" src="./js/main/auth.js"></script>
+    <script type="module" src="./js/main/flashcards.js"></script>
+  </body>
+</html>

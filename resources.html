@@ -11,21 +11,20 @@
 
     <link rel="stylesheet" href="css/pages/resources.css" />
     <link rel="stylesheet" href="css/components/theme-toggle.css" />
-    <link rel="stylesheet" href="css/chatbot.css" /> 
+    <link rel="stylesheet" href="css/chatbot.css" />
 
     <script defer src="js/main/state.js"></script>
     <script defer src="js/main/resources.js"></script>
     <script type="module" src="js/main/auth.js"></script>
     <script type="module" src="js/main/theme.js"></script>
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
-
-
   </head>
+
   <body>
     <header class="container">
       <nav class="nav" aria-label="Primary">
         <div class="logo">Korean Quest</div>
-        <a class="pill" href="index.html" >Home</a>
+        <a class="pill" href="index.html">Home</a>
         <a class="pill" href="schedule.html">Schedule</a>
         <a class="pill" href="resources.html" aria-current="page">Resources</a>
         <a class="pill" href="adventure.html">Adventure</a>
@@ -34,21 +33,37 @@
         <a class="pill" href="leaderboard.html">Leaderboard</a>
         <a class="pill" href="about.html">About</a>
         <!-- <a class="pill" href="test.html">test</a> -->
+
         <label class="kq-switch" aria-label="Toggle theme">
           <input id="themeToggle" type="checkbox" />
           <span class="kq-track"></span>
           <span class="kq-thumb" aria-hidden="true"></span>
           <span class="kq-switch-label">Theme</span>
         </label>
-<!-- 
+
+        <!--
         <span class="spacer"></span>
         <span id="userBadge" class="muted"></span>
-        <button id="loginBtn"  class="pill" type="button">Sign in</button>
-        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button> -->
+        <button id="loginBtn" class="pill" type="button">Sign in</button>
+        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
+        -->
       </nav>
     </header>
 
     <main class="container grid">
+      <!-- ✅ Study Tools (NEW) -->
+      <section class="card">
+        <h1>🧠 Study Tools</h1>
+        <p class="muted">
+          Quizlet-style flashcards and tests to help you master vocabulary fast.
+        </p>
+
+        <div class="lesson-actions" style="margin-top: 10px;">
+          <a class="btn" href="flashcards.html">📇 Flashcards</a>
+          <a class="btn secondary" href="test.html">📝 Take a Test</a>
+        </div>
+      </section>
+
       <!-- Lessons -->
       <section class="card">
         <h1>📚 Lessons</h1>
@@ -81,10 +96,13 @@
             </p>
             <div class="lesson-actions">
               <a class="btn" href="adventure.html">Adventure</a>
+              <!-- Optional: direct set link if you want -->
+              <a class="btn secondary" href="flashcards.html">Flashcards</a>
             </div>
           </article>
 
-          <!-- <article class="lesson" data-lesson-id="L3_greetings">
+          <!--
+          <article class="lesson" data-lesson-id="L3_greetings">
             <header>
               <h2>Phrases: Greetings & Introductions</h2>
               <span class="badge">8 min</span>
@@ -98,7 +116,8 @@
                 Start
               </button>
             </div>
-          </article> -->
+          </article>
+          -->
         </div>
       </section>
 
@@ -109,6 +128,7 @@
           Short explainers and pronunciation tips (embedded safely; credit
           sources).
         </p>
+
         <div class="video-wrap">
           <iframe
             src="https://www.youtube-nocookie.com/embed/videoseries?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k"
@@ -116,78 +136,39 @@
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen
-            loading="lazy">
-          </iframe>
+            loading="lazy"
+          ></iframe>
+
           <p class="muted">
-            Having trouble? <a target="_blank" rel="noopener"
-            href="https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k">Open the playlist on YouTube</a>.
+            Having trouble?
+            <a
+              target="_blank"
+              rel="noopener"
+              href="https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k"
+              >Open the playlist on YouTube</a
+            >.
           </p>
-
         </div>
-
-
       </section>
-
-      <!-- Quiz -->
-      <!--<section class="card">
-        <h2>🧩 Quick Quiz</h2>
-        <form id="quiz" class="quiz" aria-labelledby="quizTitle">
-          <div id="quizTitle" class="muted">Hangul & Basics</div>
-
-          <fieldset class="q" data-qid="q1">
-            <legend>
-              What does “slope” represent (math refresher example)?
-            </legend>
-            <label
-              ><input type="radio" name="q1" value="0" /> Where the graph
-              crosses the y-axis</label
-            >
-            <label
-              ><input type="radio" name="q1" value="1" /> Rate of change between
-              x and y</label
-            >
-            <label
-              ><input type="radio" name="q1" value="2" /> The value of y when
-              x=0</label
-            >
-          </fieldset>
-
-          <fieldset class="q" data-qid="q2">
-            <legend>“Hello” (polite) in Korean is…</legend>
-            <label><input type="radio" name="q2" value="0" /> 안녕하세요</label>
-            <label><input type="radio" name="q2" value="1" /> 감사합니다</label>
-            <label><input type="radio" name="q2" value="2" /> 죄송합니다</label>
-          </fieldset>
-
-          <button class="btn" type="submit">Submit</button>
-          <div id="quizResult" class="muted"></div>
-        </form>
-      </section> -->
 
       <!-- Downloadables -->
       <section class="card">
         <h2>⬇️ Downloadables</h2>
         <ul>
           <li>
-            <a href="../resources/KoreanWordsList.pdf" id="dl-worksheet" download
-              >Worksheet: Hangul basic word list (pdf)</a
-            >
+            <a href="../resources/KoreanWordsList.pdf" id="dl-worksheet" download>
+              Worksheet: Hangul basic word list (pdf)
+            </a>
           </li>
-          <!-- <li>
-            <a href="#" id="dl-flashcards" download
-              >Printable Flashcards (TXT)</a
-            >
-          </li> -->
+          <!--
+          <li>
+            <a href="#" id="dl-flashcards" download>Printable Flashcards (TXT)</a>
+          </li>
+          -->
         </ul>
       </section>
     </main>
 
-    <!-- <footer class="container footer">
-      <small
-        >Resources include curated videos (properly credited), lessons, quizzes,
-        and downloadable practice sets.</small
-      >
-    </footer> -->
     <div id="authModal" class="modal" hidden>
       <div class="modal-card">
         <h3>Sign in</h3>
@@ -197,12 +178,18 @@
           <label>Password</label>
           <input id="authPass" type="password" required minlength="6" />
           <div class="row">
-            <button id="emailSignIn" class="btn primary" type="submit">Sign in</button>
-            <button id="emailSignUp" class="btn secondary" type="button">Create account</button>
+            <button id="emailSignIn" class="btn primary" type="submit">
+              Sign in
+            </button>
+            <button id="emailSignUp" class="btn secondary" type="button">
+              Create account
+            </button>
           </div>
         </form>
         <div class="row">
-          <button id="googleBtn" class="btn" type="button">Continue with Google</button>
+          <button id="googleBtn" class="btn" type="button">
+            Continue with Google
+          </button>
           <button id="authClose" class="btn" type="button">Close</button>
         </div>
         <p id="authMsg" class="muted" aria-live="polite"></p>

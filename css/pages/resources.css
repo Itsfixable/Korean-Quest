@@ -1,26 +1,30 @@
 /* ==== RESOURCES THEME TOKENS (page-scoped) ==== */
-/* Force light theme tokens for this page */
 
+:root {
+  --bg: #0b0c10;
+  --panel: #111318;
+  --text: #e6e7eb;
+  --muted: #9aa1ad;
 
-:root{
-  --bg:#0b0c10; 
-  --panel:#111318; 
-  --text:#e6e7eb; 
-  --muted:#9aa1ad;
-  --brand:#22c55e; 
-  --brand-2:#86efac; 
-  --accent:#60a5fa; 
-  --danger:#ff6b6b; 
-  --ring:rgba(34,197,94,.35);
-  --surface-1:#0f1420; 
-  --surface-2:#162132; 
-  --surface-3:#1b2a42;
-  --border-weak:rgba(255,255,255,.06); 
-  --border-mid:rgba(255,255,255,.08); 
-  --border-strong:rgba(255,255,255,.12);
-  --border-solid:#2a3242; 
-  --overlay:rgba(0,0,0,.35);
+  --brand: #22c55e;
+  --brand-2: #86efac;
+  --accent: #60a5fa;
+  --danger: #ff6b6b;
+  --ring: rgba(34, 197, 94, 0.35);
+
+  --surface-1: #0f1420;
+  --surface-2: #162132;
+  --surface-3: #1b2a42;
+
+  --border-weak: rgba(255, 255, 255, 0.06);
+  --border-mid: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  --border-solid: #2a3242;
+  --overlay: rgba(0, 0, 0, 0.35);
 }
+
+/* Light theme override */
 :root[data-theme="light"] {
   --bg: #f7f9fc;
   --panel: #ffffff;
@@ -36,52 +40,51 @@
   --surface-1: #eef2f7;
   --surface-2: #f6f8fc;
   --surface-3: #e6eefb;
-  --border-weak: rgba(0,0,0,0.06);
-  --border-mid: rgba(0,0,0,0.08);
-  --border-strong: rgba(0,0,0,0.12);
+
+  --border-weak: rgba(0, 0, 0, 0.06);
+  --border-mid: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+
   --border-solid: #d5dbe6;
-  --overlay: rgba(0,0,0,0.25);
-  --shadow: 0 10px 30px rgba(0,0,0,0.1);
+  --overlay: rgba(0, 0, 0, 0.25);
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   --radius: 14px;
   --container: 1100px;
 }
 
-.lesson-list { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); }
-.lesson header { display:flex; gap:8px; align-items:center; justify-content:space-between; }
-.lesson-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-.video-wrap {
-  position:relative; padding-bottom:56.25%; height:0;
-  border-radius:12px; overflow:hidden; border:1px solid var(--border-strong); background:#000;
-}
-.video-wrap iframe, .video-wrap video { position:absolute; inset:0; width:100%; height:100%; border:0; }
-.quiz .q { background: color-mix(in srgb, var(--text) 2%, transparent); border:1px solid var(--border-mid); border-radius:12px; padding:12px; }
-
+/* Lessons layout */
 .lesson-list {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
+
 .lesson header {
   display: flex;
   gap: 8px;
   align-items: center;
   justify-content: space-between;
 }
+
 .lesson-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 8px;
 }
+
+/* Video embed */
 .video-wrap {
   position: relative;
   padding-bottom: 56.25%;
   height: 0;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-strong);
   background: #000;
 }
+
 .video-wrap iframe,
 .video-wrap video {
   position: absolute;
@@ -90,9 +93,28 @@
   height: 100%;
   border: 0;
 }
+
+/* Quiz block (if enabled later) */
 .quiz .q {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--text) 2%, transparent);
+  border: 1px solid var(--border-mid);
   border-radius: 12px;
   padding: 12px;
+}
+
+.nav{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.nav .spacer{
+  flex:1;
+}
+
+.kq-switch{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  white-space:nowrap;
 }
