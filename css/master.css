@@ -190,4 +190,64 @@ button.pill {
   filter: brightness(0.95);
 }
 .brand-logo{ width: 38px; height: 38px; }
-.brand-quest{ color: var(--brand); }
+.brand-quest{ color: #7FA2C7; }
+
+/* ===========================
+   Global Button Color Override
+   =========================== */
+
+:root{
+  --kq-btn: #7FA2C7;
+}
+
+/* Primary buttons */
+.btn,
+button.btn,
+a.btn{
+  background: var(--kq-btn) !important;
+  border-color: var(--kq-btn) !important;
+  color: #ffffff !important;
+}
+
+/* Hover / active */
+.btn:hover,
+button.btn:hover,
+a.btn:hover{
+  filter: brightness(0.95);
+}
+
+.btn:active,
+button.btn:active,
+a.btn:active{
+  filter: brightness(0.90);
+}
+
+/* Focus ring (optional, but nice) */
+.btn:focus-visible,
+button.btn:focus-visible,
+a.btn:focus-visible{
+  outline: 3px solid rgba(127, 162, 199, 0.45);
+  outline-offset: 2px;
+}
+
+/* "Secondary" buttons: make them the same color too */
+.btn.secondary,
+a.btn.secondary,
+button.btn.secondary{
+  background: var(--kq-btn) !important;
+  border-color: var(--kq-btn) !important;
+  color: #ffffff !important;
+}
+
+/* Pills in the navbar (if you want those to match too) */
+.pill{
+  background: transparent;
+  border-color: var(--kq-btn);
+}
+
+.pill[aria-current="page"],
+.pill.active{
+  background: var(--kq-btn) !important;
+  border-color: var(--kq-btn) !important;
+  color: #ffffff !important;
+}
