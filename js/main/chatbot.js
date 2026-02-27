@@ -1,14 +1,11 @@
 /* Korean Learning AI Chatbot (GitHub Pages + Cloudflare Worker)
-============================================================
-This frontend DOES NOT call Hugging Face or OpenAI directly.
-It calls your Cloudflare Worker endpoint, which holds the HF_TOKEN secret.
+   ============================================================
+   This frontend DOES NOT call Hugging Face or OpenAI directly.
+   It calls your Cloudflare Worker endpoint.
 */
-
 import { getLeaderboard, getPlayer } from "./state.js";
 
-/* -----------------------------
-   Leaderboard rendering
------------------------------- */
+/* ----------------------------- Leaderboard rendering ------------------------------ */
 function renderLeaderboard() {
   const rows = getLeaderboard().slice();
   const me = getPlayer();
@@ -22,7 +19,7 @@ function renderLeaderboard() {
   tbody.innerHTML = rows
     .map(
       (r, i) => `
-        <tr class="${r.name === "You" ? "me" : ""}">
+        <tr>
           <td>${i + 1}</td>
           <td>${r.name}</td>
           <td>${r.xp}</td>
@@ -38,50 +35,47 @@ if (document.readyState === "loading") {
   renderLeaderboard();
 }
 
-/* -----------------------------
-   Chatbot (calls Worker only)
------------------------------- */
+/* ----------------------------- Chatbot (calls Worker only) ------------------------------ */
 const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
 
-// Model string is forwarded to the Worker. Worker may ignore or use it.
-// Recommended for Option B (HF Router):
+// Recommended (forwarded to Worker; Worker may ignore/use it)
 const MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference";
 
 let chatHistory = [];
 const MAX_HISTORY = 14; // Prevent huge prompts (demo-friendly)
 
 function initChatbot() {
-  // Professional chat bubble icon (inline SVG, inherits currentColor)
-  const chatIconSVG = `
-    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false">
-      <path fill="currentColor"
-        d="M12 3C7.03 3 3 6.58 3 11c0 2.02.86 3.86 2.3 5.3L5 21l4.98-1.64
-           c.64.18 1.32.28 2.02.28 4.97 0 9-3.58 9-8s-4.03-8-9-8Zm0 14.6
-           c-.64 0-1.25-.09-1.82-.25l-.44-.13-2.84.93.9-2.66-.34-.33
-           C5.6 13.99 5 12.57 5 11c0-3.31 3.13-6 7-6s7 2.69 7 6-3.13 6-7 6Z" />
-    </svg>
+  // ✅ Robust path to favicon/chatbot.png from this module file, regardless of page location
+  const chatbotIconURL = new URL("../../favicon/chatbot.png", import.meta.url).href;
+
+  // Use PNG icon instead of inline SVG
+  const chatIconHTML = `
+    <img
+      class="chatbot-toggle-icon"
+      src="${chatbotIconURL}"
+      alt="Chatbot"
+      draggable="false"
+    />
   `;
 
   const chatbotHTML = `
-    <!-- Floating toggle -->
-    <button id="chatbot-toggle" class="chatbot-toggle-btn" type="button" aria-label="Open chat">
-      ${chatIconSVG}
+    <button id="chatbot-toggle" class="chatbot-toggle-btn" aria-label="Open chatbot">
+      ${chatIconHTML}
     </button>
 
-    <!-- Widget -->
-    <section id="chatbot-widget" class="chatbot-container" aria-label="Korean Learning Assistant">
-      <header class="chatbot-header">
+    <div id="chatbot-widget" class="chatbot-container" aria-live="polite">
+      <div class="chatbot-header">
         <h3>Korean Learning Assistant</h3>
-        <button id="chatbot-close" class="chatbot-close-btn" type="button" aria-label="Close chat">✕</button>
-      </header>
+        <button id="chatbot-close" class="chatbot-close-btn" aria-label="Close chatbot">✕</button>
+      </div>
 
-      <div id="chatbot-messages" class="chatbot-messages" aria-live="polite"></div>
+      <div id="chatbot-messages" class="chatbot-messages"></div>
 
       <div class="chatbot-input-area">
-        <input id="chatbot-input" type="text" placeholder="Ask about Korean..." autocomplete="off" />
-        <button id="chatbot-send" class="chatbot-send-btn" type="button">Send</button>
+        <input id="chatbot-input" type="text" placeholder="Ask a question..." />
+        <button id="chatbot-send" class="chatbot-send-btn">Send</button>
       </div>
-    </section>
+    </div>
   `;
 
   // Prevent duplicates if script is loaded on multiple pages
@@ -94,7 +88,6 @@ function initChatbot() {
   const sendBtn = document.getElementById("chatbot-send");
   const input = document.getElementById("chatbot-input");
   const container = document.getElementById("chatbot-widget");
-
   if (!toggleBtn || !closeBtn || !sendBtn || !input || !container) return;
 
   toggleBtn.addEventListener("click", () => {
@@ -115,7 +108,10 @@ function initChatbot() {
     if (e.key === "Enter") sendMessage();
   });
 
-  addMessage("Welcome! Ask me anything about Korean language, culture, or grammar.", "bot");
+  addMessage(
+    "Welcome! Ask me anything about Korean language, culture, or grammar.",
+    "bot"
+  );
 }
 
 async function callWorker(payload) {
@@ -131,7 +127,6 @@ async function callWorker(payload) {
   }
 
   const text = await res.text();
-
   if (!res.ok) {
     throw new Error(`Worker error (${res.status}): ${text.slice(0, 400)}`);
   }
@@ -146,7 +141,9 @@ async function callWorker(payload) {
   // ✅ Worker returns { reply: "..." }
   const reply = data?.reply;
   if (typeof reply !== "string") {
-    throw new Error(`Unexpected Worker response: ${JSON.stringify(data).slice(0, 400)}`);
+    throw new Error(
+      `Unexpected Worker response: ${JSON.stringify(data).slice(0, 400)}`
+    );
   }
 
   return reply;
@@ -210,8 +207,8 @@ function addMessage(text, sender, id = null) {
   const messageEl = document.createElement("div");
   messageEl.className = `chatbot-message chatbot-${sender}`;
   if (id) messageEl.id = id;
-  messageEl.textContent = text;
 
+  messageEl.textContent = text;
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 

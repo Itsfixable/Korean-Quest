@@ -1,55 +1,193 @@
-/* ==== HOME THEME TOKENS (page-scoped) ==== */
-:root{
-  --bg:#0b0c10;
-  --panel:#111318; 
-  --text:#e6e7eb; 
-  --muted:#9aa1ad;
-  --brand:#4f8cff; 
-  --brand-2:#7aa3ff; 
-  --accent:#7bd389; 
-  --danger:#ff6b6b; 
-  --ring:rgba(79,140,255,.45);
-  --surface-1:#0f1420; 
-  --surface-2:#1a2130; 
-  --surface-3:#20304a;
-  --border-weak:rgba(255,255,255,.06);
-  --border-mid:rgba(255,255,255,.08);
-  --border-strong:rgba(255,255,255,.12);
-  --border-solid:#2a3242; 
-  --overlay:rgba(0,0,0,.35); 
-  --shadow:0 10px 30px rgba(0,0,0,.25);
-  --radius:14px; 
-  --container:1100px;
-}
-/* Optional page variants */
-:root[data-theme="light"]{
-  --bg:#f7f9fc; 
-  --panel:#fff; 
-  --text:#111318; 
-  --muted:#586071; 
-  --ring:rgba(79,140,255,.25);
-  --surface-1:#eef2f7; 
-  --surface-2:#f6f8fc; 
-  --surface-3:#e6eefb; 
-  --border-weak:rgba(0,0,0,.06); 
-  --border-mid:rgba(0,0,0,.08);
-  --border-strong:rgba(0,0,0,.12); 
-  --border-solid:#d5dbe6; 
-  --overlay:rgba(0,0,0,.25);
+/* =========================================
+   Home Page Layout — Final Balanced Version
+   ========================================= */
+
+/* ---------- NAV BRAND ---------- */
+
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 800;
 }
 
-.grid-actions { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.learning-path { margin: 0; padding-left: 18px; }
-.quest-list { margin: 0; padding-left: 18px; }
+.brand-logo{
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  display: block;
+}
 
-.grid-actions {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+.brand-text{
+  font-size: 18px;
+  font-weight: 800;
 }
-.learning-path {
-  margin: 0;
-  padding-left: 18px;
+
+/* =========================================
+   WELCOME SECTION
+   ========================================= */
+
+.kq-welcome{
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  align-items: start;
+  position: relative;
+  overflow: visible; /* ✅ allow art to breathe */
 }
-.quest-list {
-  margin: 0;
-  padding-left: 18px;
+
+.kq-welcome__left{
+  position: relative;
+  z-index: 2;
+}
+
+.kq-welcome__right{
+  position: relative;
+  z-index: 1;
+  min-height: 260px;
+
+  background-image: url("../../favicon/index/welcome.png");
+  background-repeat: no-repeat;
+
+  /* ✅ prevent cropping */
+  background-size: contain;
+
+  /* anchor top-right */
+  background-position: right top;
+}
+
+/* KPI row */
+.kpi{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* Buttons row */
+.grid-actions{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.grid-actions .btn{
+  width: 100%;
+  display: inline-flex;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   TODAY’S QUESTS — full-width art + centered content
+   ========================================= */
+
+.kq-quests{
+  position: relative;
+  overflow: hidden;
+
+  /* ✅ stretch art to edges so flowers touch left border */
+  background-image: url("../../favicon/index/todaysQuestBanner.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: left center; /* pulls flowers to left edge */
+}
+
+/* ✅ Make banner show through more */
+.kq-quests::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(255,255,255,0.18); /* lower = more visible banner */
+  pointer-events:none;
+}
+
+.kq-quests > *{
+  position: relative;
+  z-index: 1;
+}
+
+/* Content column sits between flowers (left) and coins (right) */
+.kq-quests__content{
+  /* Move content away from both edges so it sits "between" */
+  max-width: 560px;
+
+  /* This creates that “in-between” feel */
+  margin-left: 150px;
+  margin-right: auto;
+
+  /* Keep vertical rhythm */
+  padding: 6px 0 10px;
+}
+
+/* Text stays readable and not too wide */
+.kq-quests__desc{
+  max-width: 520px;
+  margin-top: 8px;
+}
+
+/* Button bottom-left within the content area */
+.kq-view-quests{
+  margin-top: 5px;
+  display: inline-flex;
+  width: fit-content;
+  padding: 10px 14px;
+  margin-left: 50px;
+}
+/* =========================================
+   LEARNING PATH
+   ========================================= */
+
+.kq-bg{
+  position: relative;
+  overflow: visible; /* ✅ prevent cut-off */
+  background-repeat: no-repeat;
+}
+
+.kq-bg--path{
+  background-image: url("../../favicon/index/learningPath.png");
+  background-repeat: no-repeat;
+
+  /* prevent cropping */
+  background-size: contain;
+
+  /* shift slightly left + down */
+  background-position: left bottom;
+
+  padding-left: 30%;
+  padding-right: 18%;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 950px){
+  .kq-welcome{
+    grid-template-columns: 1fr;
+  }
+
+  .kq-welcome__right{
+    min-height: 220px;
+    background-position: center top;
+    background-size: contain;
+  }
+
+  .kpi{
+    grid-template-columns: 1fr;
+  }
+
+  .grid-actions{
+    grid-template-columns: 1fr;
+  }
+
+  .kq-bg--path{
+    padding-left: 22px;
+    padding-right: 22px;
+    background-size: contain;
+    background-position: center bottom;
+  }
 }
