@@ -149,3 +149,45 @@ button.pill {
   .nav::-webkit-scrollbar { display: none; }
 }
 
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  line-height: 1;
+}
+
+/* icon */
+.brand-logo{
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  display: block;
+}
+
+/* wordmark */
+.brand-wordmark{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+/* “Korean” in dark */
+.brand-korean{
+  color: #111827;
+}
+
+/* “Quest” in blue */
+.brand-quest{
+  color: #2f5bff; /* tweak to match your theme */
+}
+
+/* optional: subtle hover (feels polished) */
+.brand:hover .brand-quest{
+  filter: brightness(0.95);
+}
+.brand-logo{ width: 38px; height: 38px; }
+.brand-quest{ color: var(--brand); }

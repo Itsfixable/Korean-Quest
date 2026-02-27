@@ -1,5 +1,5 @@
 /* =========================================
-   Home Page Layout — Final Balanced Version
+   Korean Quest — Home Page (Stable Version)
    ========================================= */
 
 /* ---------- NAV BRAND ---------- */
@@ -35,7 +35,7 @@
   gap: 18px;
   align-items: start;
   position: relative;
-  overflow: visible; /* ✅ allow art to breathe */
+  overflow: visible; /* never clip artwork */
 }
 
 .kq-welcome__left{
@@ -43,19 +43,22 @@
   z-index: 2;
 }
 
+/* RIGHT SIDE HERO IMAGE */
 .kq-welcome__right{
   position: relative;
   z-index: 1;
-  min-height: 260px;
+
+  /* Let height grow naturally */
+  min-height: 340px;  /* bigger so coins never clip */
 
   background-image: url("../../favicon/index/welcome.png");
   background-repeat: no-repeat;
 
-  /* ✅ prevent cropping */
-  background-size: contain;
+  /* Slightly smaller so full art fits */
+  background-size: 80% auto;
 
-  /* anchor top-right */
-  background-position: right top;
+  /* Center horizontally, slight down offset */
+  background-position: center 20px;
 }
 
 /* KPI row */
@@ -82,26 +85,27 @@
 }
 
 /* =========================================
-   TODAY’S QUESTS — full-width art + centered content
+   TODAY’S QUESTS
    ========================================= */
 
 .kq-quests{
   position: relative;
   overflow: hidden;
 
-  /* ✅ stretch art to edges so flowers touch left border */
   background-image: url("../../favicon/index/todaysQuestBanner.png");
   background-repeat: no-repeat;
+
+  /* Stretch banner edge-to-edge */
   background-size: cover;
-  background-position: left center; /* pulls flowers to left edge */
+  background-position: left center;
 }
 
-/* ✅ Make banner show through more */
+/* Light overlay for readability */
 .kq-quests::before{
   content:"";
   position:absolute;
   inset:0;
-  background: rgba(255,255,255,0.18); /* lower = more visible banner */
+  background: rgba(255,255,255,0.18);
   pointer-events:none;
 }
 
@@ -110,26 +114,18 @@
   z-index: 1;
 }
 
-/* Content column sits between flowers (left) and coins (right) */
 .kq-quests__content{
-  /* Move content away from both edges so it sits "between" */
   max-width: 560px;
-
-  /* This creates that “in-between” feel */
   margin-left: 150px;
   margin-right: auto;
-
-  /* Keep vertical rhythm */
   padding: 6px 0 10px;
 }
 
-/* Text stays readable and not too wide */
 .kq-quests__desc{
   max-width: 520px;
   margin-top: 8px;
 }
 
-/* Button bottom-left within the content area */
 .kq-view-quests{
   margin-top: 5px;
   display: inline-flex;
@@ -137,13 +133,14 @@
   padding: 10px 14px;
   margin-left: 50px;
 }
+
 /* =========================================
-   LEARNING PATH
+   LEARNING PATH (Desktop)
    ========================================= */
 
 .kq-bg{
   position: relative;
-  overflow: visible; /* ✅ prevent cut-off */
+  overflow: visible;
   background-repeat: no-repeat;
 }
 
@@ -151,10 +148,7 @@
   background-image: url("../../favicon/index/learningPath.png");
   background-repeat: no-repeat;
 
-  /* prevent cropping */
   background-size: contain;
-
-  /* shift slightly left + down */
   background-position: left bottom;
 
   padding-left: 30%;
@@ -162,17 +156,19 @@
 }
 
 /* =========================================
-   RESPONSIVE
+   TABLET
    ========================================= */
 
 @media (max-width: 950px){
+
   .kq-welcome{
     grid-template-columns: 1fr;
   }
 
   .kq-welcome__right{
     min-height: 220px;
-    background-position: center top;
+    aspect-ratio: auto;
+    background-position: center 10px;
     background-size: contain;
   }
 
@@ -189,5 +185,81 @@
     padding-right: 22px;
     background-size: contain;
     background-position: center bottom;
+  }
+}
+
+/* =========================================
+   PHONE FIXES
+   ========================================= */
+
+@media (max-width: 600px){
+
+  /* Welcome image responsive */
+  .kq-welcome{
+    overflow: visible;
+  }
+
+  .kq-welcome__right{
+    min-height: 200px;
+    background-position: center 10px;
+    background-size: contain;
+  }
+
+  /* Today's quests readable */
+  .kq-quests::before{
+    background: rgba(255,255,255,0.28);
+  }
+
+  .kq-quests__content{
+    max-width: 92%;
+    margin: 0 auto;
+    padding: 10px 0 12px;
+    text-align: center;
+  }
+
+  .kq-view-quests{
+    margin: 12px auto 0;
+  }
+
+  /* Learning Path: controlled image container */
+  .kq-bg--path{
+    padding-left: 18px;
+    padding-right: 18px;
+
+    /* Reserve space for art */
+    padding-top: 280px;
+
+    background-image: none;
+  }
+
+  .kq-bg--path::after{
+    content:"";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 260px;
+
+    background-image: url("../../favicon/index/learningPath.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center 20px;
+
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .kq-bg--path::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: rgba(255,255,255,0.82);
+    pointer-events:none;
+    z-index: 0;
+  }
+
+  .kq-bg--path > *{
+    position: relative;
+    z-index: 1;
   }
 }
