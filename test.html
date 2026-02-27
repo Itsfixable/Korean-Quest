@@ -1,56 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Korean Quest — Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Korean Quest — Test</title>
 
-  <!-- Global + page CSS -->
-  <link rel="stylesheet" href="css/master.css" />
-  <link rel="stylesheet" href="css/contrast-overrides.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="./css/master.css" />
+    <link rel="stylesheet" href="./css/contrast-overrides.css" />
+    <link rel="stylesheet" href="./css/responsive.css" />
+    <link rel="stylesheet" href="./css/components/theme-toggle.css" />
+    <link rel="stylesheet" href="./css/pages/test.css" />
+  </head>
 
-  <link rel="stylesheet" href="css/pages/home.css" />
-  <link rel="stylesheet" href="css/components/theme-toggle.css" /> 
-  <link rel="stylesheet" href="css/pages/test.css" />
-</head>
-<body>
-  <!-- Header / Nav -->
-  <header class="container">
-    <nav class="nav" aria-label="Primary">
-      <div class="logo">orean Quest</div>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="logo pill" href="index.html">Korean Quest</a>
 
-      <a class="pill" href="index.html" >Home</a>
-      <a class="pill" href="schedule.html">Schedule</a>
-      <a class="pill" href="resources.html">Resources</a>
-      <a class="pill" href="adventure.html">Adventure</a>
-      <a class="pill" href="dashboard.html">Dashboard</a>
-      <a class="pill" href="shop.html">Shop</a>
-      <a class="pill" href="leaderboard.html">Leaderboard</a>
-      <a class="pill" href="about.html">About</a>
-      <a class="pill" href="test.html" aria-current="page">test</a>
-      <label class="kq-switch" aria-label="Toggle theme">
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
+        <a class="pill" href="about.html">About</a>
+
+        <label class="kq-switch" aria-label="Toggle theme">
           <input id="themeToggle" type="checkbox" />
           <span class="kq-track"></span>
           <span class="kq-thumb" aria-hidden="true"></span>
           <span class="kq-switch-label">Theme</span>
-      </label>
-<!-- 
-      <span class="spacer"></span>
-      <span id="userBadge" class="muted"></span>
-      <button id="loginBtn"  class="pill" type="button">Sign in</button>
-      <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button> -->
-    </nav>
-  </header>
+        </label>
+      </nav>
+    </header>
 
-  <!-- Main -->
-  <div class="square"></div>
+    <main class="container">
+      <!-- Setup -->
+      <section class="card">
+        <div class="flex setup-top">
+          <div>
+            <h1>📝 Test</h1>
+            <p class="muted">Auto-generated from your flashcard sets.</p>
+          </div>
 
-  <!-- Scripts (auth first). Modules auto-defer; place at end for stable DOM. -->
-  <script type="module" src="js/main/auth.js?v=2"></script>
-  <script type="module" src="js/main/router.js?v=2"></script>
-  <script type="module" src="js/main/state.js?v=2"></script>
-  <script type="module" src="js/main/theme.js"></script>
+          <div class="setup-grid">
+            <div class="setup-field">
+              <label class="muted" for="setSelect">Set</label>
+              <select id="setSelect" class="select"></select>
+            </div>
 
-</body>
+            <div class="setup-field">
+              <label class="muted" for="scopeSelect">Scope</label>
+              <select id="scopeSelect" class="select">
+                <option value="all" selected>All cards</option>
+                <option value="learning">Only learning</option>
+                <option value="known">Only known</option>
+              </select>
+            </div>
+
+            <div class="setup-field">
+              <label class="muted" for="modeSelect">Mode</label>
+              <select id="modeSelect" class="select">
+                <option value="mc" selected>Multiple Choice</option>
+                <option value="written">Written</option>
+                <option value="mixed">Mixed</option>
+              </select>
+            </div>
+
+            <div class="setup-field">
+              <label class="muted" for="countSelect">Questions</label>
+              <select id="countSelect" class="select">
+                <option>5</option>
+                <option selected>10</option>
+                <option>15</option>
+                <option>20</option>
+              </select>
+            </div>
+
+            <div class="setup-field setup-start">
+              <button class="btn" id="startBtn" type="button">Start</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="muted" id="setupNote" style="margin-top:10px;"></p>
+      </section>
+
+      <!-- Test card -->
+      <section class="card test-card" id="testCard" hidden>
+        <div class="test-top">
+          <div class="muted" id="qProgress">1 / 10</div>
+          <div class="progress test-progress"><i id="testProgressBar"></i></div>
+          <div class="muted" id="scoreMini">Score: 0</div>
+        </div>
+
+        <div class="q-stage" id="qStage">
+          <div class="q-panel" id="qPanel">
+            <div class="muted" id="qLabel">Question</div>
+            <h2 id="prompt" style="margin-top:10px;">—</h2>
+
+            <div id="mcArea" class="choices" hidden></div>
+
+            <div id="writtenArea" hidden style="margin-top:12px;">
+              <input id="writtenInput" class="text-input" placeholder="Type your answer…" autocomplete="off" />
+              <div class="muted" style="margin-top:6px;">Tip: spacing/case doesn’t matter.</div>
+            </div>
+
+            <div class="test-actions">
+              <button class="btn secondary" id="skipBtn" type="button">Skip</button>
+              <span class="spacer"></span>
+              <button class="btn" id="submitBtn" type="button">Submit</button>
+            </div>
+
+            <p class="muted" id="feedback" style="margin-top:10px; min-height: 22px;"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="card" id="resultCard" hidden>
+        <div class="report-top">
+          <div class="report-left">
+            <h2 style="margin:0;">📊 Report</h2>
+            <p class="muted" id="resultText" style="margin-top:6px;">—</p>
+
+            <div class="flex report-actions" style="gap:10px; margin-top: 10px;">
+              <button class="btn secondary" id="retryBtn" type="button">Retry full test</button>
+              <button class="btn" id="retryWrongBtn" type="button">Retry wrong only</button>
+            </div>
+          </div>
+
+          <!-- BIG ring on RIGHT -->
+          <div class="ring-wrap ring-large" aria-label="Score ring">
+            <svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Score percentage">
+              <circle class="ring-bg" cx="60" cy="60" r="44"></circle>
+              <circle class="ring-fg" cx="60" cy="60" r="44" id="ringFg"></circle>
+            </svg>
+            <div class="ring-text">
+              <div class="ring-percent" id="ringPercent">0%</div>
+              <div class="muted" id="ringSub">Score</div>
+            </div>
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-weak); margin: 16px 0;" />
+
+        <h3>Missed Questions</h3>
+        <p class="muted" id="missedNote" style="margin-top:6px;">—</p>
+
+        <div class="review-grid" id="missedGrid"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./js/main/theme.js"></script>
+    <script type="module" src="./js/main/router.js"></script>
+    <script type="module" src="./js/main/auth.js"></script>
+    <script type="module" src="./js/main/test.js"></script>
+  </body>
 </html>
