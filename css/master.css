@@ -277,3 +277,117 @@ header,
 .nav {
   box-shadow: none !important;
 }
+/* =========================
+   Recent Work Lesson Badge
+   ========================= */
+
+.badge,
+.tag,
+.recent-work .lesson,
+.recent-work .pill {
+  background-color: #7FA2C7 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+/* =========================
+   Calendar Selected Day
+   ========================= */
+
+.calendar .day.selected,
+.calendar .day.active,
+.calendar .day[aria-selected="true"] {
+  background-color: #7FA2C7 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.calendar .day:hover,
+.meeting:hover {
+  background-color: #7FA2C7;
+  color: #ffffff;
+  cursor: pointer;
+}
+/* =========================
+   Calendar Color Override
+   ========================= */
+
+/* Selected day */
+.calendar .day.selected,
+.calendar .day.active,
+.calendar .day[aria-selected="true"] {
+  background-color: #7FA2C7 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* Today (light highlighted day like 27) */
+.calendar .day.today,
+.calendar .day.current,
+.calendar .day.is-today {
+  background-color: #7FA2C7 !important;
+  color: #ffffff !important;
+}
+
+/* Hover state */
+.calendar .day:hover {
+  background-color: #7FA2C7 !important;
+  color: #ffffff !important;
+  cursor: pointer;
+}
+/* =========================
+   Schedule Calendar — Brand Color
+   ========================= */
+
+:root{
+  --kq-brand: #7FA2C7;
+}
+
+/* Calendar tiles (generic) */
+#calGrid button,
+#calGrid .day,
+#calGrid .cal-day,
+#calGrid [role="gridcell"]{
+  border-color: rgba(0,0,0,0.08);
+}
+
+/* Selected day (covers most common class patterns + aria state) */
+#calGrid .selected,
+#calGrid .active,
+#calGrid .is-selected,
+#calGrid [aria-selected="true"],
+#calGrid button.selected,
+#calGrid button.active,
+#calGrid button[aria-selected="true"]{
+  background: var(--kq-brand) !important;
+  color: #fff !important;
+  border-color: var(--kq-brand) !important;
+}
+
+/* "Today" highlight (your 27 looks like a special state) */
+#calGrid .today,
+#calGrid .is-today,
+#calGrid .current,
+#calGrid button.today,
+#calGrid button.is-today{
+  background: var(--kq-brand) !important;
+  color: #fff !important;
+  border-color: var(--kq-brand) !important;
+}
+
+/* Hover */
+#calGrid button:hover,
+#calGrid .day:hover,
+#calGrid .cal-day:hover{
+  background: color-mix(in srgb, var(--kq-brand) 85%, white) !important;
+  color: #fff !important;
+}
+
+/* Disabled / booked days stay grey */
+#calGrid .disabled,
+#calGrid .is-disabled,
+#calGrid button:disabled{
+  background: #9aa3ad !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  opacity: 0.75;
+}
