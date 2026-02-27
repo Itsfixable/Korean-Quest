@@ -25,12 +25,11 @@
         <a class="pill" href="leaderboard.html">Leaderboard</a>
         <a class="pill" href="about.html">About</a>
 
-        <!-- No spacer (keeps Theme close to About) -->
         <label class="kq-switch" aria-label="Toggle theme">
-            <input id="themeToggle" type="checkbox" />
-            <span class="kq-track"></span>
-            <span class="kq-thumb" aria-hidden="true"></span>
-            <span class="kq-switch-label">Theme</span>
+          <input id="themeToggle" type="checkbox" />
+          <span class="kq-track"></span>
+          <span class="kq-thumb" aria-hidden="true"></span>
+          <span class="kq-switch-label">Theme</span>
         </label>
       </nav>
     </header>
@@ -53,6 +52,7 @@
             </div>
           </div>
 
+          <!-- Flashcard -->
           <div
             class="card flashcard"
             id="flashcard"
@@ -65,18 +65,32 @@
               <span class="muted" id="cardCount">1 / 1</span>
             </div>
 
-            <!-- 3D flip container -->
-            <div class="flash-3d" id="flash3d" aria-hidden="true">
-              <div class="flash-face flash-front">
-                <div class="flash-text" id="termText">—</div>
+            <!-- Stack animation stage -->
+            <div class="flash-stage" id="flashStage" aria-hidden="true">
+              <!-- Current card -->
+              <div class="flash-3d" id="flash3d">
+                <div class="flash-face flash-front">
+                  <div class="flash-text" id="termText">—</div>
+                </div>
+                <div class="flash-face flash-back">
+                  <div class="flash-text" id="defText">—</div>
+                </div>
               </div>
-              <div class="flash-face flash-back">
-                <div class="flash-text" id="defText">—</div>
+
+              <!-- Incoming card (used for next/prev animations) -->
+              <div class="flash-3d incoming" id="incoming3d" aria-hidden="true">
+                <div class="flash-face flash-front">
+                  <div class="flash-text" id="incomingTerm">—</div>
+                </div>
+                <div class="flash-face flash-back">
+                  <div class="flash-text" id="incomingDef">—</div>
+                </div>
               </div>
             </div>
 
             <div class="muted flash-hint">Click / press Space to flip</div>
           </div>
+
           <div class="flex flash-actions">
             <button class="btn secondary" id="prevBtn" type="button">← Prev</button>
             <button class="btn" id="flipBtn" type="button">Flip</button>
@@ -89,8 +103,10 @@
           </div>
         </section>
 
+        <!-- Sidebar -->
         <aside class="card">
           <h2>Progress</h2>
+
           <div class="kpi" style="grid-template-columns: repeat(2, 1fr);">
             <div class="metric">
               <div class="muted">Known</div>
@@ -100,6 +116,23 @@
               <div class="muted">Still learning</div>
               <div class="kpi-value" id="learningCount">0</div>
             </div>
+          </div>
+
+          <!-- Known stack (NEW) -->
+          <div class="known-wrap">
+            <div class="known-header">
+              <h3 style="margin:0;">Known stack</h3>
+              <span class="muted" id="knownHint">Tap to review</span>
+            </div>
+
+            <button class="known-stack" id="knownStack" type="button" aria-label="Open known cards">
+              <div class="mini-stack" id="miniStack">
+                <!-- JS will render mini cards -->
+              </div>
+              <div class="muted" style="margin-top:10px;">
+                Click to open and bring a card back.
+              </div>
+            </button>
           </div>
 
           <div style="margin-top: 12px;">
@@ -116,6 +149,24 @@
         </aside>
       </div>
     </main>
+
+    <!-- Known modal (NEW) -->
+    <div class="kq-modal" id="knownModal" hidden>
+      <div class="kq-modal-backdrop" data-close="true"></div>
+      <div class="kq-modal-card" role="dialog" aria-modal="true" aria-label="Known cards">
+        <div class="kq-modal-top">
+          <div>
+            <h2 style="margin:0;">Known Cards</h2>
+            <p class="muted" style="margin:6px 0 0;">Click a card to toss it back into learning.</p>
+          </div>
+          <button class="btn secondary" id="knownClose" type="button">Close</button>
+        </div>
+
+        <div class="known-list" id="knownList">
+          <!-- JS renders -->
+        </div>
+      </div>
+    </div>
 
     <script type="module" src="./js/main/theme.js"></script>
     <script type="module" src="./js/main/router.js"></script>

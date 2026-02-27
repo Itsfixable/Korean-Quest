@@ -24,52 +24,22 @@
   --shadow:0 10px 30px rgba(0,0,0,0.1);
 }
 
-/* ===== NAVBAR (FLASHCARDS PAGE ONLY) ===== */
-/* This keeps Theme close to About (no big gap) */
+/* ===== NAVBAR (page scoped) ===== */
 .nav{
   display:flex;
   align-items:center;
   gap:14px;
   flex-wrap:nowrap;
 }
-
-.nav .logo{
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.nav .pill{
-  white-space:nowrap;
-}
-
-/* Theme toggle group */
-.kq-switch{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  white-space:nowrap;
-}
-
-/* Label BEFORE toggle visuals */
-.kq-switch-label{
-
-  font-size:0.95rem;
-  opacity:0.9;
-}
-
-/* Don’t let switch shrink */
-.kq-track,
-.kq-thumb{
-  flex:0 0 auto;
-}
-
-/* Mobile: hide label to prevent overflow */
+.nav .logo{ font-weight:800; white-space:nowrap; }
+.nav .pill{ white-space:nowrap; }
+.kq-switch{ display:flex; align-items:center; gap:10px; white-space:nowrap; }
 @media (max-width: 800px){
   .kq-switch-label{ display:none; }
   .nav{ gap:10px; }
 }
 
-/* ===== PAGE LAYOUT ===== */
+/* ===== LAYOUT ===== */
 .flash-layout { grid-template-columns: 1.3fr .7fr; }
 @media (max-width: 900px){ .flash-layout { grid-template-columns: 1fr; } }
 
@@ -84,69 +54,213 @@
 .flash-top { justify-content: space-between; align-items: flex-start; }
 .flash-controls { justify-content: flex-end; }
 
+/* ===== Flashcard base ===== */
 .flashcard{
   margin-top: 14px;
   border: 1px solid var(--border-mid);
   background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 85%, transparent), transparent);
-  min-height: 240px;
+  min-height: 320px;
   display: grid;
   gap: 10px;
-  align-content: center;
+  align-content: start;
   cursor: pointer;
   user-select: none;
+  perspective: 1200px;
 }
 
 .flash-meta{ display:flex; justify-content: space-between; align-items:center; }
-.flash-text{
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-}
-.flash-hint{ opacity: .8; }
 
-.flash-actions{ margin-top: 12px; }
-/* ===== Flashcard Flip Animation (Quizlet-style) ===== */
-.flashcard{
-  perspective: 1200px;              /* gives real 3D depth */
-}
-
-.flash-3d{
+/* Stage: holds current + incoming cards */
+.flash-stage{
   position: relative;
-  height: 200px;
+  height: 220px;
+  margin-top: 8px;
+}
+
+/* 3D card */
+.flash-3d{
+  position:absolute;
+  inset:0;
   transform-style: preserve-3d;
   transition: transform 420ms cubic-bezier(.2,.8,.2,1);
   border-radius: 12px;
-  margin-top: 10px;
+}
+
+/* Incoming starts hidden behind */
+.flash-3d.incoming{
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  pointer-events:none;
 }
 
 .flash-face{
-  position: absolute;
-  inset: 0;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  backface-visibility: hidden;
+  position:absolute;
+  inset:0;
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  backface-visibility:hidden;
   border-radius: 12px;
   padding: 18px;
   border: 1px solid var(--border-mid);
   background: var(--surface-1);
 }
 
-.flash-back{
-  transform: rotateY(180deg);
+.flash-back{ transform: rotateY(180deg); }
+
+.flash-text{
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-align:center;
 }
 
-/* The flip */
-.flash-3d.flipped{
-  transform: rotateY(180deg);
+.flash-hint{ opacity:.8; }
+
+/* Flip */
+.flash-3d.flipped{ transform: rotateY(180deg); }
+
+/* ===== Next/Prev stack animations ===== */
+.flash-stage.anim-next .flash-3d#flash3d{
+  animation: kq_current_to_back 420ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+.flash-stage.anim-next .flash-3d#incoming3d{
+  opacity: 1;
+  animation: kq_incoming_from_back 420ms cubic-bezier(.2,.8,.2,1) forwards;
 }
 
-/* Subtle hover polish */
-.flashcard:hover .flash-face{
-  filter: brightness(1.04);
+.flash-stage.anim-prev .flash-3d#flash3d{
+  animation: kq_current_sink_back 420ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+.flash-stage.anim-prev .flash-3d#incoming3d{
+  opacity: 1;
+  animation: kq_incoming_from_back_prev 420ms cubic-bezier(.2,.8,.2,1) forwards;
 }
 
-/* Accessibility: respect reduced motion */
+@keyframes kq_current_to_back{
+  0%{ transform: translateY(0) scale(1); opacity:1; }
+  100%{ transform: translateY(-12px) scale(0.96); opacity:0; }
+}
+@keyframes kq_incoming_from_back{
+  0%{ transform: translateY(18px) scale(0.96); opacity:0; }
+  100%{ transform: translateY(0) scale(1); opacity:1; }
+}
+@keyframes kq_current_sink_back{
+  0%{ transform: translateY(0) scale(1); opacity:1; }
+  100%{ transform: translateY(12px) scale(0.96); opacity:0; }
+}
+@keyframes kq_incoming_from_back_prev{
+  0%{ transform: translateY(-18px) scale(0.96); opacity:0; }
+  100%{ transform: translateY(0) scale(1); opacity:1; }
+}
+
+/* ===== Toss animation clone ===== */
+.toss-clone{
+  position: fixed;
+  z-index: 9999;
+  border-radius: 12px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-1);
+  box-shadow: var(--shadow);
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  padding: 14px;
+  transform-origin: center;
+  pointer-events:none;
+}
+
+.toss-term{
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-align:center;
+}
+
+/* Sidebar known stack */
+.known-wrap{ margin-top: 14px; }
+.known-header{ display:flex; justify-content: space-between; align-items:baseline; gap:10px; }
+
+.known-stack{
+  margin-top: 10px;
+  width:100%;
+  text-align:left;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.mini-stack{
+  position: relative;
+  height: 86px;
+}
+
+.mini-card{
+  position:absolute;
+  left: 8px;
+  top: 6px;
+  width: calc(100% - 16px);
+  height: 70px;
+  border-radius: 12px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  letter-spacing:-0.02em;
+  overflow:hidden;
+  padding: 0 10px;
+  white-space:nowrap;
+  text-overflow: ellipsis;
+}
+
+.mini-card:nth-child(1){ transform: translateY(0) scale(1); opacity:1; }
+.mini-card:nth-child(2){ transform: translateY(8px) scale(0.98); opacity:0.85; }
+.mini-card:nth-child(3){ transform: translateY(16px) scale(0.96); opacity:0.7; }
+
+/* Modal */
+.kq-modal{ position:fixed; inset:0; z-index: 10000; }
+.kq-modal-backdrop{ position:absolute; inset:0; background: var(--overlay); }
+.kq-modal-card{
+  position: relative;
+  width: min(820px, calc(100% - 24px));
+  margin: 40px auto;
+  border-radius: 16px;
+  border: 1px solid var(--border-mid);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+.kq-modal-top{ display:flex; justify-content:space-between; align-items:flex-start; gap: 12px; }
+
+.known-list{
+  margin-top: 14px;
+  display:grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.known-item{
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-2);
+  cursor: pointer;
+  display:grid;
+  gap: 6px;
+}
+.known-item strong{ font-size: 1.05rem; }
+.known-item .muted{ font-size: 0.95rem; }
+
+/* reduce motion */
 @media (prefers-reduced-motion: reduce){
-  .flash-3d{ transition: none; }
+  .flash-3d, .flash-stage.anim-next .flash-3d#flash3d,
+  .flash-stage.anim-next .flash-3d#incoming3d,
+  .flash-stage.anim-prev .flash-3d#flash3d,
+  .flash-stage.anim-prev .flash-3d#incoming3d{
+    transition:none !important;
+    animation:none !important;
+  }
 }
