@@ -1,92 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <title>Korean Quest — Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Global + page CSS -->
   <link rel="stylesheet" href="css/master.css" />
   <link rel="stylesheet" href="css/contrast-overrides.css" />
-
   <link rel="stylesheet" href="css/responsive.css" />
-
   <link rel="stylesheet" href="css/pages/home.css" />
   <link rel="stylesheet" href="css/components/theme-toggle.css" />
-  <link rel="stylesheet" href="css/chatbot.css" /> 
+  <link rel="stylesheet" href="css/chatbot.css" />
 </head>
+
 <body>
   <!-- Header / Nav -->
   <header class="container">
     <nav class="nav" aria-label="Primary">
-      <div class="logo">Korean Quest</div>
+      <a class="brand" href="index.html" aria-label="Korean Quest Home">
+        <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
+        <span class="brand-wordmark">
+          <span class="brand-korean">Korean</span>
+          <span class="brand-quest">Quest</span>
+        </span>
+      </a>
+      
 
       <a class="pill" href="index.html" aria-current="page">Home</a>
       <a class="pill" href="schedule.html">Schedule</a>
       <a class="pill" href="resources.html">Resources</a>
       <a class="pill" href="adventure.html">Adventure</a>
       <a class="pill" href="dashboard.html">Dashboard</a>
-      <!-- <a class="pill" href="shop.html">Shop</a> -->
       <a class="pill" href="leaderboard.html">Leaderboard</a>
       <a class="pill" href="about.html">About</a>
-      <!-- <a class="pill" href="test.html">test</a> -->
-      <label class="kq-switch" aria-label="Toggle theme">
-          <input id="themeToggle" type="checkbox" />
-          <span class="kq-track"></span>
-          <span class="kq-thumb" aria-hidden="true"></span>
-          <span class="kq-switch-label">Theme</span>
-      </label>
-
-      <!-- <span class="spacer"></span>
-      <span id="userBadge" class="muted"></span>
-      <button id="loginBtn"  class="pill" type="button">Sign in</button>
-      <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button> -->
     </nav>
   </header>
 
   <!-- Main -->
   <main class="container grid">
-    <section class="card">
-      <h1>Welcome to <span class="btn" href="index.html">Korean Quest</span></h1>
-      <p class="muted">
-        By students, for students — master Hangul, core words, phrases, and
-        sentence patterns through short lessons and a game-style adventure.
-      </p>
 
-      <div class="kpi" role="region" aria-label="Key progress">
-        <div class="metric">
-          <div class="muted">Level</div>
-          <div class="kpi-value" id="kq-level">1</div>
+    <!-- ✅ WELCOME -->
+    <section class="card kq-welcome kq-sparkles">
+      <div class="kq-welcome__left">
+        <h1>Welcome to <span class="btn" href="index.html">Korean Quest</span></h1>
+        <p class="muted">
+          By students, for students — master Hangul, core words, phrases, and
+          sentence patterns through short lessons and a game-style adventure.
+        </p>
+
+        <div class="kpi" role="region" aria-label="Key progress">
+          <div class="metric">
+            <div class="muted">Level</div>
+            <div class="kpi-value" id="kq-level">1</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Streak</div>
+            <div class="kpi-value" id="kq-streak">0🔥</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Badges</div>
+            <div id="kq-badges">—</div>
+          </div>
         </div>
-        <div class="metric">
-          <div class="muted">Streak</div>
-          <div class="kpi-value" id="kq-streak">0🔥</div>
-        </div>
-        <div class="metric">
-          <div class="muted">Badges</div>
-          <div id="kq-badges">—</div>
+
+        <div class="grid grid-actions">
+          <a class="btn" href="resources.html">Start a Lesson</a>
+          <a class="btn secondary" href="adventure.html">Enter Adventure</a>
+          <a class="btn secondary" href="schedule.html">Join Study Session</a>
         </div>
       </div>
 
-      <div class="grid grid-actions">
-        <a class="btn" href="resources.html">Start a Lesson</a>
-        <a class="btn secondary" href="adventure.html">Enter Adventure</a>
-        <a class="btn secondary" href="schedule.html">Join Study Session</a>
+      <!-- decorative right panel -->
+      <div class="kq-welcome__right" aria-hidden="true"></div>
+    </section>
+
+    <!-- ✅ TODAY'S QUESTS -->
+    <section class="card kq-quests kq-sparkles">
+      <div class="kq-quests__content">
+        <h2>Today’s Quests</h2>
+
+        <p class="muted kq-quests__desc">
+          Complete daily quests to earn coins and rare cosmetics. Keep your
+          streak to unlock weekly rewards.
+        </p>
+
+        <a class="btn secondary kq-view-quests" href="dashboard.html">
+          View Quests ›
+        </a>
       </div>
     </section>
-
-    <section class="card">
-      <h2>Today’s Quests</h2>
-      <ul class="quest-list" id="daily-quests" aria-live="polite">
-        <!-- JS populates daily quests -->
-      </ul>
-      <p class="muted">
-        Complete daily quests to earn coins and rare cosmetics. Keep your
-        streak to unlock weekly rewards.
-      </p>
-    </section>
-
-    <section class="card">
+    <!-- ✅ LEARNING PATH -->
+    <section id="learningPathSection" class="card kq-bg kq-bg--path kq-sparkles">
       <h2>Learning Path</h2>
       <ol class="learning-path">
         <li><strong>Hangul</strong> — write & read consonants (초성/종성), vowels (중성), and build syllables.</li>
@@ -95,40 +99,15 @@
         <li><strong>Sentence Structure</strong> — SOV order, particles (은/는, 이/가, 을/를), locations/time, present tense.</li>
       </ol>
     </section>
+
   </main>
 
-  <!-- Auth Modal (IDs match auth.js; starts hidden) -->
-  <div id="authModal" class="modal" hidden>
-    <div class="modal-card">
-      <h3>Sign in</h3>
-      <form id="authForm">
-        <label>Email</label>
-        <input id="authEmail" type="email" required />
-        <label>Password</label>
-        <input id="authPass" type="password" required minlength="6" />
-        <div class="row">
-          <button id="emailSignIn" class="btn primary" type="submit">Sign in</button>
-          <button id="emailSignUp" class="btn secondary" type="button">Create account</button>
-        </div>
-      </form>
-      <div class="row">
-        <button id="googleBtn" class="btn" type="button">Continue with Google</button>
-        <button id="authClose" class="btn" type="button">Close</button>
-      </div>
-      <p id="authMsg" class="muted" aria-live="polite"></p>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  
-
-  <!-- Scripts (auth first). Modules auto-defer; place at end for stable DOM. -->
+  <!-- Scripts -->
   <script type="module" src="js/main/auth.js?v=2"></script>
   <script type="module" src="js/main/router.js?v=2"></script>
   <script type="module" src="js/main/state.js?v=2"></script>
   <script type="module" src="js/main/theme.js"></script>
   <script type="module" src="./js/main/chatbot.js?v=5"></script>
-
-
 </body>
 </html>
+<script type="module" src="js/main/home-layout.js"></script>

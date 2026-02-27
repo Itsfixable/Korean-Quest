@@ -1,33 +1,56 @@
-/* Floating Chatbot Widget Styles */
+/* ---------------- Chatbot Toggle (IMAGE ONLY) ---------------- */
+:root {
+  --chatbot-hitbox: 70px;     /* clickable area size */
+  --chatbot-icon-scale: 5;    /* visual size multiplier */
+}
+/* ---------------- Chatbot Toggle (BIG IMAGE, SMALL HITBOX) ---------------- */
 
 .chatbot-toggle-btn {
   position: fixed;
   bottom: 30px;
   left: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
+
+  width: var(--chatbot-hitbox);
+  height: var(--chatbot-hitbox);
+
+  background: none;
   border: none;
-  font-size: 24px;
-  font-weight: 600;
+  padding: 0;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  box-shadow: none;
   z-index: 999;
-  transition: all 0.3s ease;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* optional: show the hitbox while testing */
+  /* outline: 2px dashed red; */
 }
 
-.chatbot-toggle-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+.chatbot-toggle-btn:hover .chatbot-toggle-icon {
+  transform: scale(calc(var(--chatbot-icon-scale) * 1.06));
 }
 
 .chatbot-toggle-btn.chatbot-hidden {
   display: none;
+}
+
+/* Keep the icon's real size small, then scale visually */
+.chatbot-toggle-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  display: block;
+
+  transform: scale(var(--chatbot-icon-scale));
+  transform-origin: center;
+  transition: transform 0.2s ease;
+
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none; /* click stays on the button */
 }
 
 .chatbot-container {
@@ -183,6 +206,10 @@
     left: 20px;
     width: 50px;
     height: 50px;
-    font-size: 20px;
+  }
+
+  .chatbot-toggle-icon {
+    width: 28px;
+    height: 28px;
   }
 }

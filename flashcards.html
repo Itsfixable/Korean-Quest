@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Korean Quest — Flashcards</title>
+
+    <link rel="stylesheet" href="./css/master.css" />
+    <link rel="stylesheet" href="./css/contrast-overrides.css" />
+    <link rel="stylesheet" href="./css/responsive.css" />
+    <link rel="stylesheet" href="./css/components/theme-toggle.css" />
+    <link rel="stylesheet" href="./css/pages/flashcards.css" />
+  </head>
+
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="logo pill" href="index.html">Korean Quest</a>
+
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
+        <a class="pill" href="about.html">About</a>
+
+       
+      </nav>
+    </header>
+
+    <main class="container">
+      <div class="grid flash-layout">
+        <section class="card">
+          <div class="flex flash-top">
+            <div>
+              <h1>Flashcards</h1>
+              <p class="muted" id="setDesc">Flip, mark “Know”, and track progress.</p>
+            </div>
+
+            <div class="flex flash-controls">
+              <label class="muted" for="setSelect">Set</label>
+              <select id="setSelect" class="select"></select>
+
+              <button class="btn secondary" id="shuffleBtn" type="button">Shuffle</button>
+              <button class="btn secondary" id="resetBtn" type="button">Reset progress</button>
+            </div>
+          </div>
+
+          <!-- Flashcard -->
+          <div
+            class="card flashcard"
+            id="flashcard"
+            role="button"
+            tabindex="0"
+            aria-label="Flashcard (click to flip)"
+          >
+            <div class="flash-meta">
+              <span class="badge" id="cardSide">TERM</span>
+              <span class="muted" id="cardCount">1 / 1</span>
+            </div>
+
+            <!-- Stack animation stage -->
+            <div class="flash-stage" id="flashStage" aria-hidden="true">
+              <!-- Current card -->
+              <div class="flash-3d" id="flash3d">
+                <div class="flash-face flash-front">
+                  <div class="flash-text" id="termText">—</div>
+                </div>
+                <div class="flash-face flash-back">
+                  <div class="flash-text" id="defText">—</div>
+                </div>
+              </div>
+
+              <!-- Incoming card (used for next/prev animations) -->
+              <div class="flash-3d incoming" id="incoming3d" aria-hidden="true">
+                <div class="flash-face flash-front">
+                  <div class="flash-text" id="incomingTerm">—</div>
+                </div>
+                <div class="flash-face flash-back">
+                  <div class="flash-text" id="incomingDef">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="muted flash-hint">Click / press Space to flip</div>
+          </div>
+
+          <div class="flex flash-actions">
+            <button class="btn secondary" id="prevBtn" type="button">← Prev</button>
+            <button class="btn" id="flipBtn" type="button">Flip</button>
+            <button class="btn secondary" id="nextBtn" type="button">Next →</button>
+
+            <span class="spacer"></span>
+
+            <button class="btn secondary" id="learnBtn" type="button">Still learning</button>
+            <button class="btn" id="knowBtn" type="button">Know</button>
+          </div>
+        </section>
+
+        <!-- Sidebar -->
+        <aside class="card">
+          <h2>Progress</h2>
+
+          <div class="kpi" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="metric">
+              <div class="muted">Known</div>
+              <div class="kpi-value" id="knownCount">0</div>
+            </div>
+            <div class="metric">
+              <div class="muted">Still learning</div>
+              <div class="kpi-value" id="learningCount">0</div>
+            </div>
+          </div>
+
+          <!-- Known stack (NEW) -->
+          <div class="known-wrap">
+            <div class="known-header">
+              <h3 style="margin:0;">Known stack</h3>
+              <span class="muted" id="knownHint">Tap to review</span>
+            </div>
+
+            <button class="known-stack" id="knownStack" type="button" aria-label="Open known cards">
+              <div class="mini-stack" id="miniStack">
+                <!-- JS will render mini cards -->
+              </div>
+              <div class="muted" style="margin-top:10px;">
+                Click to open and bring a card back.
+              </div>
+            </button>
+          </div>
+
+          <div style="margin-top: 12px;">
+            <div class="muted" style="margin-bottom: 6px;">Completion</div>
+            <div class="progress"><i id="progressBar"></i></div>
+            <div class="muted" id="progressText" style="margin-top: 6px;">0%</div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--border-weak); margin: 16px 0;" />
+
+          <h3>Next</h3>
+          <p class="muted">Ready to test yourself?</p>
+          <a class="btn" href="test.html">Go to Test</a>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Known modal (NEW) -->
+    <div class="kq-modal" id="knownModal" hidden>
+      <div class="kq-modal-backdrop" data-close="true"></div>
+      <div class="kq-modal-card" role="dialog" aria-modal="true" aria-label="Known cards">
+        <div class="kq-modal-top">
+          <div>
+            <h2 style="margin:0;">Known Cards</h2>
+            <p class="muted" style="margin:6px 0 0;">Click a card to toss it back into learning.</p>
+          </div>
+          <button class="btn secondary" id="knownClose" type="button">Close</button>
+        </div>
+
+        <div class="known-list" id="knownList">
+          <!-- JS renders -->
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./js/main/theme.js"></script>
+    <script type="module" src="./js/main/router.js"></script>
+    <script type="module" src="./js/main/auth.js"></script>
+    <script type="module" src="./js/main/flashcards.js"></script>
+  </body>
+</html>
