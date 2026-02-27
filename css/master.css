@@ -19,7 +19,7 @@ a:hover { text-decoration: underline; }
 .flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
 /* Header / Nav */
-header { position: sticky; top: 0; z-index: 9999; background: linear-gradient(180deg, rgba(0,0,0,0.35), transparent 70%); }
+header { position: sticky; top: 0; z-index: 9999; }
 .nav {
   position: relative; z-index: 10000;
   display: flex; gap: 8px; align-items: center;
@@ -250,4 +250,30 @@ button.btn.secondary{
   background: var(--kq-btn) !important;
   border-color: var(--kq-btn) !important;
   color: #ffffff !important;
+}
+
+/* ===========================
+   Global Background Override
+   =========================== */
+
+html, body {
+  background-color: #EDF4FA !important;
+}
+
+/* If your .container or main wrapper has a background */
+.container,
+main {
+  background-color: transparent !important;
+}
+
+/* Remove top dark shade */
+body {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+header,
+.container,
+.nav {
+  box-shadow: none !important;
 }
