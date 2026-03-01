@@ -2,24 +2,17 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <title>Korean Quest — Video Call</title>
+  <title>Korean Quest — Video Room</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- Shared global style -->
+
   <link rel="stylesheet" href="css/master.css" />
+  <link rel="stylesheet" href="css/contrast-overrides.css" />
   <link rel="stylesheet" href="css/responsive.css" />
-
-  <link rel="stylesheet" href="css/components/theme-toggle.css" />
-
-  <!-- Page-specific -->
   <link rel="stylesheet" href="css/pages/video.css" />
+  <link rel="stylesheet" href="css/components/theme-toggle.css" />
   <link rel="stylesheet" href="css/chatbot.css" />
 
-  <!-- Scripts -->
   <script type="module" src="js/main/theme.js"></script>
-  <script type="module" src="js/main/video.js"></script>
-  <script type="module" src="./js/main/chatbot.js?v=5"></script>
-
 </head>
 
 <body>
@@ -32,23 +25,64 @@
           <span class="brand-quest">Quest</span>
         </span>
       </a>
+
       <a class="pill" href="index.html">Home</a>
-      <a class="pill" href="schedule.html" aria-current="page">Schedule</a>
+      <a class="pill" href="schedule.html">Schedule</a>
       <a class="pill" href="resources.html">Resources</a>
       <a class="pill" href="adventure.html">Adventure</a>
       <a class="pill" href="dashboard.html">Dashboard</a>
       <a class="pill" href="leaderboard.html">Leaderboard</a>
       <a class="pill" href="about.html">About</a>
-     
+      <a class="pill" href="video.html" aria-current="page">Video</a>
     </nav>
   </header>
 
   <main class="container grid">
     <section class="card">
-      <h1>🎥 Video Room</h1>
-      <p class="muted">Room: <code id="roomName">—</code></p>
-      <div class="meet-wrap"><div id="meet"></div></div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <h1 style="margin:0;">🎥 Video Room</h1>
+        <span id="statusPill" class="pill" style="border:0; background:#e9eef6;">Idle</span>
+      </div>
+
+      <p class="muted" style="margin-top:8px;">
+        Room: <strong id="roomLabel">—</strong>
+        <span class="muted">• Open this page on another device with the same room to connect.</span>
+      </p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0;">
+        <button id="joinBtn" class="btn" type="button">Join Call</button>
+        <button id="leaveBtn" class="btn secondary" type="button" disabled>Leave</button>
+
+        <button id="copyLinkBtn" class="btn secondary" type="button">Copy Room Link</button>
+
+        <label class="pill" style="display:flex; gap:8px; align-items:center; border:0; background:#eef3f9;">
+          <input id="muteMic" type="checkbox" />
+          Mute mic
+        </label>
+
+        <label class="pill" style="display:flex; gap:8px; align-items:center; border:0; background:#eef3f9;">
+          <input id="muteCam" type="checkbox" />
+          Disable camera
+        </label>
+      </div>
+
+      <div class="video-grid">
+        <div class="video-card">
+          <div class="video-title">You</div>
+          <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+
+        <div class="video-card">
+          <div class="video-title">Partner</div>
+          <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+      </div>
+
+      <p id="debugLine" class="muted" style="margin-top:12px; white-space: pre-wrap;"></p>
     </section>
   </main>
+
+  <script type="module" src="js/main/video.js?v=1"></script>
+  <script type="module" src="./js/main/chatbot.js?v=5"></script>
 </body>
 </html>

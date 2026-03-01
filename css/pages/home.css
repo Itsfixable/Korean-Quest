@@ -135,7 +135,7 @@
 }
 
 /* =========================================
-   LEARNING PATH (Desktop)
+   LEARNING PATH (Desktop) — FIXED: no overlap
    ========================================= */
 
 .kq-bg{
@@ -144,15 +144,38 @@
   background-repeat: no-repeat;
 }
 
+/*
+  Fix strategy:
+  - Reserve a left "art column" with clamp() so it's always wide enough
+  - Restrict the background image to ONLY that left column using layered backgrounds
+  - Add a soft white overlay on the text area for readability (optional but helps)
+*/
+
 .kq-bg--path{
-  background-image: url("../../favicon/index/learningPath.png");
-  background-repeat: no-repeat;
+  /* left reserved space for the art */
+  --art-col: clamp(240px, 32vw, 420px);
 
-  background-size: contain;
-  background-position: left bottom;
+  /* Two-layer background:
+     1) art image, clipped to left column
+     2) subtle white overlay on the whole card to keep text readable
+  */
+  background-image:
+    url("../../favicon/index/learningPath.png"),
+    linear-gradient(rgba(255,255,255,0.0), rgba(255,255,255,0.0));
+  background-repeat: no-repeat, no-repeat;
 
-  padding-left: 30%;
+  /* Key: first layer only uses the art column width */
+  background-size: var(--art-col) auto, auto;
+  background-position: left bottom, 0 0;
+
+  /* Reserve space so text never enters the art column */
+  padding-left: calc(var(--art-col) + 18px);
   padding-right: 18%;
+}
+
+/* Optional: if your text still feels close to the image */
+.kq-bg--path h2{
+  margin-top: 0;
 }
 
 /* =========================================
