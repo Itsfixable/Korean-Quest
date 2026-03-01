@@ -329,16 +329,17 @@
 }
 #shuffleBtn,
 #prevBtn,
-#nextBtn {
+#nextBtn,
+#flipBtn {
   background: #d5dff1 !important;
   color: #000000 !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
-#flipBtn {
+/* #flipBtn {
   background: #c8dedf !important;
   color: #000000 !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
-}
+} */
 #learnBtn {
   background: #697897 !important;
   color: #ffffff !important;
