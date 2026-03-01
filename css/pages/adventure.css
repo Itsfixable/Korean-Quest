@@ -115,3 +115,90 @@
 .id-badge:hover {
   filter: none;
 }
+/* Adventure: Keys indicator in map header */
+#kqKeyBadge {
+  background: #D5DFF1;
+  color: #000000;
+}
+
+/* Adventure: Map level nodes */
+button.map-node {
+  background: #5B729F;
+  color: #FFFFFF;
+}
+
+/* Locked state for map nodes */
+button.map-node.locked {
+  opacity: 0.6; 
+  cursor: not-allowed;
+}
+
+/* Text inside map nodes */
+button.map-node,
+button.map-node .subtext { /* subtext here is conceptual — if present */
+  color: #BAC1CF;
+}
+
+/* QUESTIONS: Answer choice buttons */
+#qChoices .btn {
+  background: #D5DFF1;
+  color: #000000;
+  border: 2px solid #8FAECF;
+}
+
+/* RUN button */
+#qFeedback ~ .btn, /* fallback if placed adjacent */
+button#exitBattleBtn, /* or specific Run button if ID is used */
+button.btn:contains("Run") { /* using a text selector fallback */
+  background: #CD4A4A;
+  color: #FFFFFF;
+}
+
+/* =================================
+   Adventure — Brand Colors
+   ================================= */
+
+.adventure .btn-keys{
+  background: var(--kq-pale-blue);
+  color: var(--kq-black);
+}
+
+.adventure .level-btn{
+  background: var(--kq-primary);
+  color: var(--kq-white);
+}
+
+.adventure .level-btn .status,
+.adventure .level-btn .hp{
+  color: var(--kq-level-subtext);
+}
+
+.adventure .choice-btn{
+  background: var(--kq-pale-blue);
+  color: var(--kq-black);
+  border: 1px solid var(--kq-choice-border);
+}
+
+.adventure .btn-run{
+  background: var(--kq-danger);
+  color: var(--kq-white);
+}
+
+.level,
+.level *{
+  color: #ffffff !important;
+}
+/* Make level node text white (Level/Ready/Locked/HP) */
+.map-node{
+  color: #ffffff;
+}
+
+/* If locked nodes had their own color/opacity rules, force text white too */
+.map-node.locked{
+  color: #ffffff;
+}
+
+/* If you use a child element for parts of the text anywhere */
+.map-node *{
+  color: #ffffff;
+}

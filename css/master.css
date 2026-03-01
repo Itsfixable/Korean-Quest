@@ -391,3 +391,44 @@ header,
   border-color: transparent !important;
   opacity: 0.75;
 }
+
+/* =========================
+   Brand wordmark colors (FBLA spec)
+   ========================= */
+.brand-korean{ color: #000000; }
+.brand-quest{ color: #5797DB; }
+
+/* =========================
+   Sticky nav “backgroundifier”
+   (makes content behind it disappear on scroll)
+   ========================= */
+header{
+  background: var(--bg);
+  padding: 10px 0;
+}
+
+/* Keep nav card readable */
+.nav{
+  background: var(--panel);
+  border: 1px solid var(--border-weak);
+}
+
+/* =========================
+   Button variants used across pages (FBLA spec)
+   ========================= */
+.btn{
+  background: var(--brand);
+  color: #FFFFFF;
+}
+.btn.secondary{
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-mid);
+}
+
+/* Soft (grey) button helper */
+.btn.soft{
+  background: #EFEFEF;
+  border: 1px solid #C3C3C3;
+  color: #000000;
+}

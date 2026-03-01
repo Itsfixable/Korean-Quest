@@ -1,47 +1,35 @@
 /* ==== DASHBOARD THEME TOKENS (page-scoped) ==== */
 :root{
-  --bg:#0b0c10; 
-  --panel:#111318; 
-  --text:#e6e7eb; 
-  --muted:#9aa1ad;
-  --brand:#00d1b2; 
-  --brand-2:#5eead4; 
-  --accent:#7bd389; 
-  --danger:#ff6b6b; 
-  --ring:rgba(0,209,178,.35);
-  --surface-1:#0f1420; 
-  --surface-2:#132034; 
-  --surface-3:#1b2a42;
-  --border-weak:rgba(255,255,255,.06); 
-  --border-mid:rgba(255,255,255,.08); 
-  --border-strong:rgba(255,255,255,.12);
-  --border-solid:#2a3242; 
-  --overlay:rgba(0,0,0,.35);
-}
-:root[data-theme="light"] {
-  --bg: #f7f9fc;
-  --panel: #ffffff;
-  --text: #111318;
+  /* Light-only palette (FBLA spec) */
+  --bg: #EDF4FA;
+  --panel: #FFFFFF;
+  --text: #000000;
   --muted: #586071;
 
-  --brand: #4f8cff;
-  --brand-2: #7aa3ff;
-  --accent: #7bd389;
-  --danger: #ff6b6b;
-  --ring: rgba(79, 140, 255, 0.25);
+  --brand: #5B729F;     /* main buttons */
+  --brand-2: #7490C8;   /* gradients / accents */
+  --accent: #B3D1D3;
+  --danger: #CD4A4A;
+  --ring: rgba(91,114,159,.35);
 
-  --surface-1: #eef2f7;
-  --surface-2: #f6f8fc;
-  --surface-3: #e6eefb;
-  --border-weak: rgba(0,0,0,0.06);
-  --border-mid: rgba(0,0,0,0.08);
-  --border-strong: rgba(0,0,0,0.12);
-  --border-solid: #d5dbe6;
-  --overlay: rgba(0,0,0,0.25);
-  --shadow: 0 10px 30px rgba(0,0,0,0.1);
+  --surface-1: #FFFFFF;
+  --surface-2: #F6F8FC;
+  --surface-3: #E6EEF9;
+
+  --border-weak: rgba(0,0,0,.06);
+  --border-mid: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.12);
+  --border-solid: #D5DBE6;
+
+  --overlay: rgba(0,0,0,.25);
+  --shadow: 0 10px 30px rgba(0,0,0,.10);
   --radius: 14px;
   --container: 1100px;
+
+  /* extra (used by some pages) */
+  --btn-on-brand: #FFFFFF;
 }
+
 .stats {
   list-style:none; padding:0; margin:0 0 8px;
   display:grid; gap:6px; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
@@ -61,4 +49,13 @@
 #recentLessons {
   margin: 0;
   padding-left: 18px;
+}
+
+/* =========================
+   FBLA Color Overrides — Dashboard
+   ========================= */
+/* If dashboard uses .btn in JS-rendered cards, ensure main buttons match */
+.btn{
+  background: #5B729F;
+  color: #FFFFFF;
 }

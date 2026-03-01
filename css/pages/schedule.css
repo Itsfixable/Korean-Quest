@@ -1,40 +1,35 @@
 /* ==== SCHEDULE THEME TOKENS (page-scoped) ==== */
 :root{
-  --bg:#0b0c10; 
-  --panel:#111318; 
-  --text:#e6e7eb; 
-  --muted:#9aa1ad;
-  --brand:#4f8cff; 
-  --brand-2:#7aa3ff; 
-  --accent:#7bd389; 
-  --danger:#ff6b6b; 
-  --ring:rgba(79,140,255,.45);
-  --surface-1:#0f1420; 
-  --surface-2:#1a2130; 
-  --surface-3:#20304a;
-  --border-weak:rgba(255,255,255,.06); 
-  --border-mid:rgba(255,255,255,.08); 
-  --border-strong:rgba(255,255,255,.12);
-  --border-solid:#2a3242; 
-  --overlay:rgba(0,0,0,.35); 
-  --shadow:0 10px 30px rgba(0,0,0,.25); 
-  --radius:14px; 
-  --container:1100px;
+  /* Light-only palette (FBLA spec) */
+  --bg: #EDF4FA;
+  --panel: #FFFFFF;
+  --text: #000000;
+  --muted: #586071;
+
+  --brand: #5B729F;     /* main buttons */
+  --brand-2: #7490C8;   /* gradients / accents */
+  --accent: #B3D1D3;
+  --danger: #CD4A4A;
+  --ring: rgba(91,114,159,.35);
+
+  --surface-1: #FFFFFF;
+  --surface-2: #F6F8FC;
+  --surface-3: #E6EEF9;
+
+  --border-weak: rgba(0,0,0,.06);
+  --border-mid: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.12);
+  --border-solid: #D5DBE6;
+
+  --overlay: rgba(0,0,0,.25);
+  --shadow: 0 10px 30px rgba(0,0,0,.10);
+  --radius: 14px;
+  --container: 1100px;
+
+  /* extra (used by some pages) */
+  --btn-on-brand: #FFFFFF;
 }
-:root[data-theme="light"]{
-  --bg:#f7f9fc; 
-  --panel:#fff; 
-  --text:#111318; 
-  --muted:#586071; 
-  --ring:rgba(79,140,255,.25);
-  --surface-1:#eef2f7; 
-  --surface-2:#f6f8fc; 
-  --surface-3:#e6eefb; 
-  --border-weak:rgba(0,0,0,.06); 
-  --border-mid:rgba(0,0,0,.08);
-  --border-strong:rgba(0,0,0,.12); 
-  --border-solid:#d5dbe6; --overlay:rgba(0,0,0,.25);
-}
+
 
 /* Appointments layout */
 .appt-layout{ display:grid; gap:12px; grid-template-columns: 1.1fr .9fr; }
@@ -172,3 +167,43 @@
 /* Safety: guarantee slots don't overlap anything */
 .slots-grid .slot { position: relative; }
 
+
+/* =========================
+   FBLA Color Overrides — Schedule
+   ========================= */
+/* Month nav buttons */
+#prevMonth.btn, #nextMonth.btn{
+  background: #B3D1D3;
+  color: #000000;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Clear booking button */
+#clearDay.btn{
+  background: #EFEFEF;
+  border: 1px solid #C3C3C3;
+  color: #000000;
+}
+
+/* Calendar day tiles can stay as-is, but selected should match main brand */
+.cal-grid button.day.selected{
+  outline: 2px solid var(--ring);
+}
+
+/* Time slots + Join buttons */
+.slots-grid button.slot{
+  background: #5B729F;
+  color: #FFFFFF;
+  border-color: rgba(0,0,0,0.08);
+}
+.slots-grid button.slot:disabled,
+.slots-grid button.slot.is-disabled{
+  background: #B8BEC6;
+  color: #FFFFFF;
+  opacity: 1;
+}
+.slots-grid button.slot.selected,
+.slots-grid button.slot.is-selected,
+.slots-grid button.slot[aria-selected="true"]{
+  border: 2px solid #4D5079;
+}
