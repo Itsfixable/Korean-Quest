@@ -157,7 +157,7 @@
 
   /* Two-layer background:
      1) art image, clipped to left column
-     2) subtle white overlay on the whole card to keep text readable
+     2) subtle overlay (kept transparent here)
   */
   background-image:
     url("../../favicon/index/learningPath.png"),
@@ -166,7 +166,12 @@
 
   /* Key: first layer only uses the art column width */
   background-size: var(--art-col) auto, auto;
-  background-position: left bottom, 0 0;
+
+  /* FIX: top was getting visually cropped -> center it vertically instead of bottom */
+  background-position: left center, 0 0;
+
+  /* Give the artwork enough vertical room so it can't clip */
+  min-height: 320px;
 
   /* Reserve space so text never enters the art column */
   padding-left: calc(var(--art-col) + 18px);
@@ -184,13 +189,21 @@
 
 @media (max-width: 950px){
 
+  /* Keep welcome image beside buttons even when buttons collapse */
   .kq-welcome{
-    grid-template-columns: 1fr;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .kq-welcome__left{
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .kq-welcome__right{
+    flex: 0 0 clamp(180px, 34vw, 320px);
     min-height: 220px;
-    aspect-ratio: auto;
     background-position: center 10px;
     background-size: contain;
   }
@@ -203,11 +216,47 @@
     grid-template-columns: 1fr;
   }
 
+  /* =========================================================
+     Learning Path on reduced windows: image UNDER content
+     ========================================================= */
+
   .kq-bg--path{
     padding-left: 22px;
     padding-right: 22px;
+
+    /* Reserve space at the bottom for the art */
+    padding-bottom: 300px;
+
+    /* Remove desktop background layers so no overlap */
+    background-image: none;
+
+    /* allow height to grow naturally */
+    min-height: auto;
+  }
+
+  .kq-bg--path::after{
+    content:"";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 280px;
+
+    background-image: url("../../favicon/index/learningPath.png");
+    background-repeat: no-repeat;
     background-size: contain;
+
+    /* Put it at the bottom and keep whole image visible */
     background-position: center bottom;
+
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Keep text above the art */
+  .kq-bg--path > *{
+    position: relative;
+    z-index: 1;
   }
 }
 
@@ -217,12 +266,21 @@
 
 @media (max-width: 600px){
 
-  /* Welcome image responsive */
+  /* Welcome image responsive: keep beside buttons */
   .kq-welcome{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     overflow: visible;
   }
 
+  .kq-welcome__left{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   .kq-welcome__right{
+    flex: 0 0 clamp(140px, 38vw, 220px);
     min-height: 200px;
     background-position: center 10px;
     background-size: contain;
@@ -244,15 +302,19 @@
     margin: 12px auto 0;
   }
 
-  /* Learning Path: controlled image container */
+  /* =========================================================
+     Learning Path: image UNDER content (phone)
+     ========================================================= */
+
   .kq-bg--path{
     padding-left: 18px;
     padding-right: 18px;
 
-    /* Reserve space for art */
-    padding-top: 280px;
+    /* Reserve space at bottom for art */
+    padding-bottom: 280px;
 
     background-image: none;
+    min-height: auto;
   }
 
   .kq-bg--path::after{
@@ -260,23 +322,24 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
+    bottom: 0;
     height: 260px;
 
     background-image: url("../../favicon/index/learningPath.png");
     background-repeat: no-repeat;
     background-size: contain;
-    background-position: center 20px;
+    background-position: center bottom;
 
     pointer-events: none;
     z-index: 0;
   }
 
+  /* Remove the heavy white overlay since art is below content now */
   .kq-bg--path::before{
     content:"";
     position:absolute;
     inset:0;
-    background: rgba(255,255,255,0.82);
+    background: rgba(255,255,255,0.0);
     pointer-events:none;
     z-index: 0;
   }
