@@ -1,1 +1,60 @@
-/* ==== JAMO THEME TOKENS (page-scoped) ==== */ :root{ --bg:#0b0c10; --panel:#111318; --text:#e6e7eb; --muted:#9aa1ad; --brand:#c084fc; --brand-2:#d8b4fe; --accent:#7bd389; --danger:#ff6b6b; --ring:rgba(192,132,252,.35); --surface-1:#0f1420; --surface-2:#191f2e; --surface-3:#24324a; --border-weak:rgba(255,255,255,.06); --border-mid:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.12); --border-solid:#2a3242; --overlay:rgba(0,0,0,.35); } .jamo-builder { display:block; } .jamo-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .jamo-output { font-size:2rem; margin-top:8px; } select { padding:8px 10px; border-radius:10px; border:1px solid var(--border-strong); background:var(--surface-1); color:var(--text); } .jamo-builder { display: block; } .jamo-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; } .jamo-output { font-size: 2rem; margin-top: 8px; } select { padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.16); background: #0f1420; color: #fff; }
+/* ==== JAMO THEME TOKENS (page-scoped) ==== */
+:root {
+  --bg: #0b0c10;
+  --panel: #111318;
+  --text: #e6e7eb;
+  --muted: #9aa1ad;
+  --brand: #c084fc;
+  --brand-2: #d8b4fe;
+  --accent: #7bd389;
+  --danger: #ff6b6b;
+  --ring: rgba(192, 132, 252, 0.35);
+  --surface-1: #0f1420;
+  --surface-2: #191f2e;
+  --surface-3: #24324a;
+  --border-weak: rgba(255, 255, 255, 0.06);
+  --border-mid: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-solid: #2a3242;
+  --overlay: rgba(0, 0, 0, 0.35);
+}
+.jamo-builder {
+  display: block;
+}
+.jamo-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.jamo-output {
+  font-size: 2rem;
+  margin-top: 8px;
+}
+select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  color: var(--text);
+}
+.jamo-builder {
+  display: block;
+}
+.jamo-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.jamo-output {
+  font-size: 2rem;
+  margin-top: 8px;
+}
+select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #0f1420;
+  color: #fff;
+}

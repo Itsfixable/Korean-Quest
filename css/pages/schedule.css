@@ -1,1 +1,316 @@
-/* ==== SCHEDULE THEME TOKENS (page-scoped) ==== */ :root{ /* Light-only palette (FBLA spec) */ --bg: #EDF4FA; --panel: #FFFFFF; --text: #000000; --muted: #586071; --brand: #5B729F; /* main buttons */ --brand-2: #7490C8; /* gradients / accents */ --accent: #B3D1D3; --danger: #CD4A4A; --ring: rgba(91,114,159,.35); --surface-1: #FFFFFF; --surface-2: #F6F8FC; --surface-3: #E6EEF9; --border-weak: rgba(0,0,0,.06); --border-mid: rgba(0,0,0,.08); --border-strong: rgba(0,0,0,.12); --border-solid: #D5DBE6; --overlay: rgba(0,0,0,.25); --shadow: 0 10px 30px rgba(0,0,0,.10); --radius: 14px; --container: 1100px; /* extra (used by some pages) */ --btn-on-brand: #FFFFFF; } /* Appointments layout */ .appt-layout{ display:grid; gap:12px; grid-template-columns: 1.1fr .9fr; } @media (max-width:900px){ .appt-layout{ grid-template-columns:1fr; } } .cal .cal-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; } .cal-title{ margin:0; font-size:1.25rem; } /* Calendar grid */ .cal-grid{ display:grid; gap:6px; grid-template-columns: repeat(7, minmax(36px,1fr)); align-items:stretch; } .cal-grid .weekday{ font-size:.9rem; color:var(--muted); text-align:center; padding:6px 0; } .cal-grid button.day{ width:100%; aspect-ratio:1/1; border:1px solid var(--border-mid); border-radius:10px; background:var(--surface-1); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:filter .15s ease, transform .15s ease; } .cal-grid button.day:hover{ filter:brightness(1.05); transform:translateY(-1px); } .cal-grid button.day:disabled{ opacity:.45; cursor:not-allowed; } .cal-grid button.day.selected{ outline:2px solid var(--ring); background:linear-gradient(0deg, color-mix(in srgb, var(--brand) 18%, transparent), color-mix(in srgb, var(--brand) 18%, transparent)); } /* Slots */ .slots .slots-title{ margin-top:0; margin-bottom:8px; font-size:1.1rem; } .slots-grid{ display:grid; gap:8px; grid-template-columns: repeat(3, minmax(120px,1fr)); } @media (max-width:700px){ .slots-grid{ grid-template-columns: repeat(2, minmax(120px,1fr)); } } @media (max-width:480px){ .slots-grid{ grid-template-columns: 1fr; } } .slots-grid button.slot{ border:1px solid var(--border-mid); background:var(--surface-2); color:var(--text); border-radius:10px; padding:10px; cursor:pointer; text-align:center; } .slots-grid button.slot.booked{ opacity:.45; cursor:not-allowed; position:relative; } .slots-grid button.slot.me{ outline:2px solid var(--accent); } .slots-grid button.slot:hover:not(.booked){ filter:brightness(1.05); transform:translateY(-1px); } /* no overlap */ .slots{ display:grid; grid-template-rows:auto auto auto auto; row-gap:10px; } .slots .slots-grid{ grid-row:2; position:relative; z-index:1; } .slots .flex{ grid-row:3; display:flex; gap:8px; margin-top:0; position:relative; z-index:1; } #slotHint{ grid-row:4; margin-top:0; } .slots-grid .slot{ position:relative; } /* Appointments page — responsive calendar + slot grid */ .appt-layout{ display:grid; gap:12px; grid-template-columns: 1.1fr .9fr; } @media (max-width: 900px){ .appt-layout{ grid-template-columns: 1fr; } } .cal .cal-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; } .cal-title{ margin:0; font-size:1.25rem; } .cal-grid{ display:grid; gap:6px; grid-template-columns: repeat(7, minmax(36px, 1fr)); align-items:stretch; } .cal-grid .weekday{ font-size:.9rem; color:var(--muted); text-align:center; padding:6px 0; } .cal-grid button.day{ width:100%; aspect-ratio:1/1; border:1px solid rgba(255,255,255,.10); border-radius:10px; background:#0f1420; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:filter .15s ease, transform .15s ease; } .cal-grid button.day:hover{ filter:brightness(1.05); transform:translateY(-1px); } .cal-grid button.day:disabled{ opacity:.45; cursor:not-allowed; } .cal-grid button.day.selected{ outline:2px solid var(--ring); background:linear-gradient(0deg, rgba(127,170,255,.18), rgba(127,170,255,.18)); } .slots .slots-title{ margin-top:0; margin-bottom:8px; font-size:1.1rem; } .slots-grid{ display:grid; gap:8px; grid-template-columns: repeat(3, minmax(120px, 1fr)); } @media (max-width: 700px){ .slots-grid{ grid-template-columns: repeat(2, minmax(120px, 1fr)); } } @media (max-width: 480px){ .slots-grid{ grid-template-columns: 1fr; } } .slots-grid button.slot{ border:1px solid rgba(255,255,255,.10); background:#1a2130; color:#fff; border-radius:10px; padding:10px; cursor:pointer; text-align:center; } .slots-grid button.slot.booked{ opacity:.45; cursor:not-allowed; position:relative; } .slots-grid button.slot.me{ outline:2px solid var(--accent); } .slots-grid button.slot:hover:not(.booked){ filter:brightness(1.05); transform:translateY(-1px); } /* Make the right card use rows: title | grid | actions | hint */ .slots { display: grid; grid-template-rows: auto auto auto auto; row-gap: 10px; } /* Ensure the grid consumes its own row */ .slots .slots-grid { grid-row: 2; position: relative; /* avoid any absolute positioning from global styles */ z-index: 1; } /* Put the Clear button on its own row below the grid */ .slots .flex { grid-row: 3; display: flex; justify-content: flex-start; gap: 8px; margin-top: 0; /* prevent it from sliding upward */ position: relative; /* neutralize any global absolute rules */ z-index: 1; } /* Keep the hint in the last row */ #slotHint { grid-row: 4; margin-top: 0; } /* Safety: guarantee slots don't overlap anything */ .slots-grid .slot { position: relative; } /* ========================= FBLA Color Overrides — Schedule ========================= */ /* Month nav buttons */ #prevMonth.btn, #nextMonth.btn{ background: #B3D1D3; color: #000000; border: 1px solid rgba(0,0,0,0.08); } /* Clear booking button */ #clearDay.btn{ background: #EFEFEF; border: 1px solid #C3C3C3; color: #000000; } /* Calendar day tiles can stay as-is, but selected should match main brand */ .cal-grid button.day.selected{ outline: 2px solid var(--ring); } /* Time slots + Join buttons */ .slots-grid button.slot{ background: #5B729F; color: #FFFFFF; border-color: rgba(0,0,0,0.08); } .slots-grid button.slot:disabled, .slots-grid button.slot.is-disabled{ background: #B8BEC6; color: #FFFFFF; opacity: 1; } .slots-grid button.slot.selected, .slots-grid button.slot.is-selected, .slots-grid button.slot[aria-selected="true"]{ border: 2px solid #4D5079; }
+/* ==== SCHEDULE THEME TOKENS (page-scoped) ==== */
+:root {
+  /* Light-only palette (FBLA spec) */
+  --bg: #edf4fa;
+  --panel: #ffffff;
+  --text: #000000;
+  --muted: #586071;
+  --brand: #5b729f; /* main buttons */
+  --brand-2: #7490c8; /* gradients / accents */
+  --accent: #b3d1d3;
+  --danger: #cd4a4a;
+  --ring: rgba(91, 114, 159, 0.35);
+  --surface-1: #ffffff;
+  --surface-2: #f6f8fc;
+  --surface-3: #e6eef9;
+  --border-weak: rgba(0, 0, 0, 0.06);
+  --border-mid: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --border-solid: #d5dbe6;
+  --overlay: rgba(0, 0, 0, 0.25);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --radius: 14px;
+  --container: 1100px; /* extra (used by some pages) */
+  --btn-on-brand: #ffffff;
+} /* Appointments layout */
+.appt-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.1fr 0.9fr;
+}
+@media (max-width: 900px) {
+  .appt-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.cal .cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cal-title {
+  margin: 0;
+  font-size: 1.25rem;
+} /* Calendar grid */
+.cal-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(7, minmax(36px, 1fr));
+  align-items: stretch;
+}
+.cal-grid .weekday {
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 6px 0;
+}
+.cal-grid button.day {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border: 1px solid var(--border-mid);
+  border-radius: 10px;
+  background: var(--surface-1);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+.cal-grid button.day:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.cal-grid button.day:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.cal-grid button.day.selected {
+  outline: 2px solid var(--ring);
+  background: linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--brand) 18%, transparent),
+    color-mix(in srgb, var(--brand) 18%, transparent)
+  );
+} /* Slots */
+.slots .slots-title {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+.slots-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+}
+@media (max-width: 700px) {
+  .slots-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .slots-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.slots-grid button.slot {
+  border: 1px solid var(--border-mid);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+.slots-grid button.slot.booked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  position: relative;
+}
+.slots-grid button.slot.me {
+  outline: 2px solid var(--accent);
+}
+.slots-grid button.slot:hover:not(.booked) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+} /* no overlap */
+.slots {
+  display: grid;
+  grid-template-rows: auto auto auto auto;
+  row-gap: 10px;
+}
+.slots .slots-grid {
+  grid-row: 2;
+  position: relative;
+  z-index: 1;
+}
+.slots .flex {
+  grid-row: 3;
+  display: flex;
+  gap: 8px;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+}
+#slotHint {
+  grid-row: 4;
+  margin-top: 0;
+}
+.slots-grid .slot {
+  position: relative;
+} /* Appointments page — responsive calendar + slot grid */
+.appt-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1.1fr 0.9fr;
+}
+@media (max-width: 900px) {
+  .appt-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.cal .cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cal-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.cal-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(7, minmax(36px, 1fr));
+  align-items: stretch;
+}
+.cal-grid .weekday {
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 6px 0;
+}
+.cal-grid button.day {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: #0f1420;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+.cal-grid button.day:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.cal-grid button.day:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.cal-grid button.day.selected {
+  outline: 2px solid var(--ring);
+  background: linear-gradient(
+    0deg,
+    rgba(127, 170, 255, 0.18),
+    rgba(127, 170, 255, 0.18)
+  );
+}
+.slots .slots-title {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+.slots-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+}
+@media (max-width: 700px) {
+  .slots-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .slots-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.slots-grid button.slot {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1a2130;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+.slots-grid button.slot.booked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  position: relative;
+}
+.slots-grid button.slot.me {
+  outline: 2px solid var(--accent);
+}
+.slots-grid button.slot:hover:not(.booked) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+} /* Make the right card use rows: title | grid | actions | hint */
+.slots {
+  display: grid;
+  grid-template-rows: auto auto auto auto;
+  row-gap: 10px;
+} /* Ensure the grid consumes its own row */
+.slots .slots-grid {
+  grid-row: 2;
+  position: relative; /* avoid any absolute positioning from global styles */
+  z-index: 1;
+} /* Put the Clear button on its own row below the grid */
+.slots .flex {
+  grid-row: 3;
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 0; /* prevent it from sliding upward */
+  position: relative; /* neutralize any global absolute rules */
+  z-index: 1;
+} /* Keep the hint in the last row */
+#slotHint {
+  grid-row: 4;
+  margin-top: 0;
+} /* Safety: guarantee slots don't overlap anything */
+.slots-grid .slot {
+  position: relative;
+} /* ========================= FBLA Color Overrides — Schedule ========================= */ /* Month nav buttons */
+#prevMonth.btn,
+#nextMonth.btn {
+  background: #b3d1d3;
+  color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+} /* Clear booking button */
+#clearDay.btn {
+  background: #efefef;
+  border: 1px solid #c3c3c3;
+  color: #000000;
+} /* Calendar day tiles can stay as-is, but selected should match main brand */
+.cal-grid button.day.selected {
+  outline: 2px solid var(--ring);
+} /* Time slots + Join buttons */
+.slots-grid button.slot {
+  background: #5b729f;
+  color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+.slots-grid button.slot:disabled,
+.slots-grid button.slot.is-disabled {
+  background: #b8bec6;
+  color: #ffffff;
+  opacity: 1;
+}
+.slots-grid button.slot.selected,
+.slots-grid button.slot.is-selected,
+.slots-grid button.slot[aria-selected="true"] {
+  border: 2px solid #4d5079;
+}

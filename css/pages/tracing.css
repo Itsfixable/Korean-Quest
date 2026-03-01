@@ -1,1 +1,64 @@
-/* ==== TRACING THEME TOKENS (page-scoped) ==== */ :root{ --bg:#0b0c10; --panel:#111318; --text:#e6e7eb; --muted:#9aa1ad; --brand:#7aa3ff; --brand-2:#a7c1ff; --accent:#7bd389; --danger:#ff6b6b; --ring:rgba(122,163,255,.4); --surface-1:#0f1420; --surface-2:#1a2130; --surface-3:#20304a; --border-weak:rgba(255,255,255,.06); --border-mid:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.12); --border-solid:#2a3242; --overlay:rgba(0,0,0,.35); } .trace-wrap { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; } .trace-canvas { border:1px solid var(--border-solid); border-radius:12px; background:var(--surface-1); width:320px; height:320px; max-width:100%; } .trace-controls { display:grid; gap:8px; align-content:flex-start; } .trace-legend { color:var(--muted); } .trace-wrap { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; } .trace-canvas { border: 1px solid #2a3242; border-radius: 12px; background: #0f1420; width: 320px; height: 320px; max-width: 100%; } .trace-controls { display: grid; gap: 8px; align-content: flex-start; } .trace-legend { color: var(--muted); }
+/* ==== TRACING THEME TOKENS (page-scoped) ==== */
+:root {
+  --bg: #0b0c10;
+  --panel: #111318;
+  --text: #e6e7eb;
+  --muted: #9aa1ad;
+  --brand: #7aa3ff;
+  --brand-2: #a7c1ff;
+  --accent: #7bd389;
+  --danger: #ff6b6b;
+  --ring: rgba(122, 163, 255, 0.4);
+  --surface-1: #0f1420;
+  --surface-2: #1a2130;
+  --surface-3: #20304a;
+  --border-weak: rgba(255, 255, 255, 0.06);
+  --border-mid: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-solid: #2a3242;
+  --overlay: rgba(0, 0, 0, 0.35);
+}
+.trace-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.trace-canvas {
+  border: 1px solid var(--border-solid);
+  border-radius: 12px;
+  background: var(--surface-1);
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+}
+.trace-controls {
+  display: grid;
+  gap: 8px;
+  align-content: flex-start;
+}
+.trace-legend {
+  color: var(--muted);
+}
+.trace-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.trace-canvas {
+  border: 1px solid #2a3242;
+  border-radius: 12px;
+  background: #0f1420;
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+}
+.trace-controls {
+  display: grid;
+  gap: 8px;
+  align-content: flex-start;
+}
+.trace-legend {
+  color: var(--muted);
+}

@@ -1,1 +1,89 @@
-/* ==== RESOURCES THEME TOKENS (page-scoped) ==== */ :root{ /* Light-only palette (FBLA spec) */ --bg: #EDF4FA; --panel: #FFFFFF; --text: #000000; --muted: #586071; --brand: #5B729F; /* main buttons */ --brand-2: #7490C8; /* gradients / accents */ --accent: #B3D1D3; --danger: #CD4A4A; --ring: rgba(91,114,159,.35); --surface-1: #FFFFFF; --surface-2: #F6F8FC; --surface-3: #E6EEF9; --border-weak: rgba(0,0,0,.06); --border-mid: rgba(0,0,0,.08); --border-strong: rgba(0,0,0,.12); --border-solid: #D5DBE6; --overlay: rgba(0,0,0,.25); --shadow: 0 10px 30px rgba(0,0,0,.10); --radius: 14px; --container: 1100px; /* extra (used by some pages) */ --btn-on-brand: #FFFFFF; } /* Lessons layout */ .lesson-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); } .lesson header { display: flex; gap: 8px; align-items: center; justify-content: space-between; } .lesson-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; } /* Video embed */ .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-strong); background: #000; } .video-wrap iframe, .video-wrap video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; } /* Quiz block (if enabled later) */ .quiz .q { background: color-mix(in srgb, var(--text) 2%, transparent); border: 1px solid var(--border-mid); border-radius: 12px; padding: 12px; } .nav{ display:flex; align-items:center; gap:12px; } .nav .spacer{ flex:1; } .kq-switch{ display:flex; align-items:center; gap:10px; white-space:nowrap; } /* ========================= FBLA Color Overrides — Resources ========================= */ a.btn, button.btn{ background: #5B729F; color: #FFFFFF; } /* Ensure lesson cards stay readable (keep existing layout, just align palette) */ .lesson, .lesson-list .lesson{ background: var(--panel); border: 1px solid var(--border-weak); }
+/* ==== RESOURCES THEME TOKENS (page-scoped) ==== */
+:root {
+  /* Light-only palette (FBLA spec) */
+  --bg: #edf4fa;
+  --panel: #ffffff;
+  --text: #000000;
+  --muted: #586071;
+  --brand: #5b729f; /* main buttons */
+  --brand-2: #7490c8; /* gradients / accents */
+  --accent: #b3d1d3;
+  --danger: #cd4a4a;
+  --ring: rgba(91, 114, 159, 0.35);
+  --surface-1: #ffffff;
+  --surface-2: #f6f8fc;
+  --surface-3: #e6eef9;
+  --border-weak: rgba(0, 0, 0, 0.06);
+  --border-mid: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --border-solid: #d5dbe6;
+  --overlay: rgba(0, 0, 0, 0.25);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --radius: 14px;
+  --container: 1100px; /* extra (used by some pages) */
+  --btn-on-brand: #ffffff;
+} /* Lessons layout */
+.lesson-list {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.lesson header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+.lesson-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+} /* Video embed */
+.video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: #000;
+}
+.video-wrap iframe,
+.video-wrap video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+} /* Quiz block (if enabled later) */
+.quiz .q {
+  background: color-mix(in srgb, var(--text) 2%, transparent);
+  border: 1px solid var(--border-mid);
+  border-radius: 12px;
+  padding: 12px;
+}
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav .spacer {
+  flex: 1;
+}
+.kq-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+} /* ========================= FBLA Color Overrides — Resources ========================= */
+a.btn,
+button.btn {
+  background: #5b729f;
+  color: #ffffff;
+} /* Ensure lesson cards stay readable (keep existing layout, just align palette) */
+.lesson,
+.lesson-list .lesson {
+  background: var(--panel);
+  border: 1px solid var(--border-weak);
+}
