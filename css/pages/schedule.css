@@ -103,50 +103,45 @@ html, body {
 }
 
 /* Date buttons */
-.cal-grid button.day,
+/* =========================
+   CALENDAR DATE BUTTONS
+   ========================= */
+
+/* Base state */
 #calGrid button.day {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-
-  background: var(--brand) !important;
+  background-color: #5B729F !important;
   color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 12px;
+  aspect-ratio: 1 / 1;
 
-  border: 1px solid rgba(0,0,0,0.08) !important;
-
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  transition: background 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
-/* Hover darker */
-.cal-grid button.day:hover:not(:disabled) {
-  background: var(--brand-hover) !important;
+/* Hover (darker blue) */
+#calGrid button.day:hover:not(:disabled) {
+  background-color: #000000 !important;
   transform: translateY(-1px);
 }
 
-/* Disabled date */
-.cal-grid button.day:disabled,
+/* Disabled (past dates) */
 #calGrid button.day:disabled {
-  background: var(--disabled) !important;
+  background-color: #B8BEC6 !important;
   color: #FFFFFF !important;
   cursor: not-allowed;
   transform: none !important;
 }
 
-/* Selected date (no bg change, just border) */
-.cal-grid button.day.selected,
-.cal-grid button.day[aria-selected="true"],
-#calGrid button.day.selected,
-#calGrid button.day[aria-selected="true"] {
-  background: var(--brand) !important;
-  color: #FFFFFF !important;
-  border: 2px solid var(--selected-border) !important;
+/* Selected date */
+#calGrid button.day.selected {
+  background-color: #5B729F !important;
+  border: 2px solid #4D5079 !important;
 }
-
 /* =========================
    TIME SLOTS
    ========================= */
@@ -261,3 +256,70 @@ html, body {
 .slots .slots-grid { grid-row: 2; }
 .slots .flex { grid-row: 3; }
 #slotHint { grid-row: 4; margin-top: 0; }
+
+/* =========================================================
+   HARD OVERRIDES — BEAT master.css !important
+   Put this at the VERY BOTTOM of schedule.css
+   ========================================================= */
+
+html body #calGrid button.day {
+  background: #5B729F !important;
+  color: #FFFFFF !important;
+}
+
+html body #calGrid button.day:hover:not(:disabled) {
+  background: #4F648A !important;
+}
+
+html body #calGrid button.day.selected {
+  background: #5B729F !important;
+  border: 2px solid #4D5079 !important;
+}
+
+html body #slotsGrid button.slot {
+  background: #5B729F !important;
+  color: #FFFFFF !important;
+}
+
+html body #slotsGrid button.slot:hover:not(:disabled):not(.booked) {
+  background: #4F648A !important;
+}
+
+html body #slotsGrid button.slot.me {
+  background: #5B729F !important;
+  border: 2px solid #4D5079 !important;
+}
+
+html body #slotsGrid button.slot.booked,
+html body #slotsGrid button.slot:disabled,
+html body #calGrid button.day:disabled {
+  background: #B8BEC6 !important;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+html body #prevMonth,
+html body #nextMonth {
+  background: #B3D1D3 !important;
+  color: #000000 !important;
+}
+
+html body #clearDay {
+  background: #EFEFEF !important;
+  border: 1px solid #C3C3C3 !important;
+  color: #000000 !important;
+}
+
+html body #myBookings a.btn {
+  background: #5B729F !important;
+  color: #FFFFFF !important;
+}
+html body #myBookings a.btn:hover {
+  background: #4F648A !important;
+}
+
+html body #myBookings button.btn.secondary {
+  background: #EFEFEF !important;
+  border: 1px solid #C3C3C3 !important;
+  color: #000000 !important;
+}
