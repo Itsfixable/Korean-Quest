@@ -176,8 +176,8 @@
 .map-node .status,
 .map-node .hp,
 .map-node small {
-  color: #bac1cf !important;
-} /* Answer choice buttons */
+  color: #BAC7D6 !important;
+}/* Answer choice buttons */
 #qChoices .btn {
   background: #d5dff1 !important;
   color: #000000 !important;
@@ -189,4 +189,63 @@
   background: #cd4a4a !important;
   color: #ffffff !important;
   border: none !important;
+}
+/* =========================
+   FBLA Spec — Adventure READY + HP
+   ========================= */
+
+/* READY text */
+.battle .ready,
+.ready,
+.status-ready {
+  color: #BAC7D6 !important;
+}
+
+/* HP label text */
+.hp-row span,
+.hp-label,
+.hp-text {
+  color: #BAC7D6 !important;
+}
+
+/* HP bar background */
+.hp-row .bar {
+  background: #BAC7D6 !important;
+}
+
+/* HP bar fill (the inner <i> element) */
+.hp-row .bar i {
+  background: #BAC7D6 !important;
+}
+
+/* =========================
+   FBLA Spec — Adventure READY + HP
+   ========================= */
+
+/* Force READY + HP text color */
+.map-node .ready,
+.map-node .status,
+.map-node .hp,
+.map-node small,
+.map-node span {
+  color: #BAC7D6 !important;
+}
+/* =========================
+   FBLA — Adventure Level Cards
+   READY + HP text color
+   ========================= */
+
+/* Only affects the muted lines INSIDE each level card */
+/* READY + HP */
+.map-node:not(.locked) .muted {
+  color: #BAC7D6 !important;
+}
+map-node > div:first-child {
+  color: #6b6b6b  !important;  /* softer white */
+  font-weight: 800;
+}
+
+/* Locked text stays dimmer */
+.map-node.locked .muted {
+  color: #6b6b6b !important;
 }
