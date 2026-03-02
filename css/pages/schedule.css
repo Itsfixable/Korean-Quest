@@ -34,7 +34,7 @@ html, body {
 .card,
 .cal.card,
 .slots.card {
-  background: var(--panel) !important;
+  background-color: var(--panel) !important;
   color: var(--text) !important;
 }
 
@@ -294,65 +294,35 @@ html, body {
 }
 
 /* =========================================================
-   BACKGROUND DECOR IMAGES
-   - Left image: scheduleCalendarDesignLeft.png
-   - Right image: scheduleCalendarDesign.png
-   - NO decor on the time slots card
+   CALENDAR DECOR — BACKGROUND IMAGE VERSION
+   With bottom padding space
    ========================================================= */
 
-/* Calendar card hosts the background images */
 .cal-card {
   position: relative;
   overflow: hidden;
+
+  /* Two background images: left + right */
+  background-image:
+    url("../../favicon/index/scheduleCalendarDesignLeft.png"),
+    url("../../favicon/index/scheduleCalendarDesign.png");
+
+  background-repeat: no-repeat, no-repeat;
+  background-position: left bottom, right bottom;
+  background-size: 150px auto, 400px auto;
+
+  /* 🔥 THIS creates space so buttons don’t overlap decor */
+  padding-bottom: 90px;
 }
 
-/* Left decor */
-.cal-card::before {
-  content: "";
-  position: absolute;
-  left: 10px;
-  bottom: 8px;
-  width: 180px;
-  height: 70px;
-  background-image: url("../../favicon/scheduleCalendarDesignLeft.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: left bottom;
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.95;
-}
+/* =========================================================
+   MATCHING BOTTOM PADDING FOR TIME SECTION
+   So the bottom edges line up visually
+   ========================================================= */
 
-/* Right decor */
-.cal-card::after {
-  content: "";
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  width: 200px;
-  height: 70px;
-  background-image: url("../../favicon/scheduleCalendarDesign.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: right bottom;
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.95;
-}
-
-/* Make sure the calendar content sits above the background images */
-.cal-card .cal-header,
-.cal-card #calGrid {
-  position: relative;
-  z-index: 1;
-}
-
-/* NO decorative images on the slots card */
 .slots-card {
-  position: relative;
-  overflow: hidden;
+  padding-bottom: 90px;
 }
-
 /* =========================================================
    YOUR BOOKINGS — ICON AS BACKGROUND IMAGE
    ========================================================= */
@@ -376,7 +346,7 @@ html, body {
   font-weight: 900;
 }
 
-/* icon */
+/* Title icon */
 .bookings-title::before {
   content: "";
   position: absolute;
@@ -385,29 +355,24 @@ html, body {
   transform: translateY(-50%);
   width: 38px;
   height: 38px;
-  background-image: url("../../favicon/yourBookingIcon.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
+  background: url("../../favicon/index/yourBookingIcon.png") no-repeat center / contain;
   pointer-events: none;
   user-select: none;
 }
 
-/* Optional: bottom-right blossom as background image (still background, not <img>) */
+/* Bottom-right blossom (background image) */
 .bookings-card::after {
   content: "";
   position: absolute;
   right: 16px;
   bottom: 10px;
-  width: 180px;
-  height: 90px;
-  background-image: url("../../favicon/yourBookingIcon2.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: right bottom;
+  width: 220px;
+  height: 120px;
+  background: url("../../favicon/index/yourBookingIcon2.png") no-repeat right bottom / contain;
   pointer-events: none;
   user-select: none;
   opacity: 0.95;
+  z-index: 2;
 }
 
 /* =========================================================
@@ -477,94 +442,4 @@ html body #myBookings button.btn.secondary {
   background: #EFEFEF !important;
   border: 1px solid #C3C3C3 !important;
   color: #000000 !important;
-}
-/* =========================
-   DECOR IMAGES (FORCE VISIBLE)
-   4 images total (not counting banner):
-   - calendar left
-   - calendar right
-   - bookings icon
-   - bookings blossom
-   ========================= */
-
-/* Calendar card: holds left + right background images */
-.cal-card {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Put real content above the decor */
-.cal-card .cal-header,
-.cal-card #calGrid {
-  position: relative;
-  z-index: 2;
-}
-
-/* Calendar LEFT decor */
-.cal-card::before {
-  content: "";
-  position: absolute;
-  left: 10px;
-  bottom: 8px;
-  width: 220px;
-  height: 90px;
-  background: url("../../favicon/scheduleCalendarDesignLeft.png") no-repeat left bottom / contain;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Calendar RIGHT decor */
-.cal-card::after {
-  content: "";
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  width: 240px;
-  height: 90px;
-  background: url("../../favicon/scheduleCalendarDesign.png") no-repeat right bottom / contain;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Slots card: NO decor (as requested) */
-.slots-card {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Bookings card: icon + blossom as BACKGROUNDS */
-.bookings-card {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Title icon (background image) */
-.bookings-title {
-  position: relative;
-  padding-left: 46px;
-}
-
-.bookings-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
-  background: url("../../favicon/yourBookingIcon.png") no-repeat center / contain;
-  pointer-events: none;
-}
-
-/* Bottom-right blossom (background image) */
-.bookings-card::after {
-  content: "";
-  position: absolute;
-  right: 16px;
-  bottom: 10px;
-  width: 220px;
-  height: 120px;
-  background: url("../../favicon/yourBookingIcon2.png") no-repeat right bottom / contain;
-  pointer-events: none;
-  z-index: 1;
 }
