@@ -2,15 +2,16 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <title>Korean Quest — Appointments</title>
+  <title>Korean Quest — Schedule</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Nunito -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- Your shared theme -->
+
   <link rel="stylesheet" href="css/master.css" />
   <link rel="stylesheet" href="css/contrast-overrides.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
-  <!-- Page styles -->
   <link rel="stylesheet" href="css/pages/schedule.css" />
   <link rel="stylesheet" href="css/components/theme-toggle.css" />
   <link rel="stylesheet" href="css/chatbot.css" />
@@ -19,8 +20,8 @@
   <script type="module" src="js/main/state.js"></script>
   <script type="module" src="js/main/schedule.js"></script>
   <script type="module" src="./js/main/chatbot.js?v=5"></script>
-
 </head>
+
 <body>
   <header class="container">
     <nav class="nav" aria-label="Primary">
@@ -31,75 +32,68 @@
           <span class="brand-quest">Quest</span>
         </span>
       </a>
-      <a class="pill" href="index.html" >Home</a>
+
+      <a class="pill" href="index.html">Home</a>
       <a class="pill" href="schedule.html" aria-current="page">Schedule</a>
       <a class="pill" href="resources.html">Resources</a>
       <a class="pill" href="adventure.html">Adventure</a>
       <a class="pill" href="dashboard.html">Dashboard</a>
-      <!-- <a class="pill" href="shop.html">Shop</a> -->
       <a class="pill" href="leaderboard.html">Leaderboard</a>
       <a class="pill" href="about.html">About</a>
-      <!-- <a class="pill" href="test.html">test</a> -->
-
-      <!-- <span class="spacer"></span>
-      <span id="userBadge" class="muted"></span>
-      <button id="loginBtn"  class="pill" type="button">Sign in</button>
-      <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button> -->
     </nav>
   </header>
 
   <main class="container grid">
-    <section class="card">
-      <h1>📅 Book a Tutoring Slot</h1>
-      <p class="muted">Pick a date, then choose a time. Booked slots are greyed out.</p>
+    <!-- MAIN CARD -->
+    <section class="card schedule-main-card">
+      <h1 class="visually-hidden">Schedule a Study Quest</h1>
+
+      <!-- Banner -->
+      <div class="schedule-hero">
+        <img src="favicon/index/ScheduleAStudyQuestImage.png" alt="Schedule a Study Quest" />
+      </div>
+
+      <p class="muted schedule-subtitle">Pick a date, then choose a time. Booked slots are greyed out.</p>
 
       <div class="appt-layout">
         <!-- Calendar -->
-        <div class="cal card">
+        <div class="cal card cal-card">
           <div class="cal-header">
             <button class="btn secondary" id="prevMonth" type="button" aria-label="Previous month">‹</button>
             <h2 id="monthLabel" class="cal-title" aria-live="polite"></h2>
             <button class="btn secondary" id="nextMonth" type="button" aria-label="Next month">›</button>
           </div>
 
-          <div class="cal-grid" id="calGrid" role="grid" aria-label="Calendar">
-            <!-- JS renders weekday header + days -->
-          </div>
+          <div class="cal-grid" id="calGrid" role="grid" aria-label="Calendar"></div>
         </div>
 
-        <!-- Time slots -->
-        <div class="slots card">
+        <!-- Slots -->
+        <div class="slots card slots-card">
           <h2 class="slots-title">Times on <span id="selectedDateLabel">—</span></h2>
-          <div class="slots-grid" id="slotsGrid" role="list">
-            <!-- JS renders slot buttons -->
-          </div>
+
+          <div class="slots-grid" id="slotsGrid" role="list"></div>
+
           <div class="flex">
             <button class="btn secondary" id="clearDay" type="button">Clear my booking for this day</button>
           </div>
+
           <p class="muted" id="slotHint" style="margin-top:8px">
-            Tip: click an available time to book it. You can only hold one slot per day.
+            Tip: click a time to select or deselect.
           </p>
         </div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>📝 Your Bookings</h2>
-      <ul id="myBookings" class="my-list">
-        <!-- JS renders your upcoming bookings -->
-      </ul>
+    <!-- YOUR BOOKINGS -->
+    <section class="card bookings-card">
+      <div class="bookings-title-row">
+        <h2 class="bookings-title">Your Bookings</h2>
+      </div>
+
+      <ul id="myBookings" class="my-list"></ul>
     </section>
-  </main>
 
-
-  <!-- JS modules -->
-  <script>console.log('[appointments] schedule.html parsed');</script>
-
-  <script type="module" src="js/main/auth.js"></script>
-  <script type="module" src="js/main/schedule.js"></script>
-  <script type="module" src="js/main/theme.js"></script>
-
-
+    <!-- Auth modal (unchanged if you still use it elsewhere) -->
     <div id="authModal" class="modal" hidden>
       <div class="modal-card">
         <h3>Sign in</h3>
@@ -120,5 +114,8 @@
         <p id="authMsg" class="muted" aria-live="polite"></p>
       </div>
     </div>
+  </main>
+
+  <script type="module" src="js/main/auth.js"></script>
 </body>
 </html>

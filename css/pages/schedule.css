@@ -63,6 +63,8 @@ html, body {
 .cal-title {
   margin: 0;
   font-size: 1.25rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
 }
 
 /* =========================
@@ -100,9 +102,10 @@ html, body {
   color: var(--muted);
   text-align: center;
   padding: 6px 0;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
 }
 
-/* Date buttons */
 /* =========================
    CALENDAR DATE BUTTONS
    ========================= */
@@ -121,11 +124,15 @@ html, body {
 
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.15s ease;
+
+  /* Force Nunito + Bold */
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
 }
 
-/* Hover (darker blue) */
+/* Hover */
 #calGrid button.day:hover:not(:disabled) {
-  background-color: #000000 !important;
+  background-color: #4F648A !important;
   transform: translateY(-1px);
 }
 
@@ -142,6 +149,13 @@ html, body {
   background-color: #5B729F !important;
   border: 2px solid #4D5079 !important;
 }
+
+/* Keep hover effect even after selection */
+#calGrid button.day.selected:hover:not(:disabled) {
+  background-color: #4F648A !important;
+  transform: translateY(-1px);
+}
+
 /* =========================
    TIME SLOTS
    ========================= */
@@ -177,6 +191,10 @@ html, body {
   text-align: center;
 
   transition: background 0.2s ease, transform 0.15s ease;
+
+  /* Force Nunito + Bold */
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
 }
 
 /* Hover darker */
@@ -258,13 +276,148 @@ html, body {
 #slotHint { grid-row: 4; margin-top: 0; }
 
 /* =========================================================
-   HARD OVERRIDES — BEAT master.css !important
-   Put this at the VERY BOTTOM of schedule.css
+   HERO BANNER — FULL IMAGE, NO BORDER
+   ========================================================= */
+.schedule-hero {
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+.schedule-hero img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 28px;
+}
+.schedule-subtitle {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* =========================================================
+   BACKGROUND DECOR IMAGES
+   - Left image: scheduleCalendarDesignLeft.png
+   - Right image: scheduleCalendarDesign.png
+   - NO decor on the time slots card
    ========================================================= */
 
+/* Calendar card hosts the background images */
+.cal-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left decor */
+.cal-card::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  width: 180px;
+  height: 70px;
+  background-image: url("../../favicon/scheduleCalendarDesignLeft.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: left bottom;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.95;
+}
+
+/* Right decor */
+.cal-card::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 200px;
+  height: 70px;
+  background-image: url("../../favicon/scheduleCalendarDesign.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right bottom;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.95;
+}
+
+/* Make sure the calendar content sits above the background images */
+.cal-card .cal-header,
+.cal-card #calGrid {
+  position: relative;
+  z-index: 1;
+}
+
+/* NO decorative images on the slots card */
+.slots-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* =========================================================
+   YOUR BOOKINGS — ICON AS BACKGROUND IMAGE
+   ========================================================= */
+.bookings-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.bookings-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.bookings-title {
+  margin: 0;
+  padding-left: 46px; /* space for icon background */
+  position: relative;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+}
+
+/* icon */
+.bookings-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  background-image: url("../../favicon/yourBookingIcon.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Optional: bottom-right blossom as background image (still background, not <img>) */
+.bookings-card::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 180px;
+  height: 90px;
+  background-image: url("../../favicon/yourBookingIcon2.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right bottom;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.95;
+}
+
+/* =========================================================
+   HARD OVERRIDES — BEAT master.css !important
+   ========================================================= */
 html body #calGrid button.day {
   background: #5B729F !important;
   color: #FFFFFF !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
 }
 
 html body #calGrid button.day:hover:not(:disabled) {
@@ -279,6 +432,8 @@ html body #calGrid button.day.selected {
 html body #slotsGrid button.slot {
   background: #5B729F !important;
   color: #FFFFFF !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
 }
 
 html body #slotsGrid button.slot:hover:not(:disabled):not(.booked) {
@@ -322,4 +477,94 @@ html body #myBookings button.btn.secondary {
   background: #EFEFEF !important;
   border: 1px solid #C3C3C3 !important;
   color: #000000 !important;
+}
+/* =========================
+   DECOR IMAGES (FORCE VISIBLE)
+   4 images total (not counting banner):
+   - calendar left
+   - calendar right
+   - bookings icon
+   - bookings blossom
+   ========================= */
+
+/* Calendar card: holds left + right background images */
+.cal-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Put real content above the decor */
+.cal-card .cal-header,
+.cal-card #calGrid {
+  position: relative;
+  z-index: 2;
+}
+
+/* Calendar LEFT decor */
+.cal-card::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  width: 220px;
+  height: 90px;
+  background: url("../../favicon/scheduleCalendarDesignLeft.png") no-repeat left bottom / contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Calendar RIGHT decor */
+.cal-card::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 240px;
+  height: 90px;
+  background: url("../../favicon/scheduleCalendarDesign.png") no-repeat right bottom / contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Slots card: NO decor (as requested) */
+.slots-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bookings card: icon + blossom as BACKGROUNDS */
+.bookings-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Title icon (background image) */
+.bookings-title {
+  position: relative;
+  padding-left: 46px;
+}
+
+.bookings-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  background: url("../../favicon/yourBookingIcon.png") no-repeat center / contain;
+  pointer-events: none;
+}
+
+/* Bottom-right blossom (background image) */
+.bookings-card::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 220px;
+  height: 120px;
+  background: url("../../favicon/yourBookingIcon2.png") no-repeat right bottom / contain;
+  pointer-events: none;
+  z-index: 1;
 }

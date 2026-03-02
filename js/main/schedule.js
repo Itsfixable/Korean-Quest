@@ -6,70 +6,97 @@ console.log("[KQ] schedule.js loaded");
 
 /* ---------- Config ---------- */
 const MAX_PER_DAY = 2; // change to adjust the per-day cap
-const TIMES = ["09:00","09:30","10:00","10:30","11:00","11:30"];
+const TIMES = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
 
 /* ---------- Element helpers ---------- */
 const need = (id) => {
   const el = document.getElementById(id);
-  if (!el) console.error("[KQ] Missing element #"+id);
+  if (!el) console.error("[KQ] Missing element #" + id);
   return el;
 };
 const EL = {
   monthLabel: need("monthLabel"),
-  prevMonth:  need("prevMonth"),
-  nextMonth:  need("nextMonth"),
-  calGrid:    need("calGrid"),
+  prevMonth: need("prevMonth"),
+  nextMonth: need("nextMonth"),
+  calGrid: need("calGrid"),
   selectedDateLabel: need("selectedDateLabel"),
-  slotsGrid:  need("slotsGrid"),
-  clearDay:   need("clearDay"),
+  slotsGrid: need("slotsGrid"),
+  clearDay: need("clearDay"),
   myBookings: need("myBookings"),
-  slotHint:   document.getElementById("slotHint"),
+  slotHint: document.getElementById("slotHint"),
 };
 
 const today = new Date();
-let viewYear  = today.getFullYear();
+let viewYear = today.getFullYear();
 let viewMonth = today.getMonth();
 let selectedISO = iso(today);
 
 /* ---------- Date utils ---------- */
-function iso(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
-function parseISO(s){ const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); }
-function humanDate(s){ const d = parseISO(s); return d.toLocaleDateString([], {weekday:"short", month:"short", day:"numeric"}); }
+function iso(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function parseISO(s) {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function humanDate(s) {
+  const d = parseISO(s);
+  return d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+}
 
 /* ---------- Local store ---------- */
-const BK_KEY = "kq_bookings_v1";                             // { "YYYY-MM-DD_HH:MM": {date,time,room,going,createdAt} }
+const BK_KEY = "kq_bookings_v1"; // { "YYYY-MM-DD_HH:MM": {date,time,room,going,createdAt} }
 const bookings = JSON.parse(localStorage.getItem(BK_KEY) || "{}");
-function saveBookings(){ localStorage.setItem(BK_KEY, JSON.stringify(bookings)); }
-function roomFor(dateISO, timeStr){ return `KQ_${dateISO.replaceAll("-","")}_${timeStr.replace(":","")}`; }
+function saveBookings() {
+  localStorage.setItem(BK_KEY, JSON.stringify(bookings));
+}
+function roomFor(dateISO, timeStr) {
+  return `KQ_${dateISO.replaceAll("-", "")}_${timeStr.replace(":", "")}`;
+}
 
-function countForDate(dateISO){
+function countForDate(dateISO) {
   let n = 0;
   for (const k in bookings) if (bookings[k]?.date === dateISO) n++;
   return n;
 }
-function isBooked(dateISO, time){ return !!bookings[`${dateISO}_${time}`]; }
-function toggleBooking(dateISO, time){
+function toggleBooking(dateISO, time) {
   const id = `${dateISO}_${time}`;
-  if (bookings[id]){
-    delete bookings[id];                                      // deselect
+  if (bookings[id]) {
+    delete bookings[id]; // deselect
     saveBookings();
     return { action: "removed" };
   }
   // enforce cap
-  if (countForDate(dateISO) >= MAX_PER_DAY){
+  if (countForDate(dateISO) >= MAX_PER_DAY) {
     return { action: "blocked", reason: "Daily limit reached" };
   }
-  bookings[id] = { date: dateISO, time, room: roomFor(dateISO,time), going: true, createdAt: Date.now() };
+  bookings[id] = { date: dateISO, time, room: roomFor(dateISO, time), going: true, createdAt: Date.now() };
   saveBookings();
   return { action: "added" };
 }
 
+/* ---------- Selected day UI helpers ---------- */
+function setSelectedDayUI(dateISO) {
+  if (!EL.calGrid) return;
+
+  // remove selection from all day buttons
+  EL.calGrid.querySelectorAll("button.day.selected").forEach((b) => b.classList.remove("selected"));
+  EL.calGrid.querySelectorAll("button.day[aria-selected='true']").forEach((b) => b.setAttribute("aria-selected", "false"));
+
+  // add selection to the matching one (if it exists in current month view)
+  const match = EL.calGrid.querySelector(`button.day[data-iso="${dateISO}"]`);
+  if (match) {
+    match.classList.add("selected");
+    match.setAttribute("aria-selected", "true");
+  }
+}
+
 /* ---------- Calendar render ---------- */
-function renderCalendar(){
+function renderCalendar() {
   if (!EL.calGrid || !EL.monthLabel) return;
 
   const hdr = new Date(viewYear, viewMonth, 1);
-  EL.monthLabel.textContent = hdr.toLocaleDateString([], {month:"long", year:"numeric"});
+  EL.monthLabel.textContent = hdr.toLocaleDateString([], { month: "long", year: "numeric" });
 
   EL.calGrid.innerHTML = `
     <div class="weekday">Sun</div><div class="weekday">Mon</div><div class="weekday">Tue</div>
@@ -78,47 +105,59 @@ function renderCalendar(){
 
   const first = new Date(viewYear, viewMonth, 1);
   const lead = first.getDay();
-  for (let i=0;i<lead;i++) EL.calGrid.appendChild(document.createElement("div"));
+  for (let i = 0; i < lead; i++) EL.calGrid.appendChild(document.createElement("div"));
 
-  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const todayFloor = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  for (let d=1; d<=daysInMonth; d++){
-    const dateISO = `${viewYear}-${String(viewMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateISO = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "day";
     btn.textContent = d;
 
+    // store iso on the button so we can re-select without rerender
+    btn.dataset.iso = dateISO;
+    btn.setAttribute("aria-selected", "false");
+
     if (parseISO(dateISO) < todayFloor) btn.disabled = true;
 
-    btn.addEventListener("click", ()=>{
+    btn.addEventListener("click", () => {
       selectedISO = dateISO;
-      renderCalendar();   // to refresh selected outline
+
+      // ✅ Make it stay selected visually WITHOUT rerendering the entire calendar
+      setSelectedDayUI(selectedISO);
+
+      // existing behavior
       renderSlots();
     });
 
-    if (selectedISO === dateISO) btn.classList.add("selected");
+    if (selectedISO === dateISO) {
+      btn.classList.add("selected");
+      btn.setAttribute("aria-selected", "true");
+    }
+
     EL.calGrid.appendChild(btn);
   }
 }
 
 /* ---------- Slots: select / deselect with cap ---------- */
-function renderSlots(){
+function renderSlots() {
   if (!EL.slotsGrid || !EL.selectedDateLabel) return;
 
   EL.selectedDateLabel.textContent = humanDate(selectedISO);
   EL.slotsGrid.innerHTML = "";
 
   const count = countForDate(selectedISO);
-  if (EL.slotHint){
+  if (EL.slotHint) {
     EL.slotHint.textContent = `Tip: click a time to select or deselect. You can book up to ${MAX_PER_DAY} session(s) on ${humanDate(selectedISO)}.`;
   }
 
-  TIMES.forEach(t=>{
+  TIMES.forEach((t) => {
     const id = `${selectedISO}_${t}`;
     const booked = !!bookings[id];
-    const atCap  = !booked && count >= MAX_PER_DAY;
+    const atCap = !booked && count >= MAX_PER_DAY;
 
     const b = document.createElement("button");
     b.type = "button";
@@ -132,10 +171,9 @@ function renderSlots(){
       b.title = `Daily limit (${MAX_PER_DAY}) reached`;
     }
 
-    b.addEventListener("click", ()=>{
+    b.addEventListener("click", () => {
       const res = toggleBooking(selectedISO, t);
       if (res.action === "blocked") {
-        // quick non-modal notice:
         b.blur();
       }
       renderSlots();
@@ -147,22 +185,26 @@ function renderSlots(){
 }
 
 /* ---------- "Your Bookings" list ---------- */
-function renderMyBookings(){
+function renderMyBookings() {
   if (!EL.myBookings) return;
-  const items = Object.values(bookings).sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  const items = Object.values(bookings).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
   EL.myBookings.innerHTML = items.length
-    ? items.map(b=>`
+    ? items
+        .map(
+          (b) => `
         <li>
           ${humanDate(b.date)} @ ${b.time}
           — <a class="btn" href="video.html?room=${encodeURIComponent(b.room)}">Join</a>
           <button class="btn secondary" data-cancel="${b.date}_${b.time}">Cancel</button>
         </li>
-      `).join("")
+      `
+        )
+        .join("")
     : `<li class="muted">No bookings yet.</li>`;
 
-  EL.myBookings.querySelectorAll("[data-cancel]").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
+  EL.myBookings.querySelectorAll("[data-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
       const id = btn.dataset.cancel;
       delete bookings[id];
       saveBookings();
@@ -173,29 +215,48 @@ function renderMyBookings(){
 }
 
 /* ---------- Clear selected day ---------- */
-if (EL.clearDay){
-  EL.clearDay.addEventListener("click", ()=>{
-    Object.keys(bookings).forEach(k => { if (bookings[k]?.date === selectedISO) delete bookings[k]; });
+if (EL.clearDay) {
+  EL.clearDay.addEventListener("click", () => {
+    Object.keys(bookings).forEach((k) => {
+      if (bookings[k]?.date === selectedISO) delete bookings[k];
+    });
     saveBookings();
     renderSlots();
     renderMyBookings();
   });
 }
 
-
 /* ---------- Month controls ---------- */
-if (EL.prevMonth) EL.prevMonth.addEventListener("click", ()=>{
-  viewMonth--; if (viewMonth<0){ viewMonth=11; viewYear--; }
-  renderCalendar(); renderSlots();
-});
-if (EL.nextMonth) EL.nextMonth.addEventListener("click", ()=>{
-  viewMonth++; if (viewMonth>11){ viewMonth=0; viewYear++; }
-  renderCalendar(); renderSlots();
-});
+if (EL.prevMonth)
+  EL.prevMonth.addEventListener("click", () => {
+    viewMonth--;
+    if (viewMonth < 0) {
+      viewMonth = 11;
+      viewYear--;
+    }
+    renderCalendar();
+    // ensure selection is applied in the new render
+    setSelectedDayUI(selectedISO);
+    renderSlots();
+  });
+
+if (EL.nextMonth)
+  EL.nextMonth.addEventListener("click", () => {
+    viewMonth++;
+    if (viewMonth > 11) {
+      viewMonth = 0;
+      viewYear++;
+    }
+    renderCalendar();
+    // ensure selection is applied in the new render
+    setSelectedDayUI(selectedISO);
+    renderSlots();
+  });
 
 /* ---------- Boot ---------- */
-(function init(){
+(function init() {
   renderCalendar();
+  setSelectedDayUI(selectedISO);
   renderSlots();
   renderMyBookings();
 })();
