@@ -235,3 +235,19 @@
     z-index: 1;
   }
 }
+/* =========================
+   STREAK FIRE IMAGE
+   ========================= */
+
+.streak-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.streak-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
