@@ -110,7 +110,7 @@
   background-repeat:
     no-repeat, no-repeat; /* Key: first layer only uses the art column width */
   background-size:
-    var(--art-col) auto,
+    calc(var(--art-col) * 0.9) auto,
     auto; /* FIX: top was getting visually cropped -> center it vertically instead of bottom */
   background-position:
     left center,
