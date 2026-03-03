@@ -84,7 +84,7 @@
   background-image: url("../../favicon/index/food.png");
   background-repeat: no-repeat;
   background-position: right 16px bottom 10px;
-  background-size: 220px auto;
+  background-size: 300px auto;
 
   /* Reserve space so text/buttons don't overlap the image */
   padding-right: 260px;
