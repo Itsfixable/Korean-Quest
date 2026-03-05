@@ -41,7 +41,7 @@
 /* Lessons layout */
 .lesson-list {
   display: grid;
-  gap: 12px;
+  gap: 8px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
@@ -134,7 +134,7 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 .nav .spacer { flex: 1; }
 .kq-switch {

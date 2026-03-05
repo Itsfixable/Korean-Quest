@@ -57,7 +57,7 @@ textarea::placeholder {
 .nav {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   flex-wrap: nowrap;
 }
 .nav .logo {
@@ -78,7 +78,7 @@ textarea::placeholder {
     display: none;
   }
   .nav {
-    gap: 10px;
+    gap: 8px;
   }
 } /* setup */
 .setup-top {

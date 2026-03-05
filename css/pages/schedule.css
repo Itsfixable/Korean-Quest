@@ -128,6 +128,7 @@ html, body {
   /* Force Nunito + Bold */
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
+  font-size: 1.15rem !important;
 }
 
 /* Hover */
@@ -195,6 +196,7 @@ html, body {
   /* Force Nunito + Bold */
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
+  font-size: 1.05rem !important;
 }
 
 /* Hover darker */
@@ -383,6 +385,7 @@ html body #calGrid button.day {
   color: #FFFFFF !important;
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
+  font-size: 1.15rem !important;
 }
 
 html body #calGrid button.day:hover:not(:disabled) {
@@ -399,6 +402,7 @@ html body #slotsGrid button.slot {
   color: #FFFFFF !important;
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
+  font-size: 1.05rem !important;
 }
 
 html body #slotsGrid button.slot:hover:not(:disabled):not(.booked) {

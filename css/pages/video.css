@@ -6,7 +6,7 @@
   --brand: #4f8cff;
   --brand-2: #7aa3ff;
   --accent: #7bd389;
-  --danger: #ff6b6b;
+  --danger: #CD4A4A;
   --ring: rgba(79, 140, 255, 0.35);
   --surface-1: #0f1420;
   --surface-2: #1a2130;
@@ -40,4 +40,35 @@
   border: none;
   display: block;
   border-radius: 12px;
+}
+
+/* Video room action buttons */
+#joinBtn,
+#joinBtn.btn {
+  background: #6A9F71 !important;
+  color: #FFFFFF !important;
+}
+
+#joinBtn:hover:not(:disabled),
+#joinBtn.btn:hover:not(:disabled) {
+  background: color-mix(in srgb, #6A9F71 88%, #000000 12%) !important;
+}
+
+#leaveBtn,
+#leaveBtn.btn,
+#leaveBtn.btn.secondary {
+  background: #CD4A4A !important;
+  color: #FFFFFF !important;
+}
+
+#leaveBtn:hover:not(:disabled),
+#leaveBtn.btn:hover:not(:disabled),
+#leaveBtn.btn.secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, #CD4A4A 88%, #000000 12%) !important;
+}
+
+#leaveBtn:disabled,
+#leaveBtn.btn:disabled,
+#leaveBtn.btn.secondary:disabled {
+  opacity: 0.65;
 }

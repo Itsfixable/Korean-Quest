@@ -8,8 +8,8 @@
   font-weight: 800;
 }
 .brand-logo {
-  height: 28px;
-  width: 28px;
+  height: 38px;
+  width: 38px;
   object-fit: contain;
   display: block;
 }
@@ -235,6 +235,7 @@
     z-index: 1;
   }
 }
+
 /* =========================
    STREAK FIRE IMAGE
    ========================= */
