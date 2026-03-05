@@ -18,7 +18,7 @@
   --brand-hover: #4F648A;     /* slightly darker hover */
   --selected-border: #4D5079;
 
-  --disabled: #B8BEC6;
+  --disabled: rgba(91, 114, 159, 0.4);
 
   --light-btn: #EFEFEF;
   --light-border: #C3C3C3;
@@ -125,7 +125,6 @@ html, body {
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.15s ease;
 
-  /* Force Nunito + Bold */
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
   font-size: 1.15rem !important;
@@ -137,9 +136,9 @@ html, body {
   transform: translateY(-1px);
 }
 
-/* Disabled (past dates) */
+/* Disabled (past dates / unselectable days) */
 #calGrid button.day:disabled {
-  background-color: #B8BEC6 !important;
+  background-color: rgba(91, 114, 159, 0.4) !important;
   color: #FFFFFF !important;
   cursor: not-allowed;
   transform: none !important;
@@ -193,7 +192,6 @@ html, body {
 
   transition: background 0.2s ease, transform 0.15s ease;
 
-  /* Force Nunito + Bold */
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
   font-size: 1.05rem !important;
@@ -243,12 +241,41 @@ html, body {
    YOUR BOOKINGS
    ========================= */
 
+/* booking action row */
+#myBookings li,
+#myBookings .booking-item,
+#myBookings .booking-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#myBookings {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* action buttons wrapper */
+#myBookings .booking-actions,
+#myBookings .actions,
+#myBookings .btn-group {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 /* Join button (rendered as <a class="btn">) */
 #myBookings a.btn {
   background: var(--brand) !important;
   color: #FFFFFF !important;
   border: 1px solid rgba(0,0,0,0.08) !important;
   border-radius: 10px;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  min-height: auto !important;
 }
 
 /* Join hover */
@@ -262,6 +289,12 @@ html, body {
   border: 1px solid #C3C3C3 !important;
   color: #000000 !important;
   border-radius: 10px;
+}
+
+/* extra space specifically between Join and Cancel */
+#myBookings a.btn + button.btn.secondary,
+#myBookings a.btn + .btn.secondary {
+  margin-left: 8px !important;
 }
 
 /* =========================
@@ -299,12 +332,10 @@ html, body {
    CALENDAR DECOR — BACKGROUND IMAGE VERSION
    With bottom padding space
    ========================================================= */
-
 .cal-card {
   position: relative;
   overflow: hidden;
 
-  /* Two background images: left + right */
   background-image:
     url("../../favicon/index/scheduleCalendarDesignLeft.png"),
     url("../../favicon/index/scheduleCalendarDesign.png");
@@ -313,7 +344,6 @@ html, body {
   background-position: left bottom, right bottom;
   background-size: 150px auto, 400px auto;
 
-  /* 🔥 THIS creates space so buttons don’t overlap decor */
   padding-bottom: 90px;
 }
 
@@ -321,10 +351,10 @@ html, body {
    MATCHING BOTTOM PADDING FOR TIME SECTION
    So the bottom edges line up visually
    ========================================================= */
-
 .slots-card {
   padding-bottom: 90px;
 }
+
 /* =========================================================
    YOUR BOOKINGS — ICON AS BACKGROUND IMAGE
    ========================================================= */
@@ -342,7 +372,7 @@ html, body {
 
 .bookings-title {
   margin: 0;
-  padding-left: 46px; /* space for icon background */
+  padding-left: 46px;
   position: relative;
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
@@ -417,7 +447,7 @@ html body #slotsGrid button.slot.me {
 html body #slotsGrid button.slot.booked,
 html body #slotsGrid button.slot:disabled,
 html body #calGrid button.day:disabled {
-  background: #B8BEC6 !important;
+  background: rgba(91, 114, 159, 0.4) !important;
   color: #FFFFFF !important;
   opacity: 1 !important;
 }
@@ -437,7 +467,12 @@ html body #clearDay {
 html body #myBookings a.btn {
   background: #5B729F !important;
   color: #FFFFFF !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
 }
+
 html body #myBookings a.btn:hover {
   background: #4F648A !important;
 }
