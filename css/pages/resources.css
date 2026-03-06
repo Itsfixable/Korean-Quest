@@ -112,8 +112,8 @@
 .lesson[data-lesson-id="L1_hangul"] {
   background-image: url("../../favicon/resources/hangulTrace.png");
   background-repeat: no-repeat;
-  background-position: right 16px bottom 10px;
-  background-size: 260px auto;
+  background-position: right 7px bottom 10px;
+  background-size: 300px auto;
   padding-right: 250px;
   min-height: 210px;
 }
