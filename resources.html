@@ -4,11 +4,15 @@
     <meta charset="UTF-8" />
     <title>Korean Quest — Resources</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="css/master.css" />
     <link rel="stylesheet" href="css/contrast-overrides.css" />
     <link rel="stylesheet" href="css/responsive.css" />
-
     <link rel="stylesheet" href="css/pages/resources.css" />
     <link rel="stylesheet" href="css/components/theme-toggle.css" />
     <link rel="stylesheet" href="css/chatbot.css" />
@@ -24,61 +28,83 @@
     <header class="container">
       <nav class="nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
-          <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
+          <img
+            class="brand-logo"
+            src="favicon/logoImage.png"
+            alt="Korean Quest logo"
+          />
           <span class="brand-wordmark">
             <span class="brand-korean">Korean</span>
             <span class="brand-quest">Quest</span>
           </span>
         </a>
+
         <a class="pill" href="index.html">Home</a>
         <a class="pill" href="schedule.html">Schedule</a>
         <a class="pill" href="resources.html" aria-current="page">Resources</a>
         <a class="pill" href="adventure.html">Adventure</a>
         <a class="pill" href="dashboard.html">Dashboard</a>
-        <!-- <a class="pill" href="shop.html">Shop</a> -->
         <a class="pill" href="leaderboard.html">Leaderboard</a>
         <a class="pill" href="about.html">About</a>
-        <!-- <a class="pill" href="test.html">test</a> -->
-
-        <!--
-        <span class="spacer"></span>
-        <span id="userBadge" class="muted"></span>
-        <button id="loginBtn" class="pill" type="button">Sign in</button>
-        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
-        -->
       </nav>
     </header>
 
-    <main class="container grid">
-      <!-- ✅ Study Tools (NEW) -->
-      <section class="card">
-        <h1>🧠 Study Tools</h1>
+    <main class="container resources-page">
+
+      <!-- Study Tools now directly follows the banner -->
+      <section class="card study-tools-card">
+
+        <!-- Banner inside the card -->
+        <div class="study-tools-banner">
+          <img
+            src="favicon/resources/resourcesBanner.png"
+            alt="Resources banner"
+          />
+        </div>
+
+        <h1 class="section-title">
+          <img
+            src="favicon/resources/brainEmoji.png"
+            alt=""
+            class="section-title__icon"
+          />
+          <span>Study Tools</span>
+        </h1>
+
         <p class="muted">
           Quizlet-style flashcards and tests to help you master vocabulary fast.
         </p>
 
-        <div class="lesson-actions" style="margin-top: 10px;">
-          <a class="btn" href="flashcards.html">📇 Flashcards</a>
-          <a class="btn secondary" href="test.html">📝 Take a Test</a>
+        <div class="lesson-actions study-tools-actions">
+          <a class="btn" href="flashcards.html">Flashcards</a>
+          <a class="btn secondary" href="test.html">Take a Test</a>
         </div>
+
       </section>
 
-      <!-- Lessons -->
       <section class="card">
-        <h1>📚 Lessons</h1>
+        <h1 class="section-title">
+          <img
+            src="favicon/resources/bookEmoji.png"
+            alt=""
+            class="section-title__icon"
+          />
+          <span>Lessons</span>
+        </h1>
+
         <p class="muted">
           Short, student-written lessons that build from Hangul to full
           sentences.
         </p>
 
         <div class="lesson-list" id="lesson-list">
-          <!-- Example item (JS will generate full list) -->
           <article class="lesson" data-lesson-id="L1_hangul">
             <header>
               <h2>Hangul 1: ㄱ ㄴ ㄷ ㅁ ㅂ + ㅏ</h2>
-              <!-- <span class="badge">6 min</span> -->
             </header>
+
             <p>Identify basic consonants and construct syllables with ㅏ.</p>
+
             <div class="lesson-actions">
               <a class="btn" href="jamo-select.html">Trace ㄱ</a>
             </div>
@@ -87,24 +113,23 @@
           <article class="lesson" data-lesson-id="L2_vocab_food">
             <header>
               <h2>Vocab: Food Basics (밥, 물, 김치, 빵, 우유, 사과)</h2>
-              <!-- <span class="badge">7 min</span> -->
             </header>
+
             <p>
               Learn high-frequency food words with picture matching and timed
               drills.
             </p>
+
             <div class="lesson-actions">
               <a class="btn" href="adventure.html">Adventure</a>
-              <!-- Optional: direct set link if you want -->
               <a class="btn secondary" href="flashcards.html">Flashcards</a>
             </div>
           </article>
         </div>
       </section>
 
-      <!-- Videos -->
       <section class="card">
-        <h2>🎬 Videos</h2>
+        <h2>Videos</h2>
         <p class="muted">
           Short explainers and pronunciation tips (embedded safely; credit
           sources).
@@ -119,20 +144,20 @@
             allowfullscreen
             loading="lazy"
           ></iframe>
-
-          <p class="muted">
-            Having trouble?
-            <a
-              target="_blank"
-              rel="noopener"
-              href="https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k"
-              >Open the playlist on YouTube</a
-            >.
-          </p>
         </div>
+
+        <p class="muted video-help-text">
+          Having trouble?
+          <a
+            target="_blank"
+            rel="noopener"
+            href="https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k"
+          >
+            Open the playlist on YouTube
+          </a>.
+        </p>
       </section>
 
-      <!-- Downloadables -->
       <section class="card">
         <h2>⬇️ Downloadables</h2>
         <ul>
@@ -151,8 +176,10 @@
         <form id="authForm">
           <label>Email</label>
           <input id="authEmail" type="email" required />
+
           <label>Password</label>
           <input id="authPass" type="password" required minlength="6" />
+
           <div class="row">
             <button id="emailSignIn" class="btn primary" type="submit">
               Sign in
@@ -162,12 +189,14 @@
             </button>
           </div>
         </form>
+
         <div class="row">
           <button id="googleBtn" class="btn" type="button">
             Continue with Google
           </button>
           <button id="authClose" class="btn" type="button">Close</button>
         </div>
+
         <p id="authMsg" class="muted" aria-live="polite"></p>
       </div>
     </div>

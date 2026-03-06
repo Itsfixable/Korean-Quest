@@ -93,7 +93,7 @@
   text-align: center;
 }
 .map-node.locked {
-  opacity: 0.55;
+  /* opacity: 0.55; */
   cursor: not-allowed;
 }
 .hp-row {
@@ -168,8 +168,8 @@
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 .map-node.locked {
-  background: #b8bec6 !important;
-  color: #ffffff !important;
+
+  color: black !important;
   opacity: 0.8 !important;
 }
 .map-node .subtext,
@@ -247,5 +247,8 @@ map-node > div:first-child {
 
 /* Locked text stays dimmer */
 .map-node.locked .muted {
-  color: #6b6b6b !important;
+  color: black !important;
+}
+.map-node.locked {
+  background: rgba(91, 114, 159, 0.4) !important;
 }
