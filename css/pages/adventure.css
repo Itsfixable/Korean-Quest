@@ -18,6 +18,7 @@
   --border-solid: #2a3242;
   --overlay: rgba(0, 0, 0, 0.35);
 }
+
 :root[data-theme="light"] {
   --bg: #f7f9fc;
   --panel: #ffffff;
@@ -40,11 +41,13 @@
   --radius: 14px;
   --container: 1100px;
 }
+
 .map {
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
+
 .map-node {
   background: var(--surface-2);
   color: var(--text);
@@ -54,35 +57,42 @@
   cursor: pointer;
   text-align: center;
 }
+
 .map-node.locked {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
 .hp-row {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: center;
 }
+
 .bar {
   height: 10px;
   background: var(--border-solid);
   border-radius: 999px;
   overflow: hidden;
 }
+
 .bar i {
   display: block;
   height: 100%;
   background: linear-gradient(90deg, var(--brand), var(--brand-2));
 }
+
 #questionMount .btn {
   margin-top: 8px;
 }
+
 .map {
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
+
 .map-node {
   background: #1a2130;
   color: #fff;
@@ -92,56 +102,71 @@
   cursor: pointer;
   text-align: center;
 }
+
 .map-node.locked {
-  /* opacity: 0.55; */
+  opacity: 0.55;
   cursor: not-allowed;
 }
+
 .hp-row {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: center;
 }
+
 .bar {
   height: 10px;
   background: #2a3242;
   border-radius: 999px;
   overflow: hidden;
 }
+
 .bar i {
   display: block;
   height: 100%;
   background: linear-gradient(90deg, var(--brand), var(--brand-2));
 }
+
 #questionMount .btn {
   margin-top: 8px;
-} /* Fun battle polish (keeps your page tokens) */
+}
+
+/* Fun battle polish (keeps your page tokens) */
 .battle .sprite {
   filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
 }
+
 .bar {
   height: 10px;
   background: var(--border-solid);
   border-radius: 999px;
   overflow: hidden;
 }
+
+/* updated: health/progress fill back to red */
 .bar i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  background: linear-gradient(90deg, green, lightgreen);
   transition: width 0.25s ease;
 }
+
 #qChoices .btn {
   background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border-mid);
 }
+
 #qChoices .btn.correct {
   outline: 2px solid var(--accent);
 }
+
 #qChoices .btn.wrong {
   outline: 2px solid var(--danger);
-} /* Make the Keys counter match other buttons but stay compact */
+}
+
+/* Make the Keys counter match other buttons but stay compact */
 .id-badge {
   padding: 4px 10px;
   font-size: 0.85rem;
@@ -149,106 +174,95 @@
   box-shadow: none;
   transform: none;
 }
+
 .id-badge:hover {
   filter: none;
 }
 
-/* ========================= FBLA Color Overrides — Adventure (SPEC COMPLIANCE) ========================= */ /* Keys button */
-#keysBtn,
-.id-badge,
-.btn.keys,
-.keysBtn {
-  background: #d5dff1 !important;
-  color: #000000 !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-} /* Level buttons */
-.map-node {
-  background: #5b729f !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+/* Adventure: Keys indicator in map header */
+#kqKeyBadge {
+  background: #d5dff1;
+  color: #000000;
 }
-.map-node.locked {
 
-  color: black !important;
-  opacity: 0.8 !important;
+/* Adventure: Map level nodes */
+button.map-node {
+  background: #5b729f;
+  color: #ffffff;
 }
-.map-node .subtext,
-.map-node .status,
-.map-node .hp,
-.map-node small {
-  color: #BAC7D6 !important;
-}/* Answer choice buttons */
+
+/* Locked state for map nodes */
+button.map-node.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Text inside map nodes */
+button.map-node,
+button.map-node .subtext {
+  color: #bac1cf;
+}
+
+/* QUESTIONS: Answer choice buttons */
 #qChoices .btn {
-  background: #d5dff1 !important;
-  color: #000000 !important;
-  border: 1px solid #8faecf !important;
-} /* Run button */
-#exitBattleBtn,
-#runBtn,
-.btn.run {
-  background: #cd4a4a !important;
+  background: #d5dff1;
+  color: #000000;
+  border: 2px solid #8faecf;
+}
+
+/* RUN button */
+#qFeedback ~ .btn,
+button#exitBattleBtn,
+button.btn:contains("Run") {
+  background: #cd4a4a;
+  color: #ffffff;
+}
+
+/* =================================
+   Adventure — Brand Colors
+================================= */
+.adventure .btn-keys {
+  background: var(--kq-pale-blue);
+  color: var(--kq-black);
+}
+
+.adventure .level-btn {
+  background: var(--kq-primary);
+  color: var(--kq-white);
+}
+
+.adventure .level-btn .status,
+.adventure .level-btn .hp {
+  color: var(--kq-level-subtext);
+}
+
+.adventure .choice-btn {
+  background: var(--kq-pale-blue);
+  color: var(--kq-black);
+  border: 1px solid var(--kq-choice-border);
+}
+
+.adventure .btn-run {
+  background: var(--kq-danger);
+  color: var(--kq-white);
+}
+
+.level,
+.level * {
   color: #ffffff !important;
-  border: none !important;
-}
-/* =========================
-   FBLA Spec — Adventure READY + HP
-   ========================= */
-
-/* READY text */
-.battle .ready,
-.ready,
-.status-ready {
-  color: #BAC7D6 !important;
 }
 
-/* HP label text */
-.hp-row span,
-.hp-label,
-.hp-text {
-  color: #BAC7D6 !important;
+/* Make level node text white (Level/Ready/Locked/HP) */
+.map-node {
+  color: #ffffff;
 }
 
-/* HP bar background */
-.hp-row .bar {
-  background: #BAC7D6 !important;
-}
-
-/* HP bar fill (the inner <i> element) */
-.hp-row .bar i {
-  background: #BAC7D6 !important;
-}
-
-/* =========================
-   FBLA Spec — Adventure READY + HP
-   ========================= */
-
-/* Force READY + HP text color */
-.map-node .ready,
-.map-node .status,
-.map-node .hp,
-.map-node small,
-.map-node span {
-  color: #BAC7D6 !important;
-}
-/* =========================
-   FBLA — Adventure Level Cards
-   READY + HP text color
-   ========================= */
-
-/* Only affects the muted lines INSIDE each level card */
-/* READY + HP */
-.map-node:not(.locked) .muted {
-  color: #BAC7D6 !important;
-}
-map-node > div:first-child {
-  color: #6b6b6b  !important;  /* softer white */
-  font-weight: 800;
-}
-
-/* Locked text stays dimmer */
-.map-node.locked .muted {
-  color: black !important;
-}
+/* If locked nodes had their own color/opacity rules, force text white too */
 .map-node.locked {
-  background: rgba(91, 114, 159, 0.4) !important;
+  color: #ffffff;
+}
+
+/* If you use a child element for parts of the text anywhere */
+.map-node * {
+  color: #ffffff;
 }
