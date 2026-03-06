@@ -455,23 +455,24 @@ html body #myBookings button.btn.secondary {
 #calGrid button.day.selected,
 html body #calGrid button.day.selected {
   background: #5b729f !important;
-  border: 2px solid #25c237 !important;
-  box-shadow:
+  border: 3px solid #31b525 !important;
+  /* box-shadow:
     0 0 4px rgba(37, 194, 55, 0.9),
     0 0 10px rgba(37, 194, 55, 0.6),
     0 0 18px rgba(37, 194, 55, 0.35),
-    0 0 28px rgba(37, 194, 55, 0.15) !important;
+    0 0 28px rgba(37, 194, 55, 0.15) !important; */
 }
 
 #calGrid button.day.selected:hover:not(:disabled),
 html body #calGrid button.day.selected:hover:not(:disabled) {
   background: #4f648a !important;
-  box-shadow:
+}
+  /* box-shadow:
     0 0 5px rgba(37, 194, 55, 0.95),
     0 0 12px rgba(37, 194, 55, 0.7),
     0 0 22px rgba(37, 194, 55, 0.45),
     0 0 36px rgba(37, 194, 55, 0.2) !important;
-}
+} */
 
 .slots-grid button.slot.selected,
 .slots-grid button.slot.me,
@@ -482,15 +483,22 @@ html body #calGrid button.day.selected:hover:not(:disabled) {
 html body #slotsGrid button.slot.selected,
 html body #slotsGrid button.slot.me,
 html body #slotsGrid button.slot[aria-selected="true"] {
-  background: #5b729f !important;
-  color: #ffffff !important;
-  border: 2px solid #25c237 !important;
-  box-shadow:
+    background: #5b729f !important;
+    border: 3px solid #31b525 !important;
+    color: white;
+  /* box-shadow:
+    0 0 4px rgba(37, 194, 55, 0.9),
+    0 0 10px rgba(37, 194, 55, 0.6),
+    0 0 18px rgba(37, 194, 55, 0.35),
+    0 0 28px rgba(37, 194, 55, 0.15) !important; */
+}
+
+  /* box-shadow:
     0 0 4px rgba(37, 194, 55, 0.9),
     0 0 10px rgba(37, 194, 55, 0.6),
     0 0 18px rgba(37, 194, 55, 0.35),
     0 0 28px rgba(37, 194, 55, 0.15) !important;
-}
+} */
 
 .slots-grid button.slot.selected:hover:not(:disabled):not(.booked),
 .slots-grid button.slot.me:hover:not(:disabled):not(.booked),
@@ -504,9 +512,4 @@ html body
   #slotsGrid
   button.slot[aria-selected="true"]:hover:not(:disabled):not(.booked) {
   background: #4f648a !important;
-  box-shadow:
-    0 0 5px rgba(37, 194, 55, 0.95),
-    0 0 14px rgba(37, 194, 55, 0.7),
-    0 0 26px rgba(37, 194, 55, 0.45),
-    0 0 42px rgba(37, 194, 55, 0.2) !important;
-}
+  }
