@@ -113,7 +113,7 @@
   background-image: url("../../favicon/resources/hangulTrace.png");
   background-repeat: no-repeat;
   background-position: right 7px bottom 10px;
-  background-size: 300px auto;
+  background-size: 320px auto;
   padding-right: 250px;
   min-height: 210px;
 }
@@ -124,7 +124,7 @@
 .lesson[data-lesson-id="L2_vocab_food"] {
   background-image: url("../../favicon/index/food.png");
   background-repeat: no-repeat;
-  background-position: right 7px bottom 25px;
+  background-position: right 7px bottom 10px;
   background-size: 270px auto;
   padding-right: 260px;
   min-height: 210px;
