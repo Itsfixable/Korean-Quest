@@ -73,12 +73,40 @@ body {
   line-height: 1;
 }
 
+.student-dashboard-body {
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.student-dashboard-left {
+  min-width: 0;
+}
+
+.student-dashboard-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.dashboard-archery-art {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
 .dashboard-stats {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
   max-width: 380px;
-  margin-bottom: 20px;
 }
 
 .stat-box {
@@ -177,20 +205,32 @@ body {
   margin-bottom: 0;
 }
 
-/* OPTIONAL LIGHTER BULLET FEEL */
 .recent-list li::marker,
 .quest-list li::marker {
   color: #000000;
 }
 
-/* SMALL POLISH */
+/* CARD HEIGHT POLISH */
 .recent-card,
 .quests-card {
   min-height: 250px;
 }
 
 /* RESPONSIVE */
-@media (max-width: 900px) {
+@media (max-width: 980px) {
+  .student-dashboard-body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .student-dashboard-right {
+    order: -1;
+  }
+
+  .dashboard-archery-art {
+    max-width: 380px;
+  }
+
   .dashboard-columns {
     grid-template-columns: 1fr;
   }
@@ -223,5 +263,9 @@ body {
   .recent-list li {
     margin-bottom: 14px;
     line-height: 1.7;
+  }
+
+  .dashboard-archery-art {
+    max-width: 100%;
   }
 }
