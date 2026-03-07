@@ -1,0 +1,8 @@
+{
+  "name": "kq-call-summary",
+  "main": "src/index.js",
+  "compatibility_date": "2026-03-06",
+  "vars": {
+    "HF_MODEL": "katanemo/Arch-Router-1.5B:hf-inference"
+  }
+}

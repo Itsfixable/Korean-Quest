@@ -106,20 +106,14 @@ const els = {
   sharedNotes: document.getElementById("sharedNotes"),
   saveNotesBtn: document.getElementById("saveNotesBtn"),
 
-  summarySection: document.getElementById("summarySection"),
-  summaryXp: document.getElementById("summaryXp"),
-  summaryTopics: document.getElementById("summaryTopics"),
-  summaryWords: document.getElementById("summaryWords"),
-  summaryStrengths: document.getElementById("summaryStrengths"),
-  summaryRecommendations: document.getElementById("summaryRecommendations"),
-  summaryCoachNote: document.getElementById("summaryCoachNote"),
+  aiSummaryBtn: document.getElementById("aiSummaryBtn"),
 };
 
 const state = {
   api: null,
   roomCode: "",
   inCall: false,
-  role: "none", // host | student | none
+  role: "none",
   timerId: null,
   seconds: 0,
   xp: 0,
@@ -163,15 +157,19 @@ function getRoomNameFromCode(code) {
 }
 
 function saveNotes() {
+  if (!els.sharedNotes) return;
   localStorage.setItem("kq_video_notes", els.sharedNotes.value);
 }
 
 function loadNotes() {
+  if (!els.sharedNotes) return;
   const saved = localStorage.getItem("kq_video_notes");
   if (saved) els.sharedNotes.value = saved;
 }
 
 function renderWords() {
+  if (!els.wordList || !els.trackedWordCount) return;
+
   els.wordList.innerHTML = "";
 
   if (state.words.length === 0) {
@@ -207,8 +205,11 @@ function renderWords() {
 
 function renderMission(mission) {
   state.currentMission = mission;
-  els.missionTitle.textContent = mission.title;
-  els.missionDesc.textContent = mission.desc;
+
+  if (els.missionTitle) els.missionTitle.textContent = mission.title;
+  if (els.missionDesc) els.missionDesc.textContent = mission.desc;
+
+  if (!els.missionWords) return;
   els.missionWords.innerHTML = "";
 
   mission.words.forEach((word) => {
@@ -221,15 +222,19 @@ function renderMission(mission) {
 
 function renderPrompt(prompt) {
   state.currentPrompt = prompt;
-  els.promptText.textContent = prompt.english;
-  els.promptSubtext.textContent = prompt.korean;
+  if (els.promptText) els.promptText.textContent = prompt.english;
+  if (els.promptSubtext) els.promptSubtext.textContent = prompt.korean;
 }
 
 function updateStats() {
-  els.xpValue.textContent = String(state.xp);
-  els.promptCount.textContent = String(state.promptsUsed);
-  els.trackedWordCount.textContent = String(state.words.length);
-  els.missionStatus.textContent = state.missionComplete ? "Yes" : "No";
+  if (els.xpValue) els.xpValue.textContent = String(state.xp);
+  if (els.promptCount) els.promptCount.textContent = String(state.promptsUsed);
+  if (els.trackedWordCount) {
+    els.trackedWordCount.textContent = String(state.words.length);
+  }
+  if (els.missionStatus) {
+    els.missionStatus.textContent = state.missionComplete ? "Yes" : "No";
+  }
 }
 
 function addXP(amount) {
@@ -240,11 +245,11 @@ function addXP(amount) {
 function startTimer() {
   stopTimer();
   state.seconds = 0;
-  els.callTimer.textContent = "00:00";
+  if (els.callTimer) els.callTimer.textContent = "00:00";
 
   state.timerId = window.setInterval(() => {
     state.seconds += 1;
-    els.callTimer.textContent = formatTime(state.seconds);
+    if (els.callTimer) els.callTimer.textContent = formatTime(state.seconds);
 
     if (state.seconds > 0 && state.seconds % 60 === 0) {
       addXP(10);
@@ -262,6 +267,8 @@ function stopTimer() {
 function setRole(role) {
   state.role = role;
 
+  if (!els.roleBadge) return;
+
   if (role === "host") {
     els.roleBadge.textContent = "Moderator";
     els.roleBadge.className = "role-pill host";
@@ -276,29 +283,43 @@ function setRole(role) {
 
 function setCallUI(isLive) {
   state.inCall = isLive;
-  els.leaveCallBtn.disabled = !isLive;
-  els.completeSessionBtn.disabled = !isLive;
 
-  if (isLive) {
-    els.callStatus.textContent = "In call";
-    els.callStatus.classList.add("live");
-    els.meetPlaceholder.hidden = true;
-  } else {
-    els.callStatus.textContent = "Not in call";
-    els.callStatus.classList.remove("live");
-    els.meetPlaceholder.hidden = false;
+  if (els.leaveCallBtn) els.leaveCallBtn.disabled = !isLive;
+  if (els.completeSessionBtn) els.completeSessionBtn.disabled = !isLive;
+
+  if (els.callStatus) {
+    if (isLive) {
+      els.callStatus.textContent = "In call";
+      els.callStatus.classList.add("live");
+    } else {
+      els.callStatus.textContent = "Not in call";
+      els.callStatus.classList.remove("live");
+    }
+  }
+
+  if (els.meetPlaceholder) {
+    els.meetPlaceholder.hidden = isLive;
   }
 }
 
 function setRoomCode(code) {
   state.roomCode = sanitizeCode(code);
-  els.generatedCode.textContent = state.roomCode || "------";
-  els.currentRoomCode.textContent = state.roomCode || "None";
+
+  if (els.generatedCode) {
+    els.generatedCode.textContent = state.roomCode || "------";
+  }
+
+  if (els.currentRoomCode) {
+    els.currentRoomCode.textContent = state.roomCode || "None";
+  }
 }
 
 function copyCurrentCode() {
   if (!state.roomCode) return;
+
   navigator.clipboard.writeText(state.roomCode).then(() => {
+    if (!els.copyCodeBtn) return;
+
     els.copyCodeBtn.textContent = "Copied";
     window.setTimeout(() => {
       els.copyCodeBtn.textContent = "Copy";
@@ -315,7 +336,10 @@ function destroyMeeting() {
     }
     state.api = null;
   }
-  els.meetMount.innerHTML = "";
+
+  if (els.meetMount) {
+    els.meetMount.innerHTML = "";
+  }
 }
 
 function joinCallWithCode(code) {
@@ -376,7 +400,7 @@ function createGroup() {
 }
 
 function joinGroup() {
-  const code = sanitizeCode(els.joinCodeInput.value);
+  const code = sanitizeCode(els.joinCodeInput?.value || "");
 
   if (!code) {
     alert("Enter a valid room code first.");
@@ -385,7 +409,7 @@ function joinGroup() {
 
   setRole("student");
   setRoomCode(code);
-  els.joinCodeInput.value = code;
+  if (els.joinCodeInput) els.joinCodeInput.value = code;
   addXP(5);
   joinCallWithCode(code);
 }
@@ -396,148 +420,10 @@ function leaveCall() {
   stopTimer();
 }
 
-function makeListItems(target, items) {
-  target.innerHTML = "";
-  items.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    target.appendChild(li);
-  });
-}
-
-function inferTopics() {
-  const topics = new Set();
-
-  if (state.currentMission?.topic) topics.add(state.currentMission.topic);
-  if (state.currentPrompt?.topic) topics.add(state.currentPrompt.topic);
-
-  const notes = els.sharedNotes.value.toLowerCase();
-
-  if (notes.includes("food") || notes.includes("김치") || notes.includes("물")) {
-    topics.add("Food vocabulary");
-  }
-  if (notes.includes("school") || notes.includes("수업") || notes.includes("학교")) {
-    topics.add("School conversation");
-  }
-  if (
-    notes.includes("introduce") ||
-    notes.includes("이름") ||
-    notes.includes("안녕하세요")
-  ) {
-    topics.add("Introductions");
-  }
-
-  if (topics.size === 0) topics.add("General speaking practice");
-
-  return [...topics];
-}
-
-function inferStrengths() {
-  const strengths = [];
-
-  if (state.words.length >= 5) {
-    strengths.push("You used a strong amount of target vocabulary during the session.");
-  } else if (state.words.length >= 2) {
-    strengths.push("You used multiple Korean words during the call, which is a great sign of recall.");
-  } else {
-    strengths.push("You completed a speaking session and started building speaking confidence.");
-  }
-
-  if (state.promptsUsed >= 2) {
-    strengths.push("You explored multiple prompts, which helps build flexible conversation skills.");
-  }
-
-  if (state.missionComplete) {
-    strengths.push("You completed your roleplay mission and practiced language in context.");
-  }
-
-  if (els.sharedNotes.value.trim().length > 25) {
-    strengths.push("You took useful notes, which will help reinforce retention after the call.");
-  }
-
-  if (strengths.length === 0) {
-    strengths.push("You showed up and practiced speaking, which is one of the best ways to improve.");
-  }
-
-  return strengths;
-}
-
-function inferRecommendations() {
-  const recs = [];
-  const words = state.words.map((w) => w.toLowerCase());
-  const notes = els.sharedNotes.value.toLowerCase();
-
-  if (words.length < 4) {
-    recs.push("Review a short flashcard set before your next call so you can use more target words naturally.");
-  }
-
-  if (notes.includes("hard") || notes.includes("confusing") || notes.includes("forgot")) {
-    recs.push("Revisit the words or phrases you marked as difficult in your notes.");
-  }
-
-  if (state.currentMission?.topic === "Food ordering") {
-    recs.push("Try the Food Basics lesson and matching flashcards next.");
-  }
-
-  if (state.currentMission?.topic === "Introductions") {
-    recs.push("Practice beginner Hangul and introduction phrases before your next session.");
-  }
-
-  if (!state.missionComplete) {
-    recs.push("Finish the full mission next time for bonus XP and stronger speaking structure.");
-  }
-
-  if (recs.length < 3) {
-    recs.push("Do one short speaking call again tomorrow to reinforce confidence and consistency.");
-  }
-
-  return recs.slice(0, 4);
-}
-
-function buildCoachNote(durationMinutes) {
-  const topicText = inferTopics()[0];
-  const usedWords = state.words.length;
-
-  return `Nice work. You spent about ${durationMinutes} minute${
-    durationMinutes === 1 ? "" : "s"
-  } practicing ${topicText.toLowerCase()}. You tracked ${usedWords} word${
-    usedWords === 1 ? "" : "s"
-  } during the session, which gives you a strong base for your next review. Keep focusing on speaking complete phrases and reusing the mission vocabulary out loud.`;
-}
-
-function generateSummary() {
-  leaveCall();
-
-  if (state.seconds >= 120) addXP(30);
-  if (state.words.length >= 4) addXP(20);
-  if (state.promptsUsed >= 2) addXP(10);
-  if (state.missionComplete) addXP(20);
-
-  const topics = inferTopics();
-  const strengths = inferStrengths();
-  const recommendations = inferRecommendations();
-  const durationMinutes = Math.max(1, Math.round(state.seconds / 60));
-
-  makeListItems(els.summaryTopics, topics);
-  makeListItems(
-    els.summaryWords,
-    state.words.length ? state.words : ["No words were manually tracked this session."]
-  );
-  makeListItems(els.summaryStrengths, strengths);
-  makeListItems(els.summaryRecommendations, recommendations);
-
-  els.summaryXp.textContent = String(state.xp);
-  els.summaryCoachNote.textContent = buildCoachNote(durationMinutes);
-
-  els.summarySection.hidden = false;
-  els.summarySection.scrollIntoView({ behavior: "smooth", block: "start" });
-  updateStats();
-}
-
 function handleWordAdd(event) {
   event.preventDefault();
-  const value = els.wordInput.value.trim();
 
+  const value = els.wordInput?.value?.trim();
   if (!value) return;
 
   if (!state.words.includes(value)) {
@@ -545,9 +431,18 @@ function handleWordAdd(event) {
     addXP(5);
   }
 
-  els.wordInput.value = "";
+  if (els.wordInput) els.wordInput.value = "";
   renderWords();
   updateStats();
+}
+
+function finishSession() {
+  state.missionComplete = true;
+  updateStats();
+
+  if (els.aiSummaryBtn) {
+    els.aiSummaryBtn.click();
+  }
 }
 
 function initEvents() {
@@ -567,7 +462,7 @@ function initEvents() {
   });
 
   els.leaveCallBtn?.addEventListener("click", leaveCall);
-  els.completeSessionBtn?.addEventListener("click", generateSummary);
+  els.completeSessionBtn?.addEventListener("click", finishSession);
 
   els.newMissionBtn?.addEventListener("click", () => {
     renderMission(pickRandom(missions));

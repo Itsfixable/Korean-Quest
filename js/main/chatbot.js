@@ -1,230 +1,230 @@
 /* Korean Learning AI Chatbot (GitHub Pages + Cloudflare Worker)
    ============================================================
-   This frontend DOES NOT call Hugging Face or OpenAI directly.
-   It calls your Cloudflare Worker endpoint.
-*/
-import { getLeaderboard, getPlayer } from "./state.js";
+      This frontend DOES NOT call Hugging Face or OpenAI directly.
+         It calls your Cloudflare Worker endpoint.
+         */
+         import { getLeaderboard, getPlayer } from "./state.js";
 
-/* ----------------------------- Leaderboard rendering ------------------------------ */
-function renderLeaderboard() {
-  const rows = getLeaderboard().slice();
-  const me = getPlayer();
+         /* ----------------------------- Leaderboard rendering ------------------------------ */
+         function renderLeaderboard() {
+           const rows = getLeaderboard().slice();
+             const me = getPlayer();
 
-  rows.push({ name: "You", xp: me.xp });
-  rows.sort((a, b) => b.xp - a.xp);
+               rows.push({ name: "You", xp: me.xp });
+                 rows.sort((a, b) => b.xp - a.xp);
 
-  const tbody = document.querySelector("#lbTable tbody");
-  if (!tbody) return;
+                   const tbody = document.querySelector("#lbTable tbody");
+                     if (!tbody) return;
 
-  tbody.innerHTML = rows
-    .map(
-      (r, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${r.name}</td>
-          <td>${r.xp}</td>
-        </tr>
-      `
-    )
-    .join("");
-}
+                       tbody.innerHTML = rows
+                           .map(
+                                 (r, i) => `
+                                         <tr>
+                                                   <td>${i + 1}</td>
+                                                             <td>${r.name}</td>
+                                                                       <td>${r.xp}</td>
+                                                                               </tr>
+                                                                                     `
+                                                                                         )
+                                                                                             .join("");
+                                                                                             }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", renderLeaderboard);
-} else {
-  renderLeaderboard();
-}
+                                                                                             if (document.readyState === "loading") {
+                                                                                               document.addEventListener("DOMContentLoaded", renderLeaderboard);
+                                                                                               } else {
+                                                                                                 renderLeaderboard();
+                                                                                                 }
 
-/* ----------------------------- Chatbot (calls Worker only) ------------------------------ */
-const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
+                                                                                                 /* ----------------------------- Chatbot (calls Worker only) ------------------------------ */
+                                                                                                 const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
 
-// Recommended (forwarded to Worker; Worker may ignore/use it)
-const MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference";
+                                                                                                 // Recommended (forwarded to Worker; Worker may ignore/use it)
+                                                                                                 const MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference";
 
-let chatHistory = [];
-const MAX_HISTORY = 14; // Prevent huge prompts (demo-friendly)
+                                                                                                 let chatHistory = [];
+                                                                                                 const MAX_HISTORY = 14; // Prevent huge prompts (demo-friendly)
 
-function initChatbot() {
-  // ✅ Robust path to favicon/chatbot.png from this module file, regardless of page location
-  const chatbotIconURL = new URL("../../favicon/chatbot.png", import.meta.url).href;
+                                                                                                 function initChatbot() {
+                                                                                                   // ✅ Robust path to favicon/chatbot.png from this module file, regardless of page location
+                                                                                                     const chatbotIconURL = new URL("../../favicon/chatbot.png", import.meta.url).href;
 
-  // Use PNG icon instead of inline SVG
-  const chatIconHTML = `
-    <img
-      class="chatbot-toggle-icon"
-      src="${chatbotIconURL}"
-      alt="Chatbot"
-      draggable="false"
-    />
-  `;
+                                                                                                       // Use PNG icon instead of inline SVG
+                                                                                                         const chatIconHTML = `
+                                                                                                             <img
+                                                                                                                   class="chatbot-toggle-icon"
+                                                                                                                         src="${chatbotIconURL}"
+                                                                                                                               alt="Chatbot"
+                                                                                                                                     draggable="false"
+                                                                                                                                         />
+                                                                                                                                           `;
 
-  const chatbotHTML = `
-    <button id="chatbot-toggle" class="chatbot-toggle-btn" aria-label="Open chatbot">
-      ${chatIconHTML}
-    </button>
+                                                                                                                                             const chatbotHTML = `
+                                                                                                                                                 <button id="chatbot-toggle" class="chatbot-toggle-btn" aria-label="Open chatbot">
+                                                                                                                                                       ${chatIconHTML}
+                                                                                                                                                           </button>
 
-    <div id="chatbot-widget" class="chatbot-container" aria-live="polite">
-      <div class="chatbot-header">
-        <h3>Korean Learning Assistant</h3>
-        <button id="chatbot-close" class="chatbot-close-btn" aria-label="Close chatbot">✕</button>
-      </div>
+                                                                                                                                                               <div id="chatbot-widget" class="chatbot-container" aria-live="polite">
+                                                                                                                                                                     <div class="chatbot-header">
+                                                                                                                                                                             <h3>Korean Learning Assistant</h3>
+                                                                                                                                                                                     <button id="chatbot-close" class="chatbot-close-btn" aria-label="Close chatbot">✕</button>
+                                                                                                                                                                                           </div>
 
-      <div id="chatbot-messages" class="chatbot-messages"></div>
+                                                                                                                                                                                                 <div id="chatbot-messages" class="chatbot-messages"></div>
 
-      <div class="chatbot-input-area">
-        <input id="chatbot-input" type="text" placeholder="Ask a question..." />
-        <button id="chatbot-send" class="chatbot-send-btn">Send</button>
-      </div>
-    </div>
-  `;
+                                                                                                                                                                                                       <div class="chatbot-input-area">
+                                                                                                                                                                                                               <input id="chatbot-input" type="text" placeholder="Ask a question..." />
+                                                                                                                                                                                                                       <button id="chatbot-send" class="chatbot-send-btn">Send</button>
+                                                                                                                                                                                                                             </div>
+                                                                                                                                                                                                                                 </div>
+                                                                                                                                                                                                                                   `;
 
-  // Prevent duplicates if script is loaded on multiple pages
-  if (!document.getElementById("chatbot-toggle")) {
-    document.body.insertAdjacentHTML("beforeend", chatbotHTML);
-  }
+                                                                                                                                                                                                                                     // Prevent duplicates if script is loaded on multiple pages
+                                                                                                                                                                                                                                       if (!document.getElementById("chatbot-toggle")) {
+                                                                                                                                                                                                                                           document.body.insertAdjacentHTML("beforeend", chatbotHTML);
+                                                                                                                                                                                                                                             }
 
-  const toggleBtn = document.getElementById("chatbot-toggle");
-  const closeBtn = document.getElementById("chatbot-close");
-  const sendBtn = document.getElementById("chatbot-send");
-  const input = document.getElementById("chatbot-input");
-  const container = document.getElementById("chatbot-widget");
-  if (!toggleBtn || !closeBtn || !sendBtn || !input || !container) return;
+                                                                                                                                                                                                                                               const toggleBtn = document.getElementById("chatbot-toggle");
+                                                                                                                                                                                                                                                 const closeBtn = document.getElementById("chatbot-close");
+                                                                                                                                                                                                                                                   const sendBtn = document.getElementById("chatbot-send");
+                                                                                                                                                                                                                                                     const input = document.getElementById("chatbot-input");
+                                                                                                                                                                                                                                                       const container = document.getElementById("chatbot-widget");
+                                                                                                                                                                                                                                                         if (!toggleBtn || !closeBtn || !sendBtn || !input || !container) return;
 
-  toggleBtn.addEventListener("click", () => {
-    container.classList.toggle("chatbot-open");
-    toggleBtn.classList.toggle("chatbot-hidden");
-    if (container.classList.contains("chatbot-open")) input.focus();
-  });
+                                                                                                                                                                                                                                                           toggleBtn.addEventListener("click", () => {
+                                                                                                                                                                                                                                                               container.classList.toggle("chatbot-open");
+                                                                                                                                                                                                                                                                   toggleBtn.classList.toggle("chatbot-hidden");
+                                                                                                                                                                                                                                                                       if (container.classList.contains("chatbot-open")) input.focus();
+                                                                                                                                                                                                                                                                         });
 
-  closeBtn.addEventListener("click", () => {
-    container.classList.remove("chatbot-open");
-    toggleBtn.classList.remove("chatbot-hidden");
-  });
+                                                                                                                                                                                                                                                                           closeBtn.addEventListener("click", () => {
+                                                                                                                                                                                                                                                                               container.classList.remove("chatbot-open");
+                                                                                                                                                                                                                                                                                   toggleBtn.classList.remove("chatbot-hidden");
+                                                                                                                                                                                                                                                                                     });
 
-  sendBtn.addEventListener("click", sendMessage);
+                                                                                                                                                                                                                                                                                       sendBtn.addEventListener("click", sendMessage);
 
-  // Use keydown instead of deprecated keypress
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
+                                                                                                                                                                                                                                                                                         // Use keydown instead of deprecated keypress
+                                                                                                                                                                                                                                                                                           input.addEventListener("keydown", (e) => {
+                                                                                                                                                                                                                                                                                               if (e.key === "Enter") sendMessage();
+                                                                                                                                                                                                                                                                                                 });
 
-  addMessage(
-    "Welcome! Ask me anything about Korean language, culture, or grammar.",
-    "bot"
-  );
-}
+                                                                                                                                                                                                                                                                                                   addMessage(
+                                                                                                                                                                                                                                                                                                       "Welcome! Ask me anything about Korean language, culture, or grammar.",
+                                                                                                                                                                                                                                                                                                           "bot"
+                                                                                                                                                                                                                                                                                                             );
+                                                                                                                                                                                                                                                                                                             }
 
-async function callWorker(payload) {
-  let res;
-  try {
-    res = await fetch(CHAT_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  } catch (err) {
-    throw new Error(`Network error calling Worker: ${err.message}`);
-  }
+                                                                                                                                                                                                                                                                                                             async function callWorker(payload) {
+                                                                                                                                                                                                                                                                                                               let res;
+                                                                                                                                                                                                                                                                                                                 try {
+                                                                                                                                                                                                                                                                                                                     res = await fetch(CHAT_ENDPOINT, {
+                                                                                                                                                                                                                                                                                                                           method: "POST",
+                                                                                                                                                                                                                                                                                                                                 headers: { "Content-Type": "application/json" },
+                                                                                                                                                                                                                                                                                                                                       body: JSON.stringify(payload),
+                                                                                                                                                                                                                                                                                                                                           });
+                                                                                                                                                                                                                                                                                                                                             } catch (err) {
+                                                                                                                                                                                                                                                                                                                                                 throw new Error(`Network error calling Worker: ${err.message}`);
+                                                                                                                                                                                                                                                                                                                                                   }
 
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`Worker error (${res.status}): ${text.slice(0, 400)}`);
-  }
+                                                                                                                                                                                                                                                                                                                                                     const text = await res.text();
+                                                                                                                                                                                                                                                                                                                                                       if (!res.ok) {
+                                                                                                                                                                                                                                                                                                                                                           throw new Error(`Worker error (${res.status}): ${text.slice(0, 400)}`);
+                                                                                                                                                                                                                                                                                                                                                             }
 
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error(`Worker returned non-JSON: ${text.slice(0, 400)}`);
-  }
+                                                                                                                                                                                                                                                                                                                                                               let data;
+                                                                                                                                                                                                                                                                                                                                                                 try {
+                                                                                                                                                                                                                                                                                                                                                                     data = JSON.parse(text);
+                                                                                                                                                                                                                                                                                                                                                                       } catch {
+                                                                                                                                                                                                                                                                                                                                                                           throw new Error(`Worker returned non-JSON: ${text.slice(0, 400)}`);
+                                                                                                                                                                                                                                                                                                                                                                             }
 
-  // ✅ Worker returns { reply: "..." }
-  const reply = data?.reply;
-  if (typeof reply !== "string") {
-    throw new Error(
-      `Unexpected Worker response: ${JSON.stringify(data).slice(0, 400)}`
-    );
-  }
+                                                                                                                                                                                                                                                                                                                                                                               // ✅ Worker returns { reply: "..." }
+                                                                                                                                                                                                                                                                                                                                                                                 const reply = data?.reply;
+                                                                                                                                                                                                                                                                                                                                                                                   if (typeof reply !== "string") {
+                                                                                                                                                                                                                                                                                                                                                                                       throw new Error(
+                                                                                                                                                                                                                                                                                                                                                                                             `Unexpected Worker response: ${JSON.stringify(data).slice(0, 400)}`
+                                                                                                                                                                                                                                                                                                                                                                                                 );
+                                                                                                                                                                                                                                                                                                                                                                                                   }
 
-  return reply;
-}
+                                                                                                                                                                                                                                                                                                                                                                                                     return reply;
+                                                                                                                                                                                                                                                                                                                                                                                                     }
 
-async function sendMessage() {
-  const input = document.getElementById("chatbot-input");
-  const message = (input?.value || "").trim();
-  if (!message) return;
+                                                                                                                                                                                                                                                                                                                                                                                                     async function sendMessage() {
+                                                                                                                                                                                                                                                                                                                                                                                                       const input = document.getElementById("chatbot-input");
+                                                                                                                                                                                                                                                                                                                                                                                                         const message = (input?.value || "").trim();
+                                                                                                                                                                                                                                                                                                                                                                                                           if (!message) return;
 
-  addMessage(message, "user");
-  input.value = "";
+                                                                                                                                                                                                                                                                                                                                                                                                             addMessage(message, "user");
+                                                                                                                                                                                                                                                                                                                                                                                                               input.value = "";
 
-  const loadingId = "loading-" + Date.now();
-  addMessage("Thinking...", "bot", loadingId);
+                                                                                                                                                                                                                                                                                                                                                                                                                 const loadingId = "loading-" + Date.now();
+                                                                                                                                                                                                                                                                                                                                                                                                                   addMessage("Thinking...", "bot", loadingId);
 
-  try {
-    // Convert local chat history -> OpenAI-style message list
-    const messages = chatHistory.map((msg) => ({
-      role: msg.sender === "user" ? "user" : "assistant",
-      content: msg.text,
-    }));
+                                                                                                                                                                                                                                                                                                                                                                                                                     try {
+                                                                                                                                                                                                                                                                                                                                                                                                                         // Convert local chat history -> OpenAI-style message list
+                                                                                                                                                                                                                                                                                                                                                                                                                             const messages = chatHistory.map((msg) => ({
+                                                                                                                                                                                                                                                                                                                                                                                                                                   role: msg.sender === "user" ? "user" : "assistant",
+                                                                                                                                                                                                                                                                                                                                                                                                                                         content: msg.text,
+                                                                                                                                                                                                                                                                                                                                                                                                                                             }));
 
-    const payload = {
-      model: MODEL,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful Korean language learning assistant.\n" +
-            "Help users learn Korean grammar, vocabulary, pronunciation, and culture.\n" +
-            "Be encouraging and provide clear explanations.\n" +
-            "When useful, give examples in both English and Korean (Hangul + romanization).",
-        },
-        ...messages,
-      ],
-      max_tokens: 450,
-      temperature: 0.7,
-    };
+                                                                                                                                                                                                                                                                                                                                                                                                                                                 const payload = {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       model: MODEL,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             messages: [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               role: "system",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         content:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     "You are a helpful Korean language learning assistant.\n" +
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 "Help users learn Korean grammar, vocabulary, pronunciation, and culture.\n" +
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "Be encouraging and provide clear explanations.\n" +
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "When useful, give examples in both English and Korean (Hangul + romanization).",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 },
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ...messages,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ],
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     max_tokens: 450,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           temperature: 0.7,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               };
 
-    const botReply = await callWorker(payload);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   const botReply = await callWorker(payload);
 
-    const loadingEl = document.getElementById(loadingId);
-    if (loadingEl) loadingEl.remove();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       const loadingEl = document.getElementById(loadingId);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           if (loadingEl) loadingEl.remove();
 
-    addMessage(botReply, "bot");
-  } catch (error) {
-    console.error("Chatbot error:", error);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               addMessage(botReply, "bot");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 } catch (error) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     console.error("Chatbot error:", error);
 
-    const loadingEl = document.getElementById(loadingId);
-    if (loadingEl) loadingEl.remove();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         const loadingEl = document.getElementById(loadingId);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             if (loadingEl) loadingEl.remove();
 
-    addMessage(`Error: ${error.message}`, "bot");
-  }
-}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 addMessage(`Error: ${error.message}`, "bot");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   }
 
-function addMessage(text, sender, id = null) {
-  const messagesContainer = document.getElementById("chatbot-messages");
-  if (!messagesContainer) return;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   function addMessage(text, sender, id = null) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     const messagesContainer = document.getElementById("chatbot-messages");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       if (!messagesContainer) return;
 
-  const messageEl = document.createElement("div");
-  messageEl.className = `chatbot-message chatbot-${sender}`;
-  if (id) messageEl.id = id;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         const messageEl = document.createElement("div");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           messageEl.className = `chatbot-message chatbot-${sender}`;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             if (id) messageEl.id = id;
 
-  messageEl.textContent = text;
-  messagesContainer.appendChild(messageEl);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               messageEl.textContent = text;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 messagesContainer.appendChild(messageEl);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  // Only store real messages (not the temporary "Thinking..." message)
-  if (!id) {
-    chatHistory.push({ sender, text });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     // Only store real messages (not the temporary "Thinking..." message)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       if (!id) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           chatHistory.push({ sender, text });
 
-    // Cap history to avoid huge prompts and slow responses
-    if (chatHistory.length > MAX_HISTORY) {
-      chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY);
-    }
-  }
-}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               // Cap history to avoid huge prompts and slow responses
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   if (chatHistory.length > MAX_HISTORY) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initChatbot);
-} else {
-  initChatbot();
-}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               if (document.readyState === "loading") {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 document.addEventListener("DOMContentLoaded", initChatbot);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 } else {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   initChatbot();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   }
