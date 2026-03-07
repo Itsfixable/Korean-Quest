@@ -138,15 +138,26 @@ body {
   margin: 0;
 }
 
+.room-box__controls {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
 .code-display-wrap {
   display: flex;
   gap: 10px;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 300px;
 }
 
 .code-display {
   flex: 1;
   min-height: 48px;
+  max-width: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,6 +168,17 @@ body {
   letter-spacing: 0.12em;
   color: #000000;
   border: 1px solid var(--border-solid);
+}
+
+.room-input {
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+}
+
+.room-action-btn {
+  width: 100%;
+  max-width: 220px;
 }
 
 .current-room-bar {
@@ -241,6 +263,7 @@ body {
 .video-side {
   display: grid;
   gap: 16px;
+  align-content: start;
 }
 
 /* CALL STAGE */
@@ -345,44 +368,28 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* NOTES / STATS */
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+/* NOTES */
+.notes-card {
+  height: 100%;
+}
+
+.notes-area {
+  resize: vertical;
+  min-height: 170px;
   margin-top: 12px;
 }
 
-.stat-box {
+.video-row .notes-card .notes-area {
+  min-height: 250px;
+}
+
+/* RIGHT COLUMN CARDS */
+.video-side .tool-panel {
   display: grid;
-  gap: 6px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-mid);
-  border-radius: 16px;
-  padding: 16px;
-}
-
-.stat-label {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  line-height: 1;
+  gap: 12px;
 }
 
 /* TOOLS */
-.tools-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.tool-panel--wide {
-  grid-column: 1 / -1;
-}
-
 .mission-card,
 .prompt-card,
 .summary-panel,
@@ -421,12 +428,6 @@ button:disabled {
   font-weight: 700;
 }
 
-.word-form {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
 .text-input,
 .notes-area {
   width: 100%;
@@ -436,12 +437,7 @@ button:disabled {
   border-radius: 14px;
   padding: 12px 14px;
   font: inherit;
-}
-
-.notes-area {
-  resize: vertical;
-  min-height: 170px;
-  margin-top: 12px;
+  box-sizing: border-box;
 }
 
 .chip-row {
@@ -449,11 +445,6 @@ button:disabled {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
-}
-
-.chip-row--large {
-  margin-top: 14px;
-  min-height: 32px;
 }
 
 .chip {
@@ -545,27 +536,21 @@ button:disabled {
   }
 
   .video-side {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     align-items: start;
-  }
-
-  .notes-card {
-    grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 720px) {
   .room-gate-grid,
-  .tools-grid,
   .summary-grid,
-  .video-side,
-  .stats-grid {
+  .video-side {
     grid-template-columns: 1fr;
   }
 
-  .word-form,
   .code-display-wrap {
     flex-direction: column;
+    max-width: 220px;
   }
 
   .call-stage-top,
@@ -584,4 +569,32 @@ button:disabled {
     height: min(46vh, 420px);
     min-height: 300px;
   }
+
+  .video-row .notes-card .notes-area {
+    min-height: 220px;
+  }
+
+  .room-input,
+  .room-action-btn {
+    max-width: 100%;
+  }
+}
+/* Stretch roleplay mission card to match call box height */
+.video-side {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.video-side .tool-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-side .mission-card {
+  flex: 1;
+}
+
+.video-row {
+  align-items: stretch;
 }

@@ -88,16 +88,18 @@
               your partner.
             </p>
 
-            <div class="code-display-wrap">
-              <div id="generatedCode" class="code-display">------</div>
-              <button id="copyCodeBtn" class="mini-btn" type="button">
-                Copy
+            <div class="room-box__controls">
+              <div class="code-display-wrap">
+                <div id="generatedCode" class="code-display">------</div>
+                <button id="copyCodeBtn" class="mini-btn" type="button">
+                  Copy
+                </button>
+              </div>
+
+              <button id="createGroupBtn" class="btn room-action-btn" type="button">
+                Create Group
               </button>
             </div>
-
-            <button id="createGroupBtn" class="btn" type="button">
-              Create Group
-            </button>
           </div>
 
           <div class="room-box">
@@ -106,19 +108,21 @@
               Paste the moderator’s code to join the same call.
             </p>
 
-            <label class="sr-only" for="joinCodeInput">Room code</label>
-            <input
-              id="joinCodeInput"
-              class="text-input"
-              type="text"
-              placeholder="Enter code..."
-              maxlength="12"
-              autocomplete="off"
-            />
+            <div class="room-box__controls">
+              <label class="sr-only" for="joinCodeInput">Room code</label>
+              <input
+                id="joinCodeInput"
+                class="text-input room-input"
+                type="text"
+                placeholder="Enter code..."
+                maxlength="12"
+                autocomplete="off"
+              />
 
-            <button id="joinGroupBtn" class="btn" type="button">
-              Join Group
-            </button>
+              <button id="joinGroupBtn" class="btn room-action-btn" type="button">
+                Join Group
+              </button>
+            </div>
           </div>
         </div>
 
@@ -128,7 +132,7 @@
         </div>
       </section>
 
-      <!-- CALL + NOTES ROW -->
+      <!-- CALL + RIGHT COLUMN -->
       <section class="video-row">
         <section class="card call-stage-card">
           <div class="call-stage-top">
@@ -192,38 +196,7 @@
             ></textarea>
           </section>
 
-          <section class="card stats-card">
-            <h2 class="panel-title">Session Stats</h2>
-
-            <div class="stats-grid">
-              <div class="stat-box">
-                <span class="stat-label">XP this call</span>
-                <strong id="xpValue" class="stat-value">0</strong>
-              </div>
-
-              <div class="stat-box">
-                <span class="stat-label">Words tracked</span>
-                <strong id="trackedWordCount" class="stat-value">0</strong>
-              </div>
-
-              <div class="stat-box">
-                <span class="stat-label">Prompts used</span>
-                <strong id="promptCount" class="stat-value">0</strong>
-              </div>
-
-              <div class="stat-box">
-                <span class="stat-label">Mission done</span>
-                <strong id="missionStatus" class="stat-value">No</strong>
-              </div>
-            </div>
-          </section>
-        </aside>
-      </section>
-
-      <!-- TOOLS ROW -->
-      <section class="card call-tools-card">
-        <div class="tools-grid">
-          <div class="tool-panel">
+          <section class="card tool-panel">
             <div class="tool-panel__head">
               <h3>Roleplay Mission</h3>
               <button id="newMissionBtn" class="mini-btn" type="button">
@@ -243,9 +216,9 @@
                 <div id="missionWords" class="chip-row"></div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div class="tool-panel">
+          <!-- <section class="card tool-panel">
             <div class="tool-panel__head">
               <h3>Conversation Prompt</h3>
               <button id="newPromptBtn" class="mini-btn" type="button">
@@ -262,29 +235,8 @@
                 가장 좋아하는 음식이 뭐예요?
               </p>
             </div>
-          </div>
-
-          <div class="tool-panel tool-panel--wide">
-            <div class="tool-panel__head">
-              <h3>Vocabulary Tracker</h3>
-              <button id="clearWordsBtn" class="mini-btn" type="button">
-                Clear
-              </button>
-            </div>
-
-            <form id="wordForm" class="word-form">
-              <input
-                id="wordInput"
-                class="text-input"
-                type="text"
-                placeholder="Add a word used in the call..."
-              />
-              <button class="btn" type="submit">Add</button>
-            </form>
-
-            <div id="wordList" class="chip-row chip-row--large"></div>
-          </div>
-        </div>
+          </section> -->
+        </aside>
       </section>
 
       <!-- TRANSCRIPT -->
