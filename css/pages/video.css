@@ -42,9 +42,6 @@ body {
   border: 0;
 }
 
-/* =========================================================
-   PAGE
-   ========================================================= */
 .video-page {
   display: grid;
   gap: 16px;
@@ -79,9 +76,6 @@ body {
   max-width: 760px;
 }
 
-/* =========================================================
-   LAYOUT
-   ========================================================= */
 .video-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
@@ -94,9 +88,6 @@ body {
   gap: 16px;
 }
 
-/* =========================================================
-   GENERIC CARD HELPERS
-   ========================================================= */
 .panel-title {
   margin: 0;
   font-size: 1.2rem;
@@ -129,9 +120,14 @@ body {
   transform: translateY(-1px);
 }
 
-/* =========================================================
-   ROOM GATE
-   ========================================================= */
+/* room gate */
+.status-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
 .room-gate-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -191,13 +187,7 @@ body {
   font-weight: 700;
 }
 
-/* =========================================================
-   CALL STAGE
-   ========================================================= */
-.call-stage-card {
-  padding-bottom: 18px;
-}
-
+/* status */
 .call-status-wrap {
   display: flex;
   align-items: center;
@@ -206,7 +196,8 @@ body {
 }
 
 .status-pill,
-.timer-pill {
+.timer-pill,
+.role-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -227,10 +218,31 @@ body {
   color: #1d4f23;
 }
 
+.role-pill {
+  background: #f2f5fa;
+  color: var(--muted);
+  border: 1px solid var(--border-solid);
+}
+
+.role-pill.host {
+  background: #fff3d8;
+  color: #8b5b00;
+}
+
+.role-pill.student {
+  background: #e7efff;
+  color: #35538d;
+}
+
 .timer-pill {
   background: var(--surface-2);
   color: var(--brand);
   border: 1px solid var(--border-solid);
+}
+
+/* call stage */
+.call-stage-card {
+  padding-bottom: 18px;
 }
 
 .meet-wrap {
@@ -294,9 +306,7 @@ body {
   margin-top: 16px;
 }
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+/* buttons */
 #createGroupBtn,
 #joinGroupBtn {
   background: #5b729f !important;
@@ -306,17 +316,6 @@ body {
 #createGroupBtn:hover,
 #joinGroupBtn:hover {
   background: #4f648a !important;
-}
-
-#joinCallBtn,
-#joinCallBtn.btn {
-  background: #6a9f71 !important;
-  color: #ffffff !important;
-}
-
-#joinCallBtn:hover:not(:disabled),
-#joinCallBtn.btn:hover:not(:disabled) {
-  background: #5f9166 !important;
 }
 
 #leaveCallBtn,
@@ -347,9 +346,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* =========================================================
-   TOOLS
-   ========================================================= */
+/* tools */
 .tools-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -395,9 +392,7 @@ button:disabled {
   font-weight: 700;
 }
 
-/* =========================================================
-   RIGHT SIDE
-   ========================================================= */
+/* right side */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -478,9 +473,7 @@ button:disabled {
   line-height: 1;
 }
 
-/* =========================================================
-   SUMMARY
-   ========================================================= */
+/* summary */
 .summary-card {
   display: grid;
   gap: 18px;
@@ -539,9 +532,7 @@ button:disabled {
   line-height: 1.6;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+/* responsive */
 @media (max-width: 1020px) {
   .video-layout {
     grid-template-columns: 1fr;
@@ -576,6 +567,10 @@ button:disabled {
   .tool-panel__head,
   .room-gate-top {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-stack {
     align-items: flex-start;
   }
 

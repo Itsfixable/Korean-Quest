@@ -69,6 +69,7 @@ const prompts = [
 
 const els = {
   callStatus: document.getElementById("callStatus"),
+  roleBadge: document.getElementById("roleBadge"),
   callTimer: document.getElementById("callTimer"),
 
   createGroupBtn: document.getElementById("createGroupBtn"),
@@ -80,7 +81,6 @@ const els = {
 
   meetMount: document.getElementById("meetMount"),
   meetPlaceholder: document.getElementById("meetPlaceholder"),
-  joinCallBtn: document.getElementById("joinCallBtn"),
   leaveCallBtn: document.getElementById("leaveCallBtn"),
   completeSessionBtn: document.getElementById("completeSessionBtn"),
 
@@ -119,6 +119,7 @@ const state = {
   api: null,
   roomCode: "",
   inCall: false,
+  role: "none", // host | student | none
   timerId: null,
   seconds: 0,
   xp: 0,
@@ -258,10 +259,23 @@ function stopTimer() {
   }
 }
 
+function setRole(role) {
+  state.role = role;
+
+  if (role === "host") {
+    els.roleBadge.textContent = "Moderator";
+    els.roleBadge.className = "role-pill host";
+  } else if (role === "student") {
+    els.roleBadge.textContent = "Student";
+    els.roleBadge.className = "role-pill student";
+  } else {
+    els.roleBadge.textContent = "No role";
+    els.roleBadge.className = "role-pill";
+  }
+}
+
 function setCallUI(isLive) {
   state.inCall = isLive;
-
-  els.joinCallBtn.disabled = !state.roomCode || isLive;
   els.leaveCallBtn.disabled = !isLive;
   els.completeSessionBtn.disabled = !isLive;
 
@@ -280,7 +294,6 @@ function setRoomCode(code) {
   state.roomCode = sanitizeCode(code);
   els.generatedCode.textContent = state.roomCode || "------";
   els.currentRoomCode.textContent = state.roomCode || "None";
-  els.joinCallBtn.disabled = !state.roomCode || state.inCall;
 }
 
 function copyCurrentCode() {
@@ -291,23 +304,6 @@ function copyCurrentCode() {
       els.copyCodeBtn.textContent = "Copy";
     }, 1200);
   });
-}
-
-function createGroup() {
-  const code = generateRoomCode();
-  setRoomCode(code);
-  addXP(5);
-}
-
-function joinGroup() {
-  const code = sanitizeCode(els.joinCodeInput.value);
-  if (!code) {
-    alert("Enter a valid room code first.");
-    return;
-  }
-  setRoomCode(code);
-  els.joinCodeInput.value = code;
-  addXP(5);
 }
 
 function destroyMeeting() {
@@ -322,9 +318,11 @@ function destroyMeeting() {
   els.meetMount.innerHTML = "";
 }
 
-function joinCall() {
-  if (!state.roomCode) {
-    alert("Create a group or join one with a code first.");
+function joinCallWithCode(code) {
+  const cleanCode = sanitizeCode(code);
+
+  if (!cleanCode) {
+    alert("Missing room code.");
     return;
   }
 
@@ -334,8 +332,9 @@ function joinCall() {
   }
 
   destroyMeeting();
+  setRoomCode(cleanCode);
 
-  const roomName = getRoomNameFromCode(state.roomCode);
+  const roomName = getRoomNameFromCode(cleanCode);
 
   state.api = new window.JitsiMeetExternalAPI(JITSI_DOMAIN, {
     roomName,
@@ -360,12 +359,35 @@ function joinCall() {
   addXP(25);
 
   state.api.addEventListener("videoConferenceJoined", () => {
-    console.log("Joined Jitsi room");
+    console.log("Joined room:", roomName);
   });
 
   state.api.addEventListener("videoConferenceLeft", () => {
     leaveCall();
   });
+}
+
+function createGroup() {
+  const code = generateRoomCode();
+  setRole("host");
+  setRoomCode(code);
+  addXP(5);
+  joinCallWithCode(code);
+}
+
+function joinGroup() {
+  const code = sanitizeCode(els.joinCodeInput.value);
+
+  if (!code) {
+    alert("Enter a valid room code first.");
+    return;
+  }
+
+  setRole("student");
+  setRoomCode(code);
+  els.joinCodeInput.value = code;
+  addXP(5);
+  joinCallWithCode(code);
 }
 
 function leaveCall() {
@@ -544,7 +566,6 @@ function initEvents() {
     }
   });
 
-  els.joinCallBtn?.addEventListener("click", joinCall);
   els.leaveCallBtn?.addEventListener("click", leaveCall);
   els.completeSessionBtn?.addEventListener("click", generateSummary);
 
@@ -583,6 +604,7 @@ function initDefaultState() {
   loadNotes();
   updateStats();
   setCallUI(false);
+  setRole("none");
   setRoomCode("");
 }
 

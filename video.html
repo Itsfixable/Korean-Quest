@@ -72,14 +72,18 @@
                   Create a code and share it, or enter a code from someone else.
                 </p>
               </div>
-              <span id="callStatus" class="status-pill">Not in call</span>
+              <div class="status-stack">
+                <span id="callStatus" class="status-pill">Not in call</span>
+                <span id="roleBadge" class="role-pill">No role</span>
+              </div>
             </div>
 
             <div class="room-gate-grid">
               <div class="room-box">
                 <h3>Create Group</h3>
                 <p class="muted">
-                  Generate a code, then send it to your partner.
+                  Generate a code, enter the room immediately, and share it with
+                  your partner.
                 </p>
 
                 <div class="code-display-wrap">
@@ -97,7 +101,7 @@
               <div class="room-box">
                 <h3>Join Group</h3>
                 <p class="muted">
-                  Enter the shared room code to join the same call.
+                  Paste the moderator’s code to join the same call.
                 </p>
 
                 <label class="sr-only" for="joinCodeInput">Room code</label>
@@ -107,6 +111,7 @@
                   type="text"
                   placeholder="Enter code..."
                   maxlength="12"
+                  autocomplete="off"
                 />
 
                 <button id="joinGroupBtn" class="btn" type="button">
@@ -126,8 +131,8 @@
               <div>
                 <h2 class="panel-title">Call Room</h2>
                 <p class="muted">
-                  Once you create or join a group, use the controls below to
-                  enter the live practice room.
+                  The creator joins as the first participant. Anyone using the
+                  same code joins the same room.
                 </p>
               </div>
 
@@ -143,17 +148,14 @@
                 <div class="meet-placeholder__inner">
                   <h3>Room not started yet</h3>
                   <p>
-                    Create a group or join one with a code, then press
-                    <strong>Join Call</strong>.
+                    Create a group to host, or paste a code to join someone
+                    else’s room.
                   </p>
                 </div>
               </div>
             </div>
 
             <div class="call-actions">
-              <button id="joinCallBtn" class="btn" type="button" disabled>
-                Join Call
-              </button>
               <button id="leaveCallBtn" class="btn secondary" type="button" disabled>
                 Leave Call
               </button>
