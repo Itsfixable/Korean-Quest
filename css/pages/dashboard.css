@@ -253,7 +253,7 @@ body {
   }
 
   .dashboard-stats {
-    max-width: 100%;
+    max-width: 475px;
   }
 
   .stat-box {
