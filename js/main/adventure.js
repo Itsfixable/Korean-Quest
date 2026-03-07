@@ -58,21 +58,21 @@ const keyBadgeId = "kqKeyBadge";
 
 function buildMap() {
   // header key "badge" — we style it as a compact button pill
-  let badge = document.getElementById(keyBadgeId);
-  if (!badge) {
-    const header = mapGrid?.closest("section")?.querySelector("header");
-    if (header) {
-      badge = document.createElement("span");
-      badge.id = keyBadgeId;
-      badge.className = "btn id-badge";   // ← use button styling, not badge
-      badge.style.marginLeft = "8px";
-      header.querySelector("h2")?.appendChild(badge);
-    }
-  }
-  if (badge) {
-    badge.className = "btn id-badge";
-    badge.textContent = `🔑 Keys: ${P.keys}`;
-  }
+  // let badge = document.getElementById(keyBadgeId);
+  // if (!badge) {
+  //   const header = mapGrid?.closest("section")?.querySelector("header");
+  //   if (header) {
+  //     badge = document.createElement("span");
+  //     badge.id = keyBadgeId;
+  //     badge.className = "btn id-badge";   // ← use button styling, not badge
+  //     badge.style.marginLeft = "8px";
+  //     header.querySelector("h2")?.appendChild(badge);
+  //   }
+  // }
+  // if (badge) {
+  //   badge.className = "btn id-badge";
+  //   // badge.textContent = `🔑 Keys: ${P.keys}`;
+  // }
 
   mapGrid.innerHTML = "";
 

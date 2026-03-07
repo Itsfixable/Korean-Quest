@@ -1,88 +1,323 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <title>Korean Quest — Video Room</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/master.css" />
-  <link rel="stylesheet" href="css/contrast-overrides.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
-  <link rel="stylesheet" href="css/pages/video.css" />
-  <link rel="stylesheet" href="css/components/theme-toggle.css" />
-  <link rel="stylesheet" href="css/chatbot.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Video Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <script type="module" src="js/main/theme.js"></script>
-</head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
-<body>
-  <header class="container">
-    <nav class="nav" aria-label="Primary">
-      <a class="brand" href="index.html" aria-label="Korean Quest Home">
-        <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
-        <span class="brand-wordmark">
-          <span class="brand-korean">Korean</span>
-          <span class="brand-quest">Quest</span>
-        </span>
-      </a>
+    <link rel="stylesheet" href="css/master.css" />
+    <link rel="stylesheet" href="css/contrast-overrides.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/pages/video.css" />
+    <link rel="stylesheet" href="css/components/theme-toggle.css" />
+    <link rel="stylesheet" href="css/chatbot.css" />
 
-      <a class="pill" href="index.html">Home</a>
-      <a class="pill" href="schedule.html">Schedule</a>
-      <a class="pill" href="resources.html">Resources</a>
-      <a class="pill" href="adventure.html">Adventure</a>
-      <a class="pill" href="dashboard.html">Dashboard</a>
-      <a class="pill" href="leaderboard.html">Leaderboard</a>
-      <a class="pill" href="about.html">About</a>
-      <a class="pill" href="video.html" aria-current="page">Video</a>
-    </nav>
-  </header>
+    <script defer src="js/main/state.js"></script>
+    <script type="module" src="js/main/auth.js"></script>
+    <script type="module" src="js/main/theme.js"></script>
+    <script defer src="https://meet.jit.si/external_api.js"></script>
+    <script type="module" src="js/main/video.js"></script>
+    <script type="module" src="./js/main/chatbot.js?v=5"></script>
+  </head>
 
-  <main class="container grid">
-    <section class="card">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <h1 style="margin:0;">🎥 Video Room</h1>
-        <span id="statusPill" class="pill" style="border:0; background:#e9eef6;">Idle</span>
-      </div>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html" aria-label="Korean Quest Home">
+          <img
+            class="brand-logo"
+            src="favicon/logoImage.png"
+            alt="Korean Quest logo"
+          />
+          <span class="brand-wordmark">
+            <span class="brand-korean">Korean</span>
+            <span class="brand-quest">Quest</span>
+          </span>
+        </a>
 
-      <p class="muted" style="margin-top:8px;">
-        Room: <strong id="roomLabel">—</strong>
-        <span class="muted">• Open this page on another device with the same room to connect.</span>
-      </p>
+        <a class="pill" href="index.html">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
+        <a class="pill" href="about.html">About</a>
+      </nav>
+    </header>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0;">
-        <button id="joinBtn" class="btn" type="button">Join Call</button>
-        <button id="leaveBtn" class="btn secondary" type="button" disabled>Leave</button>
+    <main class="container video-page">
+      <section class="video-hero">
+        <div class="video-hero__text">
+          <p class="eyebrow">Speaking Practice</p>
+          <h1 class="video-title">Korean Call Room</h1>
+          <p class="video-subtitle">
+            Create a private practice group or join one with a code, then
+            practice Korean together with prompts, notes, and session tracking.
+          </p>
+        </div>
+      </section>
 
-        <button id="copyLinkBtn" class="btn secondary" type="button">Copy Room Link</button>
+      <section class="video-layout">
+        <div class="video-main">
+          <section class="card room-gate-card">
+            <div class="room-gate-top">
+              <div>
+                <h2 class="panel-title">Create or Join a Group</h2>
+                <p class="muted">
+                  Create a code and share it, or enter a code from someone else.
+                </p>
+              </div>
+              <span id="callStatus" class="status-pill">Not in call</span>
+            </div>
 
-        <label class="pill" style="display:flex; gap:8px; align-items:center; border:0; background:#eef3f9;">
-          <input id="muteMic" type="checkbox" />
-          Mute mic
-        </label>
+            <div class="room-gate-grid">
+              <div class="room-box">
+                <h3>Create Group</h3>
+                <p class="muted">
+                  Generate a code, then send it to your partner.
+                </p>
 
-        <label class="pill" style="display:flex; gap:8px; align-items:center; border:0; background:#eef3f9;">
-          <input id="muteCam" type="checkbox" />
-          Disable camera
-        </label>
-      </div>
+                <div class="code-display-wrap">
+                  <div id="generatedCode" class="code-display">------</div>
+                  <button id="copyCodeBtn" class="mini-btn" type="button">
+                    Copy
+                  </button>
+                </div>
 
-      <div class="video-grid">
-        <div class="video-card">
-          <div class="video-title">You</div>
-          <video id="localVideo" autoplay playsinline muted></video>
+                <button id="createGroupBtn" class="btn" type="button">
+                  Create Group
+                </button>
+              </div>
+
+              <div class="room-box">
+                <h3>Join Group</h3>
+                <p class="muted">
+                  Enter the shared room code to join the same call.
+                </p>
+
+                <label class="sr-only" for="joinCodeInput">Room code</label>
+                <input
+                  id="joinCodeInput"
+                  class="text-input"
+                  type="text"
+                  placeholder="Enter code..."
+                  maxlength="12"
+                />
+
+                <button id="joinGroupBtn" class="btn" type="button">
+                  Join Group
+                </button>
+              </div>
+            </div>
+
+            <div class="current-room-bar">
+              <span class="current-room-label">Current room:</span>
+              <strong id="currentRoomCode">None</strong>
+            </div>
+          </section>
+
+          <section class="card call-stage-card">
+            <div class="call-stage-top">
+              <div>
+                <h2 class="panel-title">Call Room</h2>
+                <p class="muted">
+                  Once you create or join a group, use the controls below to
+                  enter the live practice room.
+                </p>
+              </div>
+
+              <div class="call-status-wrap">
+                <span id="callTimer" class="timer-pill">00:00</span>
+              </div>
+            </div>
+
+            <div id="meetWrap" class="meet-wrap">
+              <div id="meetMount" class="meet-mount"></div>
+
+              <div id="meetPlaceholder" class="meet-placeholder">
+                <div class="meet-placeholder__inner">
+                  <h3>Room not started yet</h3>
+                  <p>
+                    Create a group or join one with a code, then press
+                    <strong>Join Call</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="call-actions">
+              <button id="joinCallBtn" class="btn" type="button" disabled>
+                Join Call
+              </button>
+              <button id="leaveCallBtn" class="btn secondary" type="button" disabled>
+                Leave Call
+              </button>
+              <button
+                id="completeSessionBtn"
+                class="btn ghost"
+                type="button"
+                disabled
+              >
+                Finish & Generate Summary
+              </button>
+            </div>
+          </section>
+
+          <section class="card call-tools-card">
+            <div class="tools-grid">
+              <div class="tool-panel">
+                <div class="tool-panel__head">
+                  <h3>Roleplay Mission</h3>
+                  <button id="newMissionBtn" class="mini-btn" type="button">
+                    New Mission
+                  </button>
+                </div>
+
+                <div class="mission-card">
+                  <p class="mission-label">Current mission</p>
+                  <h4 id="missionTitle">Order Food</h4>
+                  <p id="missionDesc" class="muted">
+                    One person is the customer and one is the server.
+                  </p>
+
+                  <div>
+                    <p class="mission-label">Target words</p>
+                    <div id="missionWords" class="chip-row"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tool-panel">
+                <div class="tool-panel__head">
+                  <h3>Conversation Prompt</h3>
+                  <button id="newPromptBtn" class="mini-btn" type="button">
+                    New Prompt
+                  </button>
+                </div>
+
+                <div class="prompt-card">
+                  <p class="prompt-label">Try asking:</p>
+                  <p id="promptText" class="prompt-main">
+                    What food do you like the most?
+                  </p>
+                  <p id="promptSubtext" class="prompt-sub">
+                    가장 좋아하는 음식이 뭐예요?
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div class="video-card">
-          <div class="video-title">Partner</div>
-          <video id="remoteVideo" autoplay playsinline></video>
+        <aside class="video-side">
+          <section class="card stats-card">
+            <h2 class="panel-title">Session Stats</h2>
+
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">XP this call</span>
+                <strong id="xpValue" class="stat-value">0</strong>
+              </div>
+
+              <div class="stat-box">
+                <span class="stat-label">Words tracked</span>
+                <strong id="trackedWordCount" class="stat-value">0</strong>
+              </div>
+
+              <div class="stat-box">
+                <span class="stat-label">Prompts used</span>
+                <strong id="promptCount" class="stat-value">0</strong>
+              </div>
+
+              <div class="stat-box">
+                <span class="stat-label">Mission done</span>
+                <strong id="missionStatus" class="stat-value">No</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="card vocab-card">
+            <div class="tool-panel__head">
+              <h2 class="panel-title">Vocabulary Tracker</h2>
+              <button id="clearWordsBtn" class="mini-btn" type="button">
+                Clear
+              </button>
+            </div>
+
+            <form id="wordForm" class="word-form">
+              <input
+                id="wordInput"
+                class="text-input"
+                type="text"
+                placeholder="Add a word used in the call..."
+              />
+              <button class="btn" type="submit">Add</button>
+            </form>
+
+            <div id="wordList" class="chip-row chip-row--large"></div>
+          </section>
+
+          <section class="card notes-card">
+            <div class="tool-panel__head">
+              <h2 class="panel-title">Shared Notes</h2>
+              <button id="saveNotesBtn" class="mini-btn" type="button">
+                Save
+              </button>
+            </div>
+
+            <textarea
+              id="sharedNotes"
+              class="notes-area"
+              placeholder="Type phrases, corrections, new vocabulary, or call highlights here..."
+            ></textarea>
+          </section>
+        </aside>
+      </section>
+
+      <section id="summarySection" class="card summary-card" hidden>
+        <div class="summary-top">
+          <div>
+            <p class="eyebrow">AI Session Summary</p>
+            <h2 class="summary-title">Your speaking session recap</h2>
+          </div>
+          <div class="summary-xp">
+            <span>XP Earned</span>
+            <strong id="summaryXp">0</strong>
+          </div>
         </div>
-      </div>
 
-      <p id="debugLine" class="muted" style="margin-top:12px; white-space: pre-wrap;"></p>
-    </section>
-  </main>
+        <div class="summary-grid">
+          <div class="summary-panel">
+            <h3>Topics Practiced</h3>
+            <ul id="summaryTopics" class="summary-list"></ul>
+          </div>
 
-  <script type="module" src="js/main/video.js?v=1"></script>
-  <script type="module" src="./js/main/chatbot.js?v=5"></script>
-</body>
+          <div class="summary-panel">
+            <h3>Words Used</h3>
+            <ul id="summaryWords" class="summary-list"></ul>
+          </div>
+
+          <div class="summary-panel">
+            <h3>Strengths</h3>
+            <ul id="summaryStrengths" class="summary-list"></ul>
+          </div>
+
+          <div class="summary-panel">
+            <h3>Recommended Next Steps</h3>
+            <ul id="summaryRecommendations" class="summary-list"></ul>
+          </div>
+        </div>
+
+        <div class="summary-note-box">
+          <h3>Coach Note</h3>
+          <p id="summaryCoachNote" class="summary-note">Great work.</p>
+        </div>
+      </section>
+    </main>
+  </body>
 </html>
