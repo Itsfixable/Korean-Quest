@@ -1,0 +1,8 @@
+{
+  "name": "kq-live-transcribe-hf",
+  "main": "src/index.js",
+  "compatibility_date": "2026-03-07",
+  "observability": {
+    "enabled": true
+  }
+}
