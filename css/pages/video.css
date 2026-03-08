@@ -42,7 +42,6 @@ body {
   border: 0;
 }
 
-/* PAGE */
 .video-page {
   display: grid;
   gap: 16px;
@@ -77,7 +76,6 @@ body {
   max-width: 760px;
 }
 
-/* GENERIC */
 .panel-title {
   margin: 0;
   font-size: 1.2rem;
@@ -86,7 +84,8 @@ body {
 .tool-panel__head,
 .call-stage-top,
 .summary-top,
-.room-gate-top {
+.room-gate-top,
+.transcript-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -110,7 +109,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* ROOM GATE */
 .status-stack {
   display: flex;
   flex-direction: column;
@@ -199,7 +197,6 @@ body {
   font-weight: 700;
 }
 
-/* STATUS */
 .call-status-wrap {
   display: flex;
   align-items: center;
@@ -209,7 +206,8 @@ body {
 
 .status-pill,
 .timer-pill,
-.role-pill {
+.role-pill,
+.live-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -252,7 +250,22 @@ body {
   border: 1px solid var(--border-solid);
 }
 
-/* LAYOUT */
+.live-pill {
+  border: 1px solid var(--border-solid);
+  background: #f4f6fb;
+  color: var(--muted);
+}
+
+.live-pill.is-live {
+  background: #dff1e2;
+  color: #1d6a2a;
+}
+
+.live-pill.is-error {
+  background: #f7dfdf;
+  color: #8d2b2b;
+}
+
 .video-row {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
@@ -266,7 +279,6 @@ body {
   align-content: start;
 }
 
-/* CALL STAGE */
 .call-stage-card {
   padding-bottom: 18px;
 }
@@ -328,15 +340,18 @@ body {
   margin-top: 16px;
 }
 
-/* BUTTONS */
 #createGroupBtn,
-#joinGroupBtn {
+#joinGroupBtn,
+#startLiveTranscriptBtn,
+#aiSummaryBtn {
   background: #5b729f !important;
   color: #ffffff !important;
 }
 
 #createGroupBtn:hover,
-#joinGroupBtn:hover {
+#joinGroupBtn:hover,
+#startLiveTranscriptBtn:hover:not(:disabled),
+#aiSummaryBtn:hover:not(:disabled) {
   background: #4f648a !important;
 }
 
@@ -353,13 +368,15 @@ body {
   background: #bb4343 !important;
 }
 
-#completeSessionBtn {
+#completeSessionBtn,
+#clearTranscriptBtn {
   background: #d5dff1 !important;
   color: #000000 !important;
   border: 1px solid var(--border-solid) !important;
 }
 
-#completeSessionBtn:hover:not(:disabled) {
+#completeSessionBtn:hover:not(:disabled),
+#clearTranscriptBtn:hover:not(:disabled) {
   background: #cad7ee !important;
 }
 
@@ -368,7 +385,6 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* NOTES */
 .notes-card {
   height: 100%;
 }
@@ -383,15 +399,12 @@ button:disabled {
   min-height: 250px;
 }
 
-/* RIGHT COLUMN CARDS */
 .video-side .tool-panel {
   display: grid;
   gap: 12px;
 }
 
-/* TOOLS */
 .mission-card,
-.prompt-card,
 .summary-panel,
 .summary-note-box {
   background: var(--surface-2);
@@ -400,8 +413,7 @@ button:disabled {
   padding: 16px;
 }
 
-.mission-label,
-.prompt-label {
+.mission-label {
   margin: 0 0 6px;
   color: var(--brand);
   font-weight: 900;
@@ -413,19 +425,6 @@ button:disabled {
 .mission-card h4 {
   margin: 0 0 8px;
   font-size: 1.2rem;
-}
-
-.prompt-main {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-.prompt-sub {
-  margin: 10px 0 0;
-  color: var(--muted);
-  font-weight: 700;
 }
 
 .text-input,
@@ -460,17 +459,23 @@ button:disabled {
   font-size: 0.92rem;
 }
 
-.chip button {
-  border: none;
-  background: transparent;
-  font: inherit;
-  color: #000000;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
+.transcript-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: center;
 }
 
-/* SUMMARY */
+.transcript-sub {
+  margin: 6px 0 0;
+}
+
+.transcript-area {
+  min-height: 260px;
+  white-space: pre-wrap;
+}
+
 .summary-card {
   display: grid;
   gap: 18px;
@@ -529,7 +534,6 @@ button:disabled {
   line-height: 1.6;
 }
 
-/* RESPONSIVE */
 @media (max-width: 1020px) {
   .video-row {
     grid-template-columns: 1fr;
@@ -538,6 +542,10 @@ button:disabled {
   .video-side {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .transcript-controls {
+    justify-content: flex-start;
   }
 }
 
@@ -556,7 +564,8 @@ button:disabled {
   .call-stage-top,
   .summary-top,
   .tool-panel__head,
-  .room-gate-top {
+  .room-gate-top,
+  .transcript-head {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -578,23 +587,8 @@ button:disabled {
   .room-action-btn {
     max-width: 100%;
   }
-}
-/* Stretch roleplay mission card to match call box height */
-.video-side {
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
 
-.video-side .tool-panel {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.video-side .mission-card {
-  flex: 1;
-}
-
-.video-row {
-  align-items: stretch;
+  .transcript-controls {
+    width: 100%;
+  }
 }

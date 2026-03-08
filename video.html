@@ -24,6 +24,7 @@
     <script type="module" src="js/main/video.js"></script>
     <script type="module" src="js/main/call-summary.js"></script>
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
+    <script type="module" src="./js/main/live-transcription.js?v=1"></script>
   </head>
 
   <body>
@@ -32,7 +33,7 @@
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
           <img
             class="brand-logo"
-            src="favicon/logoImage.png"
+            src="favicon/logoImage.png "
             alt="Korean Quest logo"
           />
           <span class="brand-wordmark">
@@ -58,13 +59,12 @@
           <h1 class="video-title">Korean Call Room</h1>
           <p class="video-subtitle">
             Create a private practice group or join one with a code, then
-            practice Korean together with prompts, notes, vocabulary tracking,
-            and AI session summaries.
+            practice Korean together with prompts, notes, live captions, and AI
+            session summaries.
           </p>
         </div>
       </section>
 
-      <!-- FULL-WIDTH TOP CARD -->
       <section class="card room-gate-card">
         <div class="room-gate-top">
           <div>
@@ -96,7 +96,11 @@
                 </button>
               </div>
 
-              <button id="createGroupBtn" class="btn room-action-btn" type="button">
+              <button
+                id="createGroupBtn"
+                class="btn room-action-btn"
+                type="button"
+              >
                 Create Group
               </button>
             </div>
@@ -119,7 +123,11 @@
                 autocomplete="off"
               />
 
-              <button id="joinGroupBtn" class="btn room-action-btn" type="button">
+              <button
+                id="joinGroupBtn"
+                class="btn room-action-btn"
+                type="button"
+              >
                 Join Group
               </button>
             </div>
@@ -132,7 +140,6 @@
         </div>
       </section>
 
-      <!-- CALL + RIGHT COLUMN -->
       <section class="video-row">
         <section class="card call-stage-card">
           <div class="call-stage-top">
@@ -175,7 +182,7 @@
               type="button"
               disabled
             >
-              Finish & Generate Summary
+              Finish &amp; Generate Summary
             </button>
           </div>
         </section>
@@ -217,47 +224,55 @@
               </div>
             </div>
           </section>
-
-          <!-- <section class="card tool-panel">
-            <div class="tool-panel__head">
-              <h3>Conversation Prompt</h3>
-              <button id="newPromptBtn" class="mini-btn" type="button">
-                New Prompt
-              </button>
-            </div>
-
-            <div class="prompt-card">
-              <p class="prompt-label">Try asking:</p>
-              <p id="promptText" class="prompt-main">
-                What food do you like the most?
-              </p>
-              <p id="promptSubtext" class="prompt-sub">
-                가장 좋아하는 음식이 뭐예요?
-              </p>
-            </div>
-          </section> -->
         </aside>
       </section>
 
-      <!-- TRANSCRIPT -->
       <section class="card">
-        <div class="tool-panel__head">
-          <h2 class="panel-title">Call Transcript</h2>
-          <button id="aiSummaryBtn" class="btn" type="button">
-            Generate AI Summary
-          </button>
+        <div class="tool-panel__head transcript-head">
+          <div>
+            <h2 class="panel-title">Call Transcript</h2>
+            <p class="muted transcript-sub">
+              Start captions to transcribe your microphone automatically every
+              few seconds.
+            </p>
+          </div>
+
+          <div class="transcript-controls">
+            <span id="liveTranscriptStatus" class="live-pill is-idle">
+              Captions off
+            </span>
+            <button id="startLiveTranscriptBtn" class="btn" type="button">
+              Start Captions
+            </button>
+            <button
+              id="stopLiveTranscriptBtn"
+              class="btn secondary"
+              type="button"
+              disabled
+            >
+              Stop Captions
+            </button>
+            <button id="clearTranscriptBtn" class="btn ghost" type="button">
+              Clear
+            </button>
+            <button id="aiSummaryBtn" class="btn" type="button">
+              Generate AI Summary
+            </button>
+          </div>
         </div>
 
         <textarea
           id="callTranscript"
-          class="notes-area"
-          placeholder="Paste the call transcript here..."
+          class="notes-area transcript-area"
+          placeholder="Your live transcript will appear here..."
         ></textarea>
 
+        <p id="liveTranscriptHint" class="muted" aria-live="polite">
+          Captions are currently off.
+        </p>
         <p id="aiSummaryStatus" class="muted" aria-live="polite"></p>
       </section>
 
-      <!-- SUMMARY -->
       <section id="summarySection" class="card summary-card" hidden>
         <div class="summary-top">
           <div>
@@ -305,6 +320,10 @@
         <div class="summary-note-box">
           <h3>Coach Note</h3>
           <p id="summaryCoachNote" class="summary-note">Great work.</p>
+        </div>
+        <div class="summary-note-box">
+          <h3>Call Summary</h3>
+          <p id="summaryParagraph" class="summary-note">No summary yet.</p>
         </div>
       </section>
     </main>
