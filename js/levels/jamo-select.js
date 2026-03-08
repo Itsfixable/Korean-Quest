@@ -40,23 +40,47 @@ const JAMO = [
 function starsHTML(n){ return `<span>${'⭐'.repeat(n)}${'☆'.repeat(3-n)}</span>`; }
 
 if (GRID) {
-  GRID.innerHTML = JAMO.map(({ch,kind}) => {
+  GRID.innerHTML = JAMO.map(({ ch, kind }) => {
     const earned = getJamoStars(ch);
     return `
-      <article class="aw-level-card" role="button" tabindex="0" data-char="${ch}" aria-label="Practice ${ch}">
-        <header class="flex" style="justify-content:space-between">
-          <h3>${ch}</h3>
-          <span class="btn id-badge">${kind}</span>
+      <article
+        class="aw-level-card"
+        data-char="${ch}"
+        role="listitem"
+        tabindex="0"
+        aria-label="Practice ${ch}"
+      >
+        <header class="aw-level-head">
+          <h3 class="aw-level-char">${ch}</h3>
+          <span class="aw-pill">${kind}</span>
         </header>
-        <div class="muted">Progress: ${starsHTML(earned)}</div>
-        <canvas width="128" height="128" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
-        <div class="flex">
-          <a class="btn" href="${TRACE_URL}?char=${encodeURIComponent(ch)}">Practice</a>
-          
+
+        <div class="aw-preview-wrap">
+          <canvas
+            data-char="${ch}"
+            width="120"
+            height="120"
+            aria-label="Stroke order preview for ${ch}"
+          ></canvas>
         </div>
       </article>
     `;
   }).join("");
+  //   return `
+  //     <article class="aw-level-card" role="button" tabindex="0" data-char="${ch}" aria-label="Practice ${ch}">
+  //       <header class="flex" style="justify-content:space-between">
+  //         <h3>${ch}</h3>
+  //         <span class="btn id-badge">${kind}</span>
+  //       </header>
+  //       <div class="muted">Progress: ${starsHTML(earned)}</div>
+  //       <canvas width="128" height="128" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
+  //       <div class="flex">
+  //         <a class="btn" href="${TRACE_URL}?char=${encodeURIComponent(ch)}">Practice</a>
+          
+  //       </div>
+  //     </article>
+  //   `;
+  // }).join("");
 
   /* Whole card navigates to tracing (except Replay button) */
   GRID.querySelectorAll(".aw-level-card").forEach(card => {

@@ -169,3 +169,91 @@
   color: #ffffff !important;
   border: none !important;
 }
+/* Light background behind each jamo preview */
+.aw-level-card canvas {
+  background: #f4f6fb;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+/* ===== Jamo select unified tile cards ===== */
+
+.aw-grid {
+  align-items: stretch;
+}
+
+.aw-level-card {
+  background: #f4f6fb;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.aw-level-card:hover,
+.aw-level-card:focus-visible {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
+  border-color: rgba(91, 114, 159, 0.22);
+  background: #eef3fb;
+  outline: none;
+}
+
+.aw-level-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.aw-level-head h3,
+.aw-level-char {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #111111;
+  font-weight: 800;
+}
+
+.aw-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #d5dff1;
+  color: #111111;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+
+.aw-preview-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2f8;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.aw-level-card canvas {
+  width: 120px;
+  height: 120px;
+  display: block;
+  margin-inline: auto;
+  background: transparent;
+  border-radius: 12px;
+}

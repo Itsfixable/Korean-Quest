@@ -19,6 +19,7 @@
 
 
   <!-- Hard guarantee the grid shows as columns even if page CSS misses -->
+   
   <style>
     /* FORCE a GRID here so it never falls back to stacked rows */
     #jamoGrid {
@@ -71,14 +72,14 @@
   <main class="container grid">
     <section class="card">
       <h1>🔠 Choose a Jamo</h1>
-      <p class="muted">Tap a character to practice. The preview animates the <strong>traditional stroke order</strong>. Earn ⭐ for accuracy.</p>
+      <p class="muted">Tap a character to practice. The preview animates the <strong>traditional stroke order</strong>. 
 
       <!-- REAL GRID (5 cols desktop → 3/2/1 responsive) -->
       <div class="aw-grid" id="jamoGrid" role="list">
         <!-- JS populates the cards -->
       </div>
 
-      <p class="muted" style="margin-top:8px">Stars: ≥90 → ⭐⭐⭐ • ≥75 → ⭐⭐ • ≥60 → ⭐</p>
+      <!-- <p class="muted" style="margin-top:8px">Stars: ≥90 → ⭐⭐⭐ • ≥75 → ⭐⭐ • ≥60 → ⭐</p> -->
     </section>
   </main>
 
