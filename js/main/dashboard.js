@@ -1,38 +1,54 @@
-// js/main/dashboard.js — uses recentWork feed and live XP bar
+// js/main/dashboard.js
 import { getPlayer, getQuests, getProgress, needXP } from "./state.js";
 
-function setText(id, val){ const el = document.getElementById(id); if (el) el.textContent = val; }
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
 
-const p = getPlayer();
-const quests = getQuests();
-const prog = getProgress();
+function renderDashboard() {
+  const player = getPlayer();
+  const quests = getQuests();
+  const progress = getProgress();
 
-/* Header stats */
-setText("dLevel",  p.level);
-setText("dXP",     p.xp);
-setText("dNext",   needXP(p.level));
-setText("dStreak", p.streak);
-setText("dCoins",  p.coins);
-document.getElementById("dBadges").textContent = (p.badges || []).join(" ") || "—";
+  setText("dLevel", player.level);
+  setText("dXP", player.xp);
+  setText("dNext", needXP(player.level));
+  setText("dStreak", `${player.streak} day${player.streak === 1 ? "" : "s"}`);
+  setText("dCoins", player.coins);
+  setText("dBadges", (player.badges || []).join(" • ") || "—");
 
-/* XP bar fill (live) */
-const pct = Math.min(100, Math.round(100 * (p.xp / needXP(p.level))));
-document.getElementById("dBar").style.width = pct + "%";
+  const bar = document.getElementById("dBar");
+  if (bar) {
+    const pct = Math.min(100, Math.round((player.xp / needXP(player.level)) * 100));
+    bar.style.width = `${pct}%`;
+  }
 
-/* Daily quests list */
-const qList = document.getElementById("questList");
-qList.innerHTML = (quests.daily || []).map(q => `
-  <li>${q.done ? "✅" : "⬜️"} ${q.desc} — ${Math.min(q.progress, q.target)}/${q.target}</li>
-`).join("") || '<li class="muted">No quests.</li>';
+  const questList = document.getElementById("questList");
+  if (questList) {
+    const daily = quests.daily || [];
+    questList.innerHTML = daily.length
+      ? daily
+          .map(
+            (q) =>
+              `<li>${q.done ? "✅" : "⬜️"} ${q.desc} — ${Math.min(q.progress, q.target)}/${q.target}</li>`
+          )
+          .join("")
+      : "<li>No quests.</li>";
+  }
 
-/* Recent Work feed */
-const workList = document.getElementById("recentWork");
-workList.innerHTML =
-  (prog.recentWork || [])
-    .map(w => `
-      <li>
-        <span class="badge">${w.type}</span>
-        ${new Date(w.ts).toLocaleString()} — ${w.title}
-      </li>
-    `)
-    .join("") || '<li class="muted">No work recorded yet.</li>';
+  const workList = document.getElementById("recentWork");
+  if (workList) {
+    const work = progress.recentWork || [];
+    workList.innerHTML = work.length
+      ? work
+          .map(
+            (item) =>
+              `<li>${item.type} ${new Date(item.ts).toLocaleString()} — ${item.title}</li>`
+          )
+          .join("")
+      : "<li>No work recorded yet.</li>";
+  }
+}
+
+renderDashboard();

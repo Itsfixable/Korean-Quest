@@ -570,3 +570,80 @@ header,
   padding: 8px 12px;
   border-radius: 999px;
 }
+/* =========================
+   NAV TAB SPACING FIX
+   ========================= */
+
+header.container .nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px; /* <-- increase spacing between tabs */
+  width: auto;
+  margin: 0 auto;
+}
+
+/* Keep pills a clean consistent size */
+header.container .nav .pill {
+  padding: 8px 16px; /* same padding for every tab */
+  border-radius: 999px;
+  white-space: nowrap;
+}
+/* =========================
+   SITE HEADER / NAV LOCK
+   ========================= */
+
+.site-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px 20px;
+  box-sizing: border-box;
+}
+
+.site-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+}
+
+.site-nav .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 8px;
+  flex: 0 0 auto;
+}
+
+.site-nav .brand-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  display: block;
+}
+
+.site-nav .brand-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.site-nav > a.pill {
+  flex: 0 0 auto;
+  margin: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .site-nav {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+}
