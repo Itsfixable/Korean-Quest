@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="css/pages/video.css" />
     <link rel="stylesheet" href="css/components/theme-toggle.css" />
     <link rel="stylesheet" href="css/chatbot.css" />
-
+    <script defer src="js/main/mobile-nav.js"></script>
     <script defer src="js/main/state.js"></script>
     <script type="module" src="js/main/auth.js"></script>
     <script type="module" src="js/main/theme.js"></script>
@@ -28,25 +28,40 @@
   </head>
 
   <body>
-    <header class="container" class="site-header">
-      <nav class="nav" class="site-nav" aria-label="Primary">
-        <a class="brand" href="index.html" aria-label="Korean Quest Home">
-          <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
-          <span class="brand-wordmark">
-            <span class="brand-korean">Korean</span>
-            <span class="brand-quest">Quest</span>
-          </span>
-        </a>
-        
+    <header class="container site-header">
+        <nav class="nav site-nav" aria-label="Primary">
+          <a class="brand" href="index.html" aria-label="Korean Quest Home">
+            <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
+            <span class="brand-wordmark">
+              <span class="brand-korean">Korean</span>
+              <span class="brand-quest">Quest</span>
+            </span>
+          </a>
 
-        <a class="pill" href="index.html" >Home</a>
-        <a class="pill" href="schedule.html"aria-current="page">Schedule</a>
-        <a class="pill" href="resources.html">Resources</a>
-        <a class="pill" href="adventure.html">Adventure</a>
-        <a class="pill" href="dashboard.html">Dashboard</a>
-        <a class="pill" href="leaderboard.html">Leaderboard</a>
-        <a class="pill" href="about.html">About</a>
-      </nav>
+          <div class="nav-mobile-top">
+            <a class="pill nav-home-link" href="index.html">Home</a>
+
+            <button
+              class="nav-toggle"
+              id="navToggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="mobileNavMenu"
+              aria-label="Open menu"
+            >
+              ☰
+            </button>
+          </div>
+
+          <div class="nav-links" id="mobileNavMenu">
+            <a class="pill" href="schedule.html" aria-current="page">Schedule</a>
+            <a class="pill" href="resources.html">Resources</a>
+            <a class="pill" href="adventure.html">Adventure</a>
+            <a class="pill" href="dashboard.html">Dashboard</a>
+            <a class="pill" href="leaderboard.html">Leaderboard</a>
+            <a class="pill" href="about.html">About</a>
+          </div>
+        </nav>
     </header>
 
 

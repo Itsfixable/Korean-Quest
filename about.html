@@ -8,7 +8,7 @@
     <script type="module" src="js/main/auth.js"></script>
     <script type="module" src="js/main/theme.js"></script>
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
-
+    <script defer src="js/main/mobile-nav.js"></script>
 
     <link rel="stylesheet" href="css/master.css" />
     <link rel="stylesheet" href="css/contrast-overrides.css" />
@@ -22,8 +22,8 @@
     
   </head>
   <body>
-    <header class="container" class="site-header">
-      <nav class="nav" class="site-nav" aria-label="Primary">
+    <header class="container site-header">
+      <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
           <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
           <span class="brand-wordmark">
@@ -31,15 +31,30 @@
             <span class="brand-quest">Quest</span>
           </span>
         </a>
-        
 
-        <a class="pill" href="index.html" >Home</a>
-        <a class="pill" href="schedule.html">Schedule</a>
-        <a class="pill" href="resources.html">Resources</a>
-        <a class="pill" href="adventure.html">Adventure</a>
-        <a class="pill" href="dashboard.html">Dashboard</a>
-        <a class="pill" href="leaderboard.html">Leaderboard</a>
-        <a class="pill" href="about.html" aria-current="page">About</a>
+        <div class="nav-mobile-top">
+          <a class="pill nav-home-link" href="index.html">Home</a>
+
+          <button
+            class="nav-toggle"
+            id="navToggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mobileNavMenu"
+            aria-label="Open menu"
+          >
+            ☰
+          </button>
+        </div>
+
+        <div class="nav-links" id="mobileNavMenu">
+          <a class="pill" href="schedule.html">Schedule</a>
+          <a class="pill" href="resources.html">Resources</a>
+          <a class="pill" href="adventure.html">Adventure</a>
+          <a class="pill" href="dashboard.html">Dashboard</a>
+          <a class="pill" href="leaderboard.html">Leaderboard</a>
+          <a class="pill" href="about.html" aria-current="page">About</a>
+        </div>
       </nav>
     </header>
 
