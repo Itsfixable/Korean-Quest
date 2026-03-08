@@ -342,17 +342,57 @@ body {
 
 #createGroupBtn,
 #joinGroupBtn,
-#startLiveTranscriptBtn,
 #aiSummaryBtn {
   background: #5b729f !important;
   color: #ffffff !important;
+  border-color: #5b729f !important;
 }
 
 #createGroupBtn:hover,
 #joinGroupBtn:hover,
-#startLiveTranscriptBtn:hover:not(:disabled),
 #aiSummaryBtn:hover:not(:disabled) {
   background: #4f648a !important;
+  border-color: #4f648a !important;
+}
+
+#startLiveTranscriptBtn {
+  background: #6a9f71 !important;
+  border-color: #6a9f71 !important;
+  color: #ffffff !important;
+}
+
+#startLiveTranscriptBtn:hover:not(:disabled),
+#startLiveTranscriptBtn:focus-visible:not(:disabled) {
+  background: #5b8c62 !important;
+  border-color: #5b8c62 !important;
+  color: #ffffff !important;
+}
+
+#startLiveTranscriptBtn:disabled {
+  background: #6a9f71 !important;
+  border-color: #6a9f71 !important;
+  color: #ffffff !important;
+  opacity: 0.65;
+}
+
+#stopLiveTranscriptBtn {
+  background: #cd4a4a !important;
+  border-color: #cd4a4a !important;
+  color: #ffffff !important;
+}
+
+#stopLiveTranscriptBtn:hover:not(:disabled),
+#stopLiveTranscriptBtn:focus-visible:not(:disabled) {
+  background: #b94242 !important;
+  border-color: #b94242 !important;
+  color: #ffffff !important;
+}
+
+#stopLiveTranscriptBtn:disabled {
+  background: #cd4a4a !important;
+  border-color: #cd4a4a !important;
+  color: #ffffff !important;
+  opacity: 0.65;
 }
 
 #leaveCallBtn,
