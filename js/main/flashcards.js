@@ -297,11 +297,11 @@ function getKnownTerms() {
 function renderKnownStack() {
   const prog = store[currentSet.id];
   const terms = getKnownTerms();
-
   if (!miniStack()) return;
-  miniStack().innerHTML = "";
 
-  const top3 = terms.slice(-3).reverse(); // show newest on top
+  miniStack().innerHTML = "";
+  const top3 = terms.slice(-3).reverse();
+
   if (top3.length === 0) {
     const empty = document.createElement("div");
     empty.className = "mini-card";
@@ -314,11 +314,10 @@ function renderKnownStack() {
     const c = cardForTerm(t);
     const div = document.createElement("div");
     div.className = "mini-card";
-    div.textContent = c?.term ?? t;
+    div.innerHTML = `<span>${escapeHtml(c?.term ?? t)}</span>`;
     miniStack().appendChild(div);
   }
 
-  // keep knownOrder synced
   prog.knownOrder = getKnownTerms();
   saveStore(store);
 }
@@ -328,11 +327,13 @@ function openKnownModal() {
   if (!knownModal()) return;
   renderKnownModalList();
   knownModal().hidden = false;
+  document.body.classList.add("modal-open");
 }
 
 function closeKnownModal() {
   if (!knownModal()) return;
   knownModal().hidden = true;
+  document.body.classList.remove("modal-open");
 }
 
 function renderKnownModalList() {
