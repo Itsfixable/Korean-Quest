@@ -326,14 +326,7 @@ async function generateSummary() {
       }),
     });
 
-    const rawText = await response.text();
-    let data;
-
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      throw new Error(`Summary server returned non-JSON: ${rawText}`);
-    }
+    const data = await response.json();
 
     if (!response.ok) {
       throw new Error(data.error || "Summary request failed.");
