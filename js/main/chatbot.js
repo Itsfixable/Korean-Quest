@@ -1,39 +1,3 @@
-/* Korean Learning AI Chatbot (GitHub Pages + Cloudflare Worker)
-   ============================================================
-      This frontend DOES NOT call Hugging Face or OpenAI directly.
-         It calls your Cloudflare Worker endpoint.
-         */
-         import { getLeaderboard, getPlayer } from "./state.js";
-
-         /* ----------------------------- Leaderboard rendering ------------------------------ */
-         function renderLeaderboard() {
-           const rows = getLeaderboard().slice();
-             const me = getPlayer();
-
-               rows.push({ name: "You", xp: me.xp });
-                 rows.sort((a, b) => b.xp - a.xp);
-
-                   const tbody = document.querySelector("#lbTable tbody");
-                     if (!tbody) return;
-
-                       tbody.innerHTML = rows
-                           .map(
-                                 (r, i) => `
-                                         <tr>
-                                                   <td>${i + 1}</td>
-                                                             <td>${r.name}</td>
-                                                                       <td>${r.xp}</td>
-                                                                               </tr>
-                                                                                     `
-                                                                                         )
-                                                                                             .join("");
-                                                                                             }
-
-                                                                                             if (document.readyState === "loading") {
-                                                                                               document.addEventListener("DOMContentLoaded", renderLeaderboard);
-                                                                                               } else {
-                                                                                                 renderLeaderboard();
-                                                                                                 }
 
                                                                                                  /* ----------------------------- Chatbot (calls Worker only) ------------------------------ */
                                                                                                  const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
