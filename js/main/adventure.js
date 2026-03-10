@@ -57,6 +57,30 @@ const ENEMIES = [
   { name: "Tiger Spirit", sprite: "🐯" },
 ];
 
+const WORLDS = [
+  {
+    id: 1,
+    title: "Hangul Hills",
+    rangeLabel: "World 1",
+    levels: [1, 2, 3, 4],
+    bgClass: "world-bg-1",
+  },
+  {
+    id: 2,
+    title: "Food Forest",
+    rangeLabel: "World 2",
+    levels: [5, 6, 7, 8],
+    bgClass: "world-bg-2",
+  },
+  {
+    id: 3,
+    title: "Greeting Kingdom",
+    rangeLabel: "World 3",
+    levels: [9, 10, 11, 12],
+    bgClass: "world-bg-3",
+  },
+];
+
 const mapGrid = document.getElementById("mapGrid");
 const topicSelect = document.getElementById("topicSelect");
 const diffSelect = document.getElementById("difficultySelect");
@@ -82,6 +106,7 @@ let currentQuestion = null;
 let answerLocked = false;
 let speedFrame = 0;
 let speedPercent = 100;
+let activeWorldId = 1;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -114,8 +139,36 @@ function saveProgress() {
   localStorage.setItem(STORE_KEY, JSON.stringify(P));
 }
 
+function getWorldForLevel(level) {
+  if (level >= 1 && level <= 4) return 1;
+  if (level >= 5 && level <= 8) return 2;
+  return 3;
+}
+
+function isWorldComplete(worldId) {
+  const world = WORLDS.find((w) => w.id === worldId);
+  if (!world) return false;
+  return world.levels.every((lvl) => P.cleared[lvl]);
+}
+
+function isWorldUnlocked(worldId) {
+  if (worldId === 1) return true;
+  if (worldId === 2) return isWorldComplete(1);
+  if (worldId === 3) return isWorldComplete(2);
+  return false;
+}
+function getVisibleWorld() {
+  const active = WORLDS.find((w) => w.id === activeWorldId);
+  if (active && isWorldUnlocked(active.id)) return active;
+
+  if (isWorldUnlocked(3)) return WORLDS[2];
+  if (isWorldUnlocked(2)) return WORLDS[1];
+  return WORLDS[0];
+}
+
 function ensureStyles() {
   if (document.getElementById("kq-adventure-enhancements")) return;
+
   const style = document.createElement("style");
   style.id = "kq-adventure-enhancements";
   style.textContent = `
@@ -138,43 +191,159 @@ function ensureStyles() {
     .kq-adventure-pills {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       margin-top: 12px;
     }
 
     .kq-adventure-pill {
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 900;
+      background: rgba(91, 114, 159, 0.10);
+      color: var(--brand, #5b729f);
+      transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+
+    .kq-adventure-pill:hover {
+      transform: translateY(-1px);
+      background: rgba(91, 114, 159, 0.16);
+    }
+
+    .kq-adventure-pill.is-active {
+      background: linear-gradient(180deg, #7089bc 0%, #5d76aa 100%);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(55, 76, 119, 0.18);
+    }
+
+    .kq-adventure-controls,
+    .kq-aventure-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 10px 0 18px;
+    }
+
+    .kq-adventure-controls select,
+    .kq-aventure-controls select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      min-width: 150px;
+      padding: 12px 40px 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(91, 114, 159, 0.18);
+      background-color: #f7f9fd;
+      color: #273142;
+      font-size: 0.95rem;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      cursor: pointer;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #5b729f 50%),
+        linear-gradient(135deg, #5b729f 50%, transparent 50%);
+      background-position:
+        calc(100% - 20px) calc(50% - 3px),
+        calc(100% - 14px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .kq-adventure-controls select:focus,
+    .kq-aventure-controls select:focus {
+      outline: none;
+      border-color: #7c98d1;
+      box-shadow: 0 0 0 4px rgba(124, 152, 209, 0.16);
+    }
+
+    #mapGrid {
+      display: block;
+      margin-top: 30px;
+    }
+
+    .kq-world-section {
+      margin: 0 auto 24px;
+      max-width: 940px;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kq-world-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 252, 246, 0.66);
+      z-index: 0;
+    }
+
+    .kq-world-section > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .kq-world-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .kq-world-header h3 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .kq-world-header p {
+      margin: 4px 0 0;
+      color: var(--muted, #5e6678);
+      font-weight: 700;
+    }
+
+    .kq-world-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 8px 12px;
       border-radius: 999px;
-      font-size: .82rem;
-      font-weight: 900;
       background: rgba(91, 114, 159, 0.10);
       color: var(--brand, #5b729f);
+      font-size: 0.82rem;
+      font-weight: 900;
+      white-space: nowrap;
     }
 
-    .kq-adventure-pill.done {
-      background: rgba(106, 159, 113, 0.12);
-      color: #4f7c56;
-    }
-
-    /* ===== MAP GRID ===== */
-    #mapGrid {
+    .kq-world-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
-      align-items: stretch;
+      margin-top: 5px;  
     }
 
+    .world-bg-1,
+    .world-bg-2,
+    .world-bg-3 {
+      background-image: none;
+    }
     .map-node {
-      text-align: left;
+      ext-align: left;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       gap: 10px;
       min-height: 165px;
-      padding: 16px 15px;
+      padding: 16px 28px 16px 16px; /* more space on right */
       border-radius: 20px;
       border: 1px solid rgba(0,0,0,0.08);
       background: linear-gradient(180deg, #6d86b8 0%, #5f78ab 100%);
@@ -192,36 +361,17 @@ function ensureStyles() {
       filter: brightness(1.03);
     }
 
-    /* unlocked/playable */
     .map-node.playable {
       background: linear-gradient(180deg, #7089bc 0%, #5d76aa 100%);
       color: #ffffff;
     }
 
-    /* cleared */
     .map-node.cleared {
       background: linear-gradient(180deg, #6b80b2 0%, #5871a3 100%);
       color: #ffffff;
       box-shadow: 0 14px 28px rgba(67, 95, 148, 0.26);
     }
 
-    /* locked by lesson */
-    .map-node.lesson-locked {
-      cursor: not-allowed;
-      background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(244,240,230,.92));
-      color: #3b2a1d;
-      border: 1px dashed rgba(122, 95, 62, 0.20);
-      box-shadow: none;
-      opacity: 1;
-    }
-
-    .map-node.lesson-locked:hover {
-      transform: none;
-      filter: none;
-      box-shadow: none;
-    }
-
-    /* locked by progression */
     .map-node.locked {
       cursor: not-allowed;
       background: linear-gradient(180deg, rgba(245,245,248,.96), rgba(233,236,242,.95));
@@ -237,7 +387,6 @@ function ensureStyles() {
       box-shadow: none;
     }
 
-    /* boss nodes */
     .map-node.boss-node.playable,
     .map-node.boss-node.cleared {
       background: linear-gradient(180deg, #a66b2f 0%, #8d5722 100%);
@@ -298,7 +447,6 @@ function ensureStyles() {
       margin-top: auto;
     }
 
-    /* explicit text colors */
     .map-node.playable .kq-node-top,
     .map-node.playable .kq-node-label,
     .map-node.playable .kq-node-sub,
@@ -322,21 +470,12 @@ function ensureStyles() {
       color: #ffffff;
     }
 
-    .map-node.lesson-locked .kq-node-top,
-    .map-node.lesson-locked .kq-node-label,
-    .map-node.lesson-locked .kq-node-sub,
-    .map-node.lesson-locked .kq-node-meta,
-    .map-node.lesson-locked .kq-node-status,
     .map-node.locked .kq-node-top,
     .map-node.locked .kq-node-label,
     .map-node.locked .kq-node-sub,
     .map-node.locked .kq-node-meta,
     .map-node.locked .kq-node-status {
       color: #2a2a2a;
-    }
-
-    .map-node.lesson-locked .kq-node-status {
-      color: #8d5722;
     }
 
     .map-node.locked .kq-node-status {
@@ -367,16 +506,27 @@ function ensureStyles() {
       outline: 2px solid rgba(205, 74, 74, 0.45);
       background: rgba(205, 74, 74, 0.12);
     }
+      .kq-adventure-controls select option,
+      .kq-aventure-controls select option {
+        background: #f7f9fd;
+        color: #273142;
+        font-weight: 700;
+      }
 
     @media (max-width: 980px) {
-      #mapGrid {
+      .kq-world-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 640px) {
-      #mapGrid {
+      .kq-world-grid {
         grid-template-columns: 1fr;
+      }
+
+      .kq-world-header {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .map-node {
@@ -385,12 +535,6 @@ function ensureStyles() {
     }
   `;
   document.head.appendChild(style);
-}
-
-function getRequiredLesson(level) {
-  if (level <= 4) return { id: "L1_hangul", title: "Hangul 1", range: "Levels 1–4" };
-  if (level <= 8) return { id: "L2_vocab_food", title: "Food Basics", range: "Levels 5–8" };
-  return { id: "L3_greetings", title: "Greetings & Intros", range: "Levels 9–12" };
 }
 
 function ensureSummary() {
@@ -415,37 +559,95 @@ function ensureSummary() {
 function renderSummary() {
   const adventure = getAdventureProgress();
   const summary = ensureSummary();
-  const nextLessonText = adventure.nextLesson
-    ? `Complete the next lesson to unlock ${adventure.nextLesson.label}.`
-    : "All chapters are unlocked — clear the remaining levels to finish the map.";
+
+  const world2Unlocked = isWorldUnlocked(2);
+  const world3Unlocked = isWorldUnlocked(3);
+
+  const nextText = !world2Unlocked
+    ? "Beat every level in Hangul Hills to unlock Food Forest."
+    : !world3Unlocked
+    ? "Beat every level in Food Forest to unlock Greeting Kingdom."
+    : "All worlds are unlocked — clear every level to complete the map.";
 
   summary.innerHTML = `
     <strong>Adventure unlocks now follow lesson progress</strong>
     <p>
       Your current lesson gate opens the map through <strong>Level ${adventure.cap}</strong>.
-      ${nextLessonText}
+      ${nextText}
     </p>
     <div class="kq-adventure-pills">
-      ${adventure.lessons
-        .map(
-          (lesson) => `
-            <span class="kq-adventure-pill ${lesson.done ? "done" : ""}">
-              ${lesson.done ? "✅" : "🔒"} ${lesson.label}
-            </span>
-          `,
-        )
-        .join("")}
+      <button type="button"
+        class="kq-adventure-pill ${activeWorldId === 1 ? "is-active" : ""}"
+        data-world-tab="1">
+        🌍 Hangul Hills
+      </button>
+
+      <button type="button"
+        class="kq-adventure-pill ${activeWorldId === 2 ? "is-active" : ""}"
+        data-world-tab="2">
+        ${world2Unlocked ? "🌍" : "🔒"} Food Forest
+      </button>
+
+      <button type="button"
+        class="kq-adventure-pill ${activeWorldId === 3 ? "is-active" : ""}"
+        data-world-tab="3">
+        ${world3Unlocked ? "🌍" : "🔒"} Greeting Kingdom
+      </button>
     </div>
   `;
+
+  summary.querySelectorAll("[data-world-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = Number(btn.dataset.worldTab);
+      if (!isWorldUnlocked(id)) {
+        setFeedback(
+          id === 2
+            ? "🔒 Beat all of Hangul Hills to unlock Food Forest."
+            : "🔒 Beat all of Food Forest to unlock Greeting Kingdom."
+        );
+        return;
+      }
+
+      activeWorldId = id;
+      renderSummary();
+      buildMap();
+    });
+  });
 }
 
 function buildMap() {
   if (!mapGrid) return;
 
   const adventure = getAdventureProgress();
+  const world = getVisibleWorld();
+  activeWorldId = world.id;
+
   mapGrid.innerHTML = "";
 
-  for (let level = 1; level <= 12; level += 1) {
+  const worldUnlocked = isWorldUnlocked(world.id);
+  const completedCount = world.levels.filter((lvl) => P.cleared[lvl]).length;
+
+  const section = document.createElement("section");
+  section.className = `kq-world-section ${world.bgClass}`;
+
+  section.innerHTML = `
+    <div class="kq-world-header">
+      <div>
+        <h3>${world.rangeLabel} — ${world.title}</h3>
+        <p>${completedCount}/${world.levels.length} levels cleared</p>
+      </div>
+      <span class="kq-world-badge">
+        ${worldUnlocked ? "🌍 Unlocked" : "🔒 Locked"}
+      </span>
+    </div>
+    <div class="kq-world-grid" id="kq-world-grid-${world.id}"></div>
+  `;
+
+  mapGrid.appendChild(section);
+
+  const worldGrid = section.querySelector(`#kq-world-grid-${world.id}`);
+
+  world.levels.forEach((level) => {
     const node = document.createElement("button");
     node.type = "button";
     node.className = "map-node";
@@ -453,8 +655,6 @@ function buildMap() {
     const enemy = ENEMIES[(level - 1) % ENEMIES.length];
     const boss = BOSS_LEVELS.has(level);
     const hp = 16 + Math.floor(level * 2.1);
-    const requiredLesson = getRequiredLesson(level);
-    const lessonLocked = level > adventure.cap;
     const sequentialLocked = level > P.unlocked;
 
     let statusText = "Ready";
@@ -468,15 +668,11 @@ function buildMap() {
     if (P.cleared[level]) {
       statusText = "✅ Cleared";
       node.classList.add("cleared");
-    } else if (!lessonLocked && !sequentialLocked) {
+    } else if (!sequentialLocked) {
       node.classList.add("playable");
     }
 
-    if (lessonLocked) {
-      node.classList.add("lesson-locked");
-      statusText = "Lesson locked";
-      reasonText = `Complete ${requiredLesson.title} to unlock ${requiredLesson.range}.`;
-    } else if (sequentialLocked) {
+    if (sequentialLocked) {
       node.classList.add("locked");
       statusText = "Clear previous level";
       reasonText = `Beat Level ${level - 1} first to continue.`;
@@ -484,23 +680,25 @@ function buildMap() {
 
     node.innerHTML = `
       <div class="kq-node-top">
+
         <div class="kq-node-title">
-          <span class="kq-node-sub">${boss ? "👑 Boss Stage" : "🗺️ Adventure Stage"}</span>
-          <span class="kq-node-label">${boss ? `Boss ${level}` : `Level ${level}`}</span>
+          <span class="kq-node-sub">
+            ${boss ? "👑" : "🗺️"} ${enemy.sprite}
+            ${boss ? "Boss Stage" : "Adventure Stage"}
+          </span>
+
+          <span class="kq-node-label">
+            ${boss ? `Boss ${level}` : `Level ${level}`}
+          </span>
         </div>
-        <span class="kq-node-emoji">${enemy.sprite}</span>
+
       </div>
 
       <div class="kq-node-meta">${reasonText}</div>
-
       <div class="kq-node-status">${statusText}</div>
     `;
 
     node.addEventListener("click", () => {
-      if (lessonLocked) {
-        setFeedback(`🔒 ${requiredLesson.title} unlocks this chapter. Visit Resources first.`);
-        return;
-      }
       if (sequentialLocked) {
         setFeedback(`🔒 Clear Level ${level - 1} first.`);
         return;
@@ -516,8 +714,8 @@ function buildMap() {
       });
     });
 
-    mapGrid.appendChild(node);
-  }
+    worldGrid.appendChild(node);
+  });
 }
 
 function setFeedback(message) {
@@ -570,6 +768,7 @@ function makeHangulQuestion() {
     const distractors = shuffle(HANGUL.filter((item) => item.roman !== picked.roman))
       .slice(0, 3)
       .map((item) => item.roman);
+
     return {
       title: "Hangul Sound Match",
       prompt: `What sound matches ${picked.char}?`,
@@ -581,6 +780,7 @@ function makeHangulQuestion() {
   const distractors = shuffle(HANGUL.filter((item) => item.char !== picked.char))
     .slice(0, 3)
     .map((item) => item.char);
+
   return {
     title: "Hangul Symbol Match",
     prompt: `Which letter matches “${picked.roman}”?`,
@@ -597,6 +797,7 @@ function makeVocabQuestion() {
     const distractors = shuffle(VOCAB.filter((item) => item.en !== picked.en))
       .slice(0, 3)
       .map((item) => item.en);
+
     return {
       title: "Vocabulary Match",
       prompt: `What does “${picked.ko}” mean?`,
@@ -608,6 +809,7 @@ function makeVocabQuestion() {
   const distractors = shuffle(VOCAB.filter((item) => item.ko !== picked.ko))
     .slice(0, 3)
     .map((item) => item.ko);
+
   return {
     title: "Vocabulary Match",
     prompt: `Which Korean word means “${picked.en}”?`,
@@ -618,7 +820,7 @@ function makeVocabQuestion() {
 
 function makeQuestion(topic) {
   if (topic === "hangul") return makeHangulQuestion();
-  if (topic === "vocabulary") return makeVocabQuestion();
+  if (topic === "vocab" || topic === "vocabulary") return makeVocabQuestion();
   return Math.random() < 0.5 ? makeHangulQuestion() : makeVocabQuestion();
 }
 
@@ -636,6 +838,7 @@ function startSpeedBar() {
   const tick = (now) => {
     const elapsed = now - start;
     speedPercent = clamp(100 - (elapsed / total) * 100, 0, 100);
+
     if (speedFill) speedFill.style.width = `${speedPercent}%`;
 
     if (speedPercent <= 0) {
@@ -680,13 +883,23 @@ function endBattle(win) {
   if (win) {
     const xp = (battle.boss ? 24 : 16) + Math.floor(battle.level / 2) + Math.floor(battle.streak / 2);
     const coins = (battle.boss ? 18 : 10) + Math.floor(battle.level / 3);
+
     addXP(xp);
     addCoins(coins);
-    markBattleWin(`Cleared ${battle.boss ? `Boss ${battle.level}` : `Level ${battle.level}`}`, { boss: battle.boss });
+    markBattleWin(`Cleared ${battle.boss ? `Boss ${battle.level}` : `Level ${battle.level}`}`, {
+      boss: battle.boss,
+    });
 
     P.cleared[battle.level] = true;
     P.unlocked = Math.max(P.unlocked, battle.level + 1);
     saveProgress();
+
+    const clearedWorld = getWorldForLevel(battle.level);
+    if (clearedWorld === 1 && isWorldComplete(1)) {
+      activeWorldId = 2;
+    } else if (clearedWorld === 2 && isWorldComplete(2)) {
+      activeWorldId = 3;
+    }
 
     setFeedback(`✅ Victory! +${xp} XP • +${coins} coins`);
     setTurnHint("Map updated — your next level is ready.");
@@ -736,10 +949,11 @@ function handleAnswer(correct, clickedButton = null, timedOut = false) {
     const damage = enemyDmgFor(battle.difficulty) + (timedOut ? 1 : 0);
     battle.playerHP = clamp(battle.playerHP - damage, 0, battle.playerHPMax);
     updateBars();
+
     setFeedback(
       timedOut
         ? `⏳ Too slow. The enemy hit you for ${damage}.`
-        : `❌ Not quite. The enemy hit you for ${damage}.`,
+        : `❌ Not quite. The enemy hit you for ${damage}.`
     );
     setTurnHint(`Correct answer: ${currentQuestion?.answer || "—"}`);
 
@@ -807,9 +1021,9 @@ diffSelect?.addEventListener("change", buildMap);
 
 mountGuideBubble(
   [
-    "Adventure levels now unlock from lesson progress...",
-    "Speed matters here...",
-    "Beat Level 4, 8, and 12..."
+    "World 1 starts in Hangul Hills. Beat all 4 levels to unlock Food Forest.",
+    "Only one world shows at a time now, so the map stays clean and readable.",
+    "Beat each boss level to move through the worlds faster.",
   ],
   { label: "Map Guide", id: "kq-adventure-bubble", side: "right" }
 );

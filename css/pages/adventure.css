@@ -282,11 +282,11 @@ button.btn:contains("Run") {
   position: absolute;
   inset: 0;
 
-  background-image: url("../../favicon/adventure/adventureBg.png");
-  background-size: 80%;
+  background-image: url("../../favicon/adventure/world1.png");
+  background-size: 110%;
   background-repeat: no-repeat;
   background-position: center top;
-
+  padding-top: 100px;
   opacity: 1;
   z-index: 0;
 }
