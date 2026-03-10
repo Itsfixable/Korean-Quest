@@ -635,3 +635,174 @@ a.btn:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+/* =========================
+   NAVBAR LAYOUT FIX
+   ========================= */
+
+.site-header {
+  width: 100%;
+}
+
+.site-header .nav {
+  width: 100%;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  /* prevents Login / Sign Up from dropping */
+  flex-wrap: nowrap;
+}
+
+/* brand/logo section */
+.site-nav .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* main navigation links */
+.nav-links-desktop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-left: auto;
+
+  /* keep everything on one row */
+  flex-wrap: nowrap;
+}
+
+/* nav buttons (Home / Schedule / etc) */
+.nav-links-desktop .pill {
+  white-space: nowrap;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+}
+
+/* auth container */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  /* prevents shrinking and wrapping */
+  flex-shrink: 0;
+}
+
+/* Login / Sign Up button */
+.nav-auth .pill {
+  white-space: nowrap;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+}
+
+/* logged in username */
+.nav-user-trigger {
+  border: none;
+  background: transparent;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+
+  padding: 10px 12px;
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  white-space: nowrap;
+}
+
+.nav-user-trigger:hover {
+  background: rgba(91,114,159,0.08);
+}
+
+/* dropdown arrow */
+.nav-user-caret {
+  font-size: 0.8rem;
+  color: #5b729f;
+}
+
+/* dropdown menu */
+.nav-user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+
+  min-width: 160px;
+
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+
+  border-radius: 16px;
+  padding: 8px;
+
+  box-shadow: 0 16px 36px rgba(0,0,0,0.14);
+}
+
+.nav-user-menu button {
+  width: 100%;
+  border: none;
+  background: transparent;
+
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+
+  text-align: left;
+
+  padding: 10px 12px;
+  border-radius: 12px;
+
+  cursor: pointer;
+}
+
+.nav-user-menu button:hover {
+  background: rgba(91,114,159,0.10);
+}
+/* NAVBAR TEXT SIZE FIX */
+
+.nav-links-desktop .pill {
+  font-size: 0.9rem;   /* ~14.4px instead of 16px */
+  padding: 8px 5px;
+}
+
+.nav-auth .pill {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+/* slightly reduce spacing between links */
+.nav-links-desktop {
+  gap: 5px;
+}
+/* =========================
+   MOBILE ADJUSTMENTS
+   ========================= */
+
+@media (max-width: 900px) {
+
+  .nav-links-desktop {
+    gap: 10px;
+  }
+
+  .nav-auth .pill {
+    font-size: 0.95rem;
+  }
+
+}
+
+@media (max-width: 640px) {
+
+  .nav-links-desktop {
+    display: none;
+  }
+
+}

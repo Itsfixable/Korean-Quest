@@ -572,7 +572,7 @@ function renderSummary() {
   summary.innerHTML = `
     <strong>Adventure unlocks now follow lesson progress</strong>
     <p>
-      Your current lesson gate opens the map through <strong>Level ${adventure.cap}</strong>.
+      Beat every level in each world to unlock the next one.
       ${nextText}
     </p>
     <div class="kq-adventure-pills">
