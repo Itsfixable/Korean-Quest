@@ -358,3 +358,13 @@ button.btn:contains("Run") {
     max-width: 120px;
   }
 }
+@media (max-width: 1024px) {
+  .adventure-levels-wrapper,
+  .adventure-levels-wrapper::before,
+  .adventure-levels-wrapper::after,
+  .map,
+  #mapGrid,
+  #mapCard {
+    background-image: none !important;
+  }
+}

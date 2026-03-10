@@ -1,7 +1,6 @@
 (function () {
-  const MOBILE_BREAKPOINT = 640;
+  const MOBILE_BREAKPOINT = 1180;
   const FAKE_AUTH_KEY = "kq_fake_user";
-  let currentMode = "";
 
   const LINKS = [
     ["index.html", "Home"],
@@ -57,8 +56,9 @@
         display: grid !important;
         grid-template-columns: auto 1fr auto !important;
         align-items: center !important;
-        column-gap: 22px !important;
+        column-gap: 16px !important;
         width: 100% !important;
+        min-width: 0 !important;
       }
 
       .site-nav .brand {
@@ -66,36 +66,45 @@
         align-items: center !important;
         gap: 10px !important;
         white-space: nowrap !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
       }
 
       .nav-links-desktop {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 12px !important;
+        gap: 8px !important;
         min-width: 0 !important;
         flex-wrap: nowrap !important;
+        overflow: hidden !important;
       }
 
       .nav-links-desktop .pill {
         white-space: nowrap !important;
+        flex: 0 0 auto !important;
         font-family: "Nunito", sans-serif !important;
         font-weight: 700 !important;
-        flex: 0 0 auto !important;
+        font-size: 0.86rem !important;
+        padding: 8px 9px !important;
       }
 
       .nav-auth {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-end !important;
-        gap: 10px !important;
+        gap: 6px !important;
         white-space: nowrap !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
       }
 
       .nav-auth .pill {
         white-space: nowrap !important;
         font-family: "Nunito", sans-serif !important;
         font-weight: 700 !important;
+        font-size: 0.84rem !important;
+        padding: 8px 6px !important;
       }
 
       .nav-auth-ghost {
@@ -103,11 +112,23 @@
         border: none !important;
         box-shadow: none !important;
         color: #111827 !important;
-        padding: 10px 8px !important;
+        padding: 8px 4px !important;
       }
 
       .nav-auth-ghost:hover {
         background: rgba(91, 114, 159, 0.08) !important;
+      }
+
+      .nav-auth-login-text-short {
+        display: inline !important;
+      }
+
+      .nav-auth-login-text-long {
+        display: none !important;
+      }
+
+      .nav-user-wrap {
+        position: relative;
       }
 
       .nav-user-trigger {
@@ -115,16 +136,15 @@
         background: transparent;
         color: #111827;
         font-family: "Nunito", sans-serif;
-        font-size: 1rem;
+        font-size: 0.84rem;
         font-weight: 700;
         cursor: pointer;
-        padding: 10px 12px;
+        padding: 8px 6px;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         white-space: nowrap;
-        position: relative;
       }
 
       .nav-user-trigger:hover {
@@ -132,12 +152,8 @@
       }
 
       .nav-user-caret {
-        font-size: 0.8rem;
+        font-size: 0.74rem;
         color: #5b729f;
-      }
-
-      .nav-user-wrap {
-        position: relative;
       }
 
       .nav-user-menu {
@@ -265,6 +281,39 @@
         color: #fff;
       }
 
+      .nav-mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .nav-toggle {
+        border: none;
+        background: transparent;
+        font-size: 1.4rem;
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: 10px;
+      }
+
+      .nav-toggle:hover {
+        background: rgba(91, 114, 159, 0.08);
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        margin-top: 12px;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
       .nav-mobile-auth {
         display: flex;
         flex-wrap: wrap;
@@ -295,43 +344,36 @@
         border-radius: 14px;
       }
 
-      @media (max-width: 1080px) {
-        .site-nav {
-          column-gap: 16px !important;
-        }
-
+      @media (min-width: 1400px) {
         .nav-links-desktop {
           gap: 10px !important;
         }
 
-        .nav-links-desktop .pill,
+        .nav-links-desktop .pill {
+          font-size: 0.9rem !important;
+          padding: 8px 10px !important;
+        }
+
         .nav-auth .pill,
         .nav-user-trigger {
-          font-size: 0.95rem !important;
+          font-size: 0.88rem !important;
+        }
+
+        .nav-auth-login-text-long {
+          display: inline !important;
+        }
+
+        .nav-auth-login-text-short {
+          display: none !important;
         }
       }
 
-      @media (max-width: 940px) {
-        .site-nav {
-          column-gap: 12px !important;
-        }
-
-        .nav-links-desktop {
-          gap: 8px !important;
-        }
-
-        .nav-links-desktop .pill,
-        .nav-auth .pill,
-        .nav-user-trigger {
-          font-size: 0.92rem !important;
-        }
-      }
-
-      @media (max-width: 640px) {
+      @media (max-width: ${MOBILE_BREAKPOINT}px) {
         .site-nav {
           display: flex !important;
           align-items: center !important;
           justify-content: space-between !important;
+          flex-wrap: wrap !important;
         }
 
         .nav-links-desktop {
@@ -386,9 +428,7 @@
     document.body.appendChild(overlay);
 
     overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) {
-        overlay.hidden = true;
-      }
+      if (event.target === overlay) overlay.hidden = true;
     });
 
     overlay.querySelector("#kqAuthCancel")?.addEventListener("click", () => {
@@ -521,7 +561,10 @@
     const login = document.createElement("a");
     login.href = "#";
     login.className = "pill nav-auth-ghost";
-    login.textContent = "Login / Sign Up";
+    login.innerHTML = `
+      <span class="nav-auth-login-text-long">Login / Sign Up</span>
+      <span class="nav-auth-login-text-short">Login</span>
+    `;
 
     login.addEventListener("click", (e) => {
       e.preventDefault();
@@ -688,7 +731,6 @@
 
     const currentPath = getCurrentPath();
     const nextMode = window.innerWidth <= MOBILE_BREAKPOINT ? "mobile" : "desktop";
-    currentMode = nextMode;
 
     closeAllUserMenus();
 

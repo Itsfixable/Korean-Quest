@@ -1,7 +1,7 @@
 /* state.js — central game state, progression, achievements, adventure unlocks, and guide bubbles */
 
 export const KQ_VERSION = "1.5.0";
-
+const GUIDE_BUBBLE_PREF_KEY = "kq-guide-bubbles-enabled";
 const KEY = "kq-state";
 const DAILY_QUEST_XP_BONUS = 15;
 const DAILY_ALL_XP_BONUS = 60;
@@ -634,13 +634,50 @@ function ensureGuideStyle() {
   document.head.appendChild(style);
 }
 
+export function areGuideBubblesEnabled() {
+  const saved = localStorage.getItem(GUIDE_BUBBLE_PREF_KEY);
+  if (saved === null) return true;
+  return saved === "true";
+}
+
+export function setGuideBubblesEnabled(enabled) {
+  localStorage.setItem(GUIDE_BUBBLE_PREF_KEY, String(Boolean(enabled)));
+
+  document.querySelectorAll(".kq-guide-bubble").forEach((bubble) => {
+    bubble.hidden = !enabled;
+  });
+}
+
+export function mountGuideBubbleToggle() {
+  if (document.getElementById("kqGuideBubbleToggle")) return;
+
+  const wrap = document.createElement("div");
+  wrap.id = "kqGuideBubbleToggle";
+  wrap.className = "kq-guide-toggle";
+
+  wrap.innerHTML = `
+    <label class="kq-guide-toggle-label">
+      <span>Guide Bubbles</span>
+      <input type="checkbox" id="kqGuideBubbleCheckbox" ${areGuideBubblesEnabled() ? "checked" : ""}>
+      <span class="kq-guide-toggle-slider"></span>
+    </label>
+  `;
+
+  document.body.appendChild(wrap);
+
+  const checkbox = wrap.querySelector("#kqGuideBubbleCheckbox");
+  checkbox?.addEventListener("change", () => {
+    setGuideBubblesEnabled(checkbox.checked);
+  });
+}
 export function mountGuideBubble(messages = [], options = {}) {
   if (!Array.isArray(messages) || messages.length === 0) return;
   ensureGuideStyle();
+  mountGuideBubbleToggle();
 
   const label = String(options.label || "Guide");
   const bubbleId = options.id || "kq-guide-bubble";
-  const side = options.side || "left";
+  const side = options.side || "right";
   let bubble = document.getElementById(bubbleId);
 
   if (!bubble) {
@@ -652,6 +689,7 @@ export function mountGuideBubble(messages = [], options = {}) {
     document.body.appendChild(bubble);
   }
 
+  bubble.hidden = !areGuideBubblesEnabled();
   bubble.dataset.side = side;
   bubble.style.left = "";
   bubble.style.right = "";
@@ -687,7 +725,14 @@ export function mountGuideBubble(messages = [], options = {}) {
 
   let idx = 0;
   const paint = () => {
+    if (!areGuideBubblesEnabled()) {
+      bubble.hidden = true;
+      return;
+    }
+
+    bubble.hidden = false;
     bubble.classList.add("is-hidden");
+
     window.setTimeout(() => {
       bubble.innerHTML = `<strong>${label}</strong>${messages[idx % messages.length]}`;
       bubble.classList.remove("is-hidden");
