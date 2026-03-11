@@ -1,4 +1,67 @@
 /* ========================================= Korean Quest — Home Page (Stable Version) ========================================= */ /* ---------- NAV BRAND ---------- */
+/* =========================================
+   HERO SECTION (SELL THE PRODUCT)
+========================================= */
+
+.kq-hero {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: center;
+  overflow: visible;
+}
+
+.kq-hero-left {
+  z-index: 2;
+}
+
+.kq-hero-tag {
+  font-weight: 800;
+  color: #5b729f;
+  margin-bottom: 6px;
+}
+
+.kq-hero-title {
+  font-size: 2.3rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.kq-highlight {
+  color: #5d76aa;
+}
+
+.kq-hero-sub {
+  font-size: 1.05rem;
+  max-width: 540px;
+  margin-bottom: 16px;
+}
+
+.kq-hero-cta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.kq-cta-primary {
+  font-size: 1.05rem;
+  padding: 12px 18px;
+}
+
+.kq-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.kq-hero-right {
+  min-height: 340px;
+  background-image: url("../../favicon/index/welcome.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
 .brand {
   display: inline-flex;
   align-items: center;
@@ -122,6 +185,21 @@
 .kq-bg--path h2 {
   margin-top: 0;
 } /* ========================================= TABLET ========================================= */
+@media (max-width: 900px) {
+
+  .kq-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .kq-hero-right {
+    min-height: 260px;
+  }
+
+  .kq-hero-title {
+    font-size: 1.9rem;
+  }
+
+}
 @media (max-width: 950px) {
   /* Keep welcome image beside buttons even when buttons collapse */
   .kq-welcome {

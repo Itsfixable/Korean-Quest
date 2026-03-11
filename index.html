@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Korean Quest — Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/master.css" />
   <link rel="stylesheet" href="css/contrast-overrides.css" />
@@ -11,45 +12,52 @@
   <link rel="stylesheet" href="css/pages/home.css" />
   <link rel="stylesheet" href="css/components/theme-toggle.css" />
   <link rel="stylesheet" href="css/chatbot.css" />
-  
 </head>
 
 <body>
   <!-- Header / Nav -->
-    <header class="container site-header">
-      <nav class="nav site-nav" aria-label="Primary">
-        <a class="brand" href="index.html" aria-label="Korean Quest Home">
+  <header class="container site-header">
+    <nav class="nav site-nav" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Korean Quest Home">
+        <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
+        <span class="brand-wordmark">
+          <span class="brand-korean">Korean</span>
+          <span class="brand-quest">Quest</span>
+        </span>
+      </a>
+    </nav>
+  </header>
 
-
-          <img class="brand-logo" src="favicon/logoImage.png" alt="Korean Quest logo" />
-
-
-          <span class="brand-wordmark">
-            <span class="brand-korean">Korean</span>
-            <span class="brand-quest">Quest</span>
-          </span>
-        </a>
-      </nav>
-    </header>
   <!-- Main -->
   <main class="container grid">
 
-    <!-- ✅ WELCOME -->
-    <section class="card kq-welcome kq-sparkles">
-      <div class="kq-welcome__left">
-        <h1>Welcome to <span class="btn" href="index.html">Korean Quest</span></h1>
-        <p class="muted">
-          By students, for students — master Hangul, core words, phrases, and
-          sentence patterns through short lessons and a game-style adventure.
+    <!-- HERO / SELL SECTION -->
+    <section class="card kq-hero kq-sparkles">
+      <div class="kq-hero-left">
+        <p class="kq-hero-tag">🚀 Learn Korean Faster</p>
+
+        <h1 class="kq-hero-title">
+          Learn Korean in <span class="kq-highlight">3 Minutes a Day</span>
+        </h1>
+
+        <p class="kq-hero-sub">
+          Master Hangul, vocabulary, and real Korean phrases through
+          <strong>interactive lessons</strong>,
+          <strong>game battles</strong>,
+          and <strong>daily challenges</strong>.
         </p>
 
-        <div class="kpi" role="region" aria-label="Key progress">
+        <div class="kq-hero-cta">
+          <a class="btn kq-cta-primary" href="resources.html">Start Learning →</a>
+          <a class="btn secondary" href="adventure.html">Try the Adventure</a>
+        </div>
 
-
+        <div class="kq-hero-stats" role="region" aria-label="Key progress">
           <div class="metric">
             <div class="muted">Level</div>
             <div class="kpi-value" id="kq-level">1</div>
           </div>
+
           <div class="metric">
             <div class="kpi-value streak-value">
               <img src="favicon/index/streakEmoji.png" alt="Streak fire icon" class="streak-icon">
@@ -57,31 +65,57 @@
             </div>
             <div class="muted">Day Streak</div>
           </div>
+
           <div class="metric">
             <div class="muted">Badges</div>
             <div id="homeBadges">—</div>
           </div>
         </div>
-
-        <div class="grid grid-actions">
-          <a class="btn" href="resources.html">Start a Lesson</a>
-          <a class="btn secondary" href="adventure.html">Enter Adventure</a>
-          <a class="btn secondary" href="schedule.html">Join Study Session</a>
-        </div>
       </div>
 
-      <!-- decorative right panel -->
-      <div class="kq-welcome__right" aria-hidden="true"></div>
+      <div class="kq-hero-right" aria-hidden="true"></div>
     </section>
 
-    <!-- ✅ TODAY'S QUESTS -->
+    <!-- WHY KOREAN QUEST -->
+    <section class="card kq-feature-band kq-sparkles">
+      <div class="kq-feature-intro">
+        <p class="kq-section-tag">Why Korean Quest?</p>
+        <h2>Everything you need to start learning — right away.</h2>
+        <p class="muted">
+          No scavenger hunt. No confusing menus. Just a clear path from
+          your first Korean letter to useful words, phrases, and sentence patterns.
+        </p>
+      </div>
+
+      <div class="kq-feature-grid">
+        <article class="kq-feature-card">
+          <div class="kq-feature-icon">📝</div>
+          <h3>Quick Lessons</h3>
+          <p>Learn the essentials in short, beginner-friendly lessons built for fast progress.</p>
+        </article>
+
+        <article class="kq-feature-card">
+          <div class="kq-feature-icon">🎮</div>
+          <h3>Game Adventure</h3>
+          <p>Turn practice into motivation with battles, unlocks, and world progression.</p>
+        </article>
+
+        <article class="kq-feature-card">
+          <div class="kq-feature-icon">🔥</div>
+          <h3>Daily Momentum</h3>
+          <p>Build streaks, complete quests, and stay consistent with bite-sized daily goals.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- TODAY’S QUESTS -->
     <section class="card kq-quests kq-sparkles">
       <div class="kq-quests__content">
+        <p class="kq-section-tag">Daily Motivation</p>
         <h2>Today’s Quests</h2>
 
         <p class="muted kq-quests__desc">
-          Complete daily quests to earn coins and rare cosmetics. Keep your
-          streak to unlock weekly rewards.
+          Complete daily quests to earn coins, grow your streak, and build a habit that makes Korean stick.
         </p>
 
         <a class="btn secondary kq-view-quests" href="dashboard.html">
@@ -89,15 +123,40 @@
         </a>
       </div>
     </section>
-    <!-- ✅ LEARNING PATH -->
+
+    <!-- LEARNING PATH -->
     <section id="learningPathSection" class="card kq-bg kq-bg--path kq-sparkles">
-      <h2>Learning Path</h2>
+      <p class="kq-section-tag">Your Roadmap</p>
+      <h2>Follow a clear path from beginner to confident learner</h2>
+
       <ol class="learning-path">
         <li><strong>Hangul</strong> — write & read consonants (초성/종성), vowels (중성), and build syllables.</li>
-        <li><strong>Common Words</strong> — numbers, family, food, school, time.</li>
-        <li><strong>Phrases</strong> — greetings, introductions, requests, likes/dislikes.</li>
-        <li><strong>Sentence Structure</strong> — SOV order, particles (은/는, 이/가, 을/를), locations/time, present tense.</li>
+        <li><strong>Common Words</strong> — numbers, family, food, school, and everyday essentials.</li>
+        <li><strong>Phrases</strong> — greetings, introductions, requests, and likes/dislikes.</li>
+        <li><strong>Sentence Structure</strong> — SOV order, particles (은/는, 이/가, 을/를), time/location, and present tense.</li>
       </ol>
+
+      <div class="kq-path-cta">
+        <a class="btn" href="resources.html">Start with Lesson 1</a>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="card kq-final-cta kq-sparkles">
+      <div class="kq-final-cta__content">
+        <p class="kq-section-tag">Ready to Begin?</p>
+        <h2>Start learning Korean now — not someday.</h2>
+        <p class="muted">
+          Whether you want to read Hangul, speak basic phrases, or stay motivated with game-style progress,
+          Korean Quest gives you a simple place to start.
+        </p>
+
+        <div class="grid grid-actions">
+          <a class="btn" href="resources.html">Start a Lesson</a>
+          <a class="btn secondary" href="adventure.html">Enter Adventure</a>
+          <a class="btn secondary" href="schedule.html">Join Study Session</a>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -110,8 +169,6 @@
   <script defer src="js/main/nav-rebuild.js"></script>
   <script type="module" src="js/main/index-stats.js"></script>
   <script type="module" src="./js/main/chatbot.js?v=5"></script>
- 
-
+  <script type="module" src="js/main/home-layout.js"></script>
 </body>
 </html>
-<script type="module" src="js/main/home-layout.js"></script>

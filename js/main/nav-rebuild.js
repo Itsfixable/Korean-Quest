@@ -1,5 +1,6 @@
 (function () {
-  const MOBILE_BREAKPOINT = 1180;
+  const MOBILE_BREAKPOINT = 640;
+  const TABLET_BREAKPOINT = 1180;
   const FAKE_AUTH_KEY = "kq_fake_user";
 
   const LINKS = [
@@ -11,6 +12,13 @@
     ["leaderboard.html", "Leaderboard"],
     ["about.html", "About"],
   ];
+
+  const TABLET_PRIMARY_LINKS = new Set([
+    "index.html",
+    "resources.html",
+    "adventure.html",
+    "dashboard.html",
+  ]);
 
   function getFakeUser() {
     try {
@@ -46,12 +54,22 @@
     return a;
   }
 
-  function ensureFakeAuthStyles() {
-    if (document.getElementById("kq-fake-auth-styles")) return;
+  function ensureNavStyles() {
+    if (document.getElementById("kq-nav-rebuild-styles")) return;
 
     const style = document.createElement("style");
-    style.id = "kq-fake-auth-styles";
+    style.id = "kq-nav-rebuild-styles";
     style.textContent = `
+      .site-header,
+      .site-nav,
+      .site-nav .brand,
+      .nav-links-desktop,
+      .nav-auth,
+      .nav-user-wrap,
+      .nav-more-wrap {
+        overflow: visible !important;
+      }
+
       .site-nav {
         display: grid !important;
         grid-template-columns: auto 1fr auto !important;
@@ -70,23 +88,33 @@
         flex: 0 0 auto !important;
       }
 
-      .nav-links-desktop {
+      .nav-links-desktop,
+      .nav-links-tablet {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         gap: 8px !important;
         min-width: 0 !important;
         flex-wrap: nowrap !important;
-        overflow: hidden !important;
       }
 
-      .nav-links-desktop .pill {
+      .nav-links-desktop .pill,
+      .nav-links-tablet .pill {
         white-space: nowrap !important;
         flex: 0 0 auto !important;
         font-family: "Nunito", sans-serif !important;
         font-weight: 700 !important;
-        font-size: 0.86rem !important;
-        padding: 8px 9px !important;
+        font-size: 0.88rem !important;
+        padding: 8px 10px !important;
+      }
+
+      .nav-right-group {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
       }
 
       .nav-auth {
@@ -97,6 +125,7 @@
         white-space: nowrap !important;
         min-width: 0 !important;
         flex: 0 0 auto !important;
+        position: relative !important;
       }
 
       .nav-auth .pill {
@@ -127,11 +156,14 @@
         display: none !important;
       }
 
-      .nav-user-wrap {
-        position: relative;
+      .nav-user-wrap,
+      .nav-more-wrap {
+        position: relative !important;
+        overflow: visible !important;
       }
 
-      .nav-user-trigger {
+      .nav-user-trigger,
+      .nav-more-trigger {
         border: none;
         background: transparent;
         color: #111827;
@@ -147,54 +179,71 @@
         white-space: nowrap;
       }
 
-      .nav-user-trigger:hover {
+      .nav-user-trigger:hover,
+      .nav-more-trigger:hover {
         background: rgba(91, 114, 159, 0.08);
       }
 
-      .nav-user-caret {
+      .nav-user-caret,
+      .nav-more-caret {
         font-size: 0.74rem;
         color: #5b729f;
       }
 
-      .nav-user-menu {
+      .nav-user-menu,
+      .nav-more-menu {
+        display: none;
         position: absolute;
         top: calc(100% + 8px);
         right: 0;
-        min-width: 160px;
+        min-width: 180px;
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.08);
         border-radius: 16px;
         box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
         padding: 8px;
-        z-index: 2200;
+        z-index: 9999;
       }
 
-      .nav-user-menu[hidden] {
-        display: none;
+      .nav-user-wrap.open .nav-user-menu,
+      .nav-more-wrap.open .nav-more-menu {
+        display: block;
       }
 
-      .nav-user-menu button {
+      .nav-user-menu button,
+      .nav-more-menu a,
+      .nav-more-menu button {
         width: 100%;
         border: none;
         background: transparent;
         color: #111827;
         font-family: "Nunito", sans-serif;
-        font-size: 0.96rem;
+        font-size: 0.95rem;
         font-weight: 700;
         text-align: left;
         padding: 10px 12px;
         border-radius: 12px;
         cursor: pointer;
+        display: block;
+        text-decoration: none;
       }
 
-      .nav-user-menu button:hover {
+      .nav-user-menu button:hover,
+      .nav-more-menu a:hover,
+      .nav-more-menu button:hover {
         background: rgba(91, 114, 159, 0.10);
+      }
+
+      .nav-more-divider {
+        height: 1px;
+        background: rgba(0, 0, 0, 0.08);
+        margin: 6px 0;
       }
 
       .kq-auth-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.35);
+        background: rgba(0, 0, 0, 0.35);
         display: grid;
         place-items: center;
         z-index: 3000;
@@ -210,8 +259,8 @@
         background: #fff;
         border-radius: 24px;
         padding: 22px;
-        box-shadow: 0 24px 60px rgba(0,0,0,0.22);
-        border: 1px solid rgba(0,0,0,0.08);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(0, 0, 0, 0.08);
       }
 
       .kq-auth-modal h3 {
@@ -239,7 +288,7 @@
       }
 
       .kq-auth-field input {
-        border: 1px solid rgba(0,0,0,0.12);
+        border: 1px solid rgba(0, 0, 0, 0.12);
         border-radius: 14px;
         padding: 12px 14px;
         font-size: 0.96rem;
@@ -331,13 +380,15 @@
         position: relative;
       }
 
-      .nav-mobile-user-wrap .nav-user-trigger {
+      .nav-mobile-user-wrap .nav-user-trigger,
+      .nav-mobile-user-wrap .nav-more-trigger {
         width: 100%;
         justify-content: center;
         background: rgba(91, 114, 159, 0.08);
       }
 
-      .nav-mobile-user-wrap .nav-user-menu {
+      .nav-mobile-user-wrap .nav-user-menu,
+      .nav-mobile-user-wrap .nav-more-menu {
         position: static;
         margin-top: 8px;
         box-shadow: none;
@@ -345,17 +396,15 @@
       }
 
       @media (min-width: 1400px) {
-        .nav-links-desktop {
-          gap: 10px !important;
-        }
-
-        .nav-links-desktop .pill {
+        .nav-links-desktop .pill,
+        .nav-links-tablet .pill {
           font-size: 0.9rem !important;
           padding: 8px 10px !important;
         }
 
         .nav-auth .pill,
-        .nav-user-trigger {
+        .nav-user-trigger,
+        .nav-more-trigger {
           font-size: 0.88rem !important;
         }
 
@@ -368,6 +417,26 @@
         }
       }
 
+      @media (max-width: ${TABLET_BREAKPOINT}px) and (min-width: ${MOBILE_BREAKPOINT + 1}px) {
+        .site-nav {
+          display: grid !important;
+          grid-template-columns: auto 1fr auto !important;
+          column-gap: 12px !important;
+        }
+
+        .nav-links-tablet .pill {
+          font-size: 0.82rem !important;
+          padding: 7px 8px !important;
+        }
+
+        .nav-auth .pill,
+        .nav-user-trigger,
+        .nav-more-trigger {
+          font-size: 0.82rem !important;
+          padding: 7px 5px !important;
+        }
+      }
+
       @media (max-width: ${MOBILE_BREAKPOINT}px) {
         .site-nav {
           display: flex !important;
@@ -376,7 +445,9 @@
           flex-wrap: wrap !important;
         }
 
-        .nav-links-desktop {
+        .nav-links-desktop,
+        .nav-links-tablet,
+        .nav-right-group {
           display: none !important;
         }
 
@@ -494,30 +565,38 @@
   }
 
   function closeAllUserMenus() {
-    document.querySelectorAll(".nav-user-menu").forEach((menu) => {
-      menu.hidden = true;
+    document.querySelectorAll(".nav-user-wrap, .nav-more-wrap, .nav-mobile-user-wrap").forEach((wrap) => {
+      wrap.classList.remove("open");
     });
-    document.querySelectorAll(".nav-user-trigger").forEach((btn) => {
+
+    document.querySelectorAll(".nav-user-trigger, .nav-more-trigger").forEach((btn) => {
       btn.setAttribute("aria-expanded", "false");
     });
   }
 
-  function attachUserMenu(trigger, menu) {
+  function attachPopupMenu(trigger, menu, wrapSelector) {
+    const wrap = trigger.closest(wrapSelector);
+    if (!wrap) return;
+
     trigger.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const isOpen = !menu.hidden;
+      const shouldOpen = !wrap.classList.contains("open");
       closeAllUserMenus();
 
-      if (!isOpen) {
-        menu.hidden = false;
+      if (shouldOpen) {
+        wrap.classList.add("open");
         trigger.setAttribute("aria-expanded", "true");
+      } else {
+        wrap.classList.remove("open");
+        trigger.setAttribute("aria-expanded", "false");
       }
     });
 
     menu.querySelector("[data-signout]")?.addEventListener("click", (e) => {
       e.preventDefault();
+      e.stopPropagation();
       logoutFakeUser();
     });
   }
@@ -545,14 +624,13 @@
 
       const menu = document.createElement("div");
       menu.className = "nav-user-menu";
-      menu.hidden = true;
       menu.innerHTML = `
         <button type="button" data-signout="true">Sign Out</button>
       `;
 
       userWrap.appendChild(trigger);
       userWrap.appendChild(menu);
-      attachUserMenu(trigger, menu);
+      attachPopupMenu(trigger, menu, ".nav-user-wrap");
 
       wrap.appendChild(userWrap);
       return wrap;
@@ -573,6 +651,51 @@
 
     wrap.appendChild(login);
     return wrap;
+  }
+
+  function buildMoreMenu(currentPath) {
+    const moreWrap = document.createElement("div");
+    moreWrap.className = "nav-more-wrap";
+
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "nav-more-trigger";
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.innerHTML = `More <span class="nav-more-caret">▾</span>`;
+
+    const menu = document.createElement("div");
+    menu.className = "nav-more-menu";
+
+    LINKS.filter(([href]) => !TABLET_PRIMARY_LINKS.has(href)).forEach(([href, label]) => {
+      menu.appendChild(makeLink(href, label, currentPath));
+    });
+
+    menu.appendChild(document.createElement("div")).className = "nav-more-divider";
+
+    const user = getFakeUser();
+    if (user?.loggedIn) {
+      const signOutBtn = document.createElement("button");
+      signOutBtn.type = "button";
+      signOutBtn.setAttribute("data-signout", "true");
+      signOutBtn.textContent = `Sign Out (${user.name})`;
+      menu.appendChild(signOutBtn);
+    } else {
+      const loginBtn = document.createElement("button");
+      loginBtn.type = "button";
+      loginBtn.textContent = "Login / Sign Up";
+      loginBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAuthModal();
+        closeAllUserMenus();
+      });
+      menu.appendChild(loginBtn);
+    }
+
+    moreWrap.appendChild(trigger);
+    moreWrap.appendChild(menu);
+    attachPopupMenu(trigger, menu, ".nav-more-wrap");
+
+    return moreWrap;
   }
 
   function buildAuthMobile(closeMenu) {
@@ -598,7 +721,6 @@
 
       const menu = document.createElement("div");
       menu.className = "nav-user-menu";
-      menu.hidden = true;
       menu.innerHTML = `
         <button type="button" data-signout="true">Sign Out</button>
       `;
@@ -612,8 +734,9 @@
       trigger.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const isOpen = !menu.hidden;
-        menu.hidden = isOpen;
+
+        const isOpen = userWrap.classList.contains("open");
+        userWrap.classList.toggle("open", !isOpen);
         trigger.setAttribute("aria-expanded", String(!isOpen));
       });
 
@@ -649,8 +772,31 @@
       linksWrap.appendChild(makeLink(href, label, currentPath));
     });
 
-    linksWrap.appendChild(buildAuthDesktop());
+    const rightGroup = document.createElement("div");
+    rightGroup.className = "nav-right-group";
+    rightGroup.appendChild(buildAuthDesktop());
+
     nav.appendChild(linksWrap);
+    nav.appendChild(rightGroup);
+  }
+
+  function buildTablet(nav, brand, currentPath) {
+    nav.innerHTML = "";
+    nav.appendChild(brand);
+
+    const linksWrap = document.createElement("div");
+    linksWrap.className = "nav-links-tablet";
+
+    LINKS.filter(([href]) => TABLET_PRIMARY_LINKS.has(href)).forEach(([href, label]) => {
+      linksWrap.appendChild(makeLink(href, label, currentPath));
+    });
+
+    const rightGroup = document.createElement("div");
+    rightGroup.className = "nav-right-group";
+    rightGroup.appendChild(buildMoreMenu(currentPath));
+
+    nav.appendChild(linksWrap);
+    nav.appendChild(rightGroup);
   }
 
   function buildMobile(nav, brand, currentPath) {
@@ -730,17 +876,18 @@
     if (!brand) return;
 
     const currentPath = getCurrentPath();
-    const nextMode = window.innerWidth <= MOBILE_BREAKPOINT ? "mobile" : "desktop";
+    const width = window.innerWidth;
 
     closeAllUserMenus();
 
-    if (nextMode === "mobile") {
+    if (width <= MOBILE_BREAKPOINT) {
       buildMobile(nav, brand, currentPath);
+    } else if (width <= TABLET_BREAKPOINT) {
+      buildTablet(nav, brand, currentPath);
     } else {
       buildDesktop(nav, brand, currentPath);
     }
   }
-
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
@@ -748,13 +895,18 @@
   });
 
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".nav-auth") && !e.target.closest(".nav-mobile-user-wrap")) {
+    if (
+      !e.target.closest(".nav-auth") &&
+      !e.target.closest(".nav-mobile-user-wrap") &&
+      !e.target.closest(".nav-user-wrap") &&
+      !e.target.closest(".nav-more-wrap")
+    ) {
       closeAllUserMenus();
     }
   });
 
   document.addEventListener("DOMContentLoaded", () => {
-    ensureFakeAuthStyles();
+    ensureNavStyles();
     ensureAuthModal();
     rebuildNav();
   });
