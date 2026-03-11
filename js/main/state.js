@@ -656,13 +656,13 @@ export function mountGuideBubbleToggle() {
   wrap.className = "kq-guide-toggle";
 
   wrap.innerHTML = `
-    <label class="kq-guide-toggle-label">
-      <span>Guide Bubbles</span>
-      <input type="checkbox" id="kqGuideBubbleCheckbox" ${areGuideBubblesEnabled() ? "checked" : ""}>
-      <span class="kq-guide-toggle-slider"></span>
-    </label>
+    
   `;
-
+    // <label class="kq-guide-toggle-label">
+    //   <span>Guide Bubbles</span>
+    //   <input type="checkbox" id="kqGuideBubbleCheckbox" ${areGuideBubblesEnabled() ? "checked" : ""}>
+    //   <span class="kq-guide-toggle-slider"></span>
+    // </label>
   document.body.appendChild(wrap);
 
   const checkbox = wrap.querySelector("#kqGuideBubbleCheckbox");
