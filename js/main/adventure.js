@@ -3,7 +3,6 @@ import {
   addCoins,
   getAdventureProgress,
   markBattleWin,
-  mountGuideBubble,
   on,
 } from "./state.js";
 
@@ -1083,12 +1082,3 @@ exitBattleBtn?.addEventListener("click", exitBattle);
 
 topicSelect?.addEventListener("change", buildMap);
 diffSelect?.addEventListener("change", buildMap);
-
-mountGuideBubble(
-  [
-    "World 1 starts in Hangul Hills. Beat all 4 levels to unlock Food Forest.",
-    "Only one world shows at a time now, so the map stays clean and readable.",
-    "Beat each boss level to move through the worlds faster.",
-  ],
-  { label: "Map Guide", id: "kq-adventure-bubble", side: "right" }
-);
