@@ -472,7 +472,7 @@
     overlay.innerHTML = `
       <div class="kq-auth-modal" role="dialog" aria-modal="true" aria-labelledby="kqAuthTitle">
         <h3 id="kqAuthTitle">Login / Sign Up</h3>
-        <p>This is a demo account system for Korean Quest.</p>
+    
 
         <div class="kq-auth-field">
           <label for="kqFakeName">Name</label>
