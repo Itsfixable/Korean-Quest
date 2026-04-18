@@ -3,16 +3,30 @@
   const FAKE_AUTH_KEY = "kq_fake_user";
   const GAME_STATE_KEY = "kq-state";
 
+  const ICON_BASE = "favicon/nav/";
+
   const LINKS = [
-    ["index.html", "Home", "🏠"],
-    ["schedule.html", "Schedule", "🗓️"],
-    ["resources.html", "Resources", "🛡️"],
-    ["adventure.html", "Adventure", "📌"],
-    ["dashboard.html", "Dashboard", "🧰"],
-    ["shop.html", "Shop", "🛍️"],
-    ["leaderboard.html", "Leaderboard", "📚"],
-    ["about.html", "About", "🔎"],
+    ["index.html", "Home", "nav-home.png"],
+    ["schedule.html", "Schedule", "nav-schedule.png"],
+    ["resources.html", "Resources", "nav-learn.png"],
+    ["adventure.html", "Adventure", "nav-adventure.png"],
+    ["dashboard.html", "Dashboard", "nav-dashboard.png"],
+    ["shop.html", "Shop", "nav-shop.png"],
+    ["leaderboard.html", "Leaderboard", "nav-leaderboard.png"],
+    ["about.html", "About", "nav-about.png"],
   ];
+
+  const EXTRA_ICONS = {
+    home: `${ICON_BASE}nav-home.png`,
+    schedule: `${ICON_BASE}nav-schedule.png`,
+    learn: `${ICON_BASE}nav-learn.png`,
+    adventure: `${ICON_BASE}nav-adventure.png`,
+    dashboard: `${ICON_BASE}nav-dashboard.png`,
+    shop: `${ICON_BASE}nav-shop.png`,
+    leaderboard: `${ICON_BASE}nav-leaderboard.png`,
+    statistics: `${ICON_BASE}nav-statistics.png`,
+    avatar: `${ICON_BASE}nav-avatar.png`,
+  };
 
   function getFakeUser() {
     try {
@@ -56,12 +70,16 @@
     }
   }
 
-  function makeSidebarLink(href, label, icon, currentPath) {
+  function iconSrc(filename) {
+    return `${ICON_BASE}${filename}`;
+  }
+
+  function makeSidebarLink(href, label, iconFile, currentPath) {
     const a = document.createElement("a");
     a.className = "pill kq-side-link";
     a.href = href;
     a.innerHTML = `
-      <span class="kq-side-link-icon" aria-hidden="true">${icon}</span>
+      <img class="kq-side-link-icon" src="${iconSrc(iconFile)}" alt="" aria-hidden="true" />
       <span class="kq-side-link-label">${label}</span>
     `;
 
@@ -72,11 +90,14 @@
     return a;
   }
 
-  function makeMobileLink(href, label, currentPath) {
+  function makeMobileLink(href, label, iconFile, currentPath) {
     const a = document.createElement("a");
-    a.className = "pill";
+    a.className = "pill kq-mobile-link";
     a.href = href;
-    a.textContent = label;
+    a.innerHTML = `
+      <img class="kq-mobile-link-icon" src="${iconSrc(iconFile)}" alt="" aria-hidden="true" />
+      <span>${label}</span>
+    `;
 
     if (href === currentPath) {
       a.setAttribute("aria-current", "page");
@@ -278,10 +299,12 @@
       }
 
       .kq-side-link-icon {
-        width: 28px;
-        text-align: center;
-        font-size: 1.18rem;
-        flex: 0 0 28px;
+        width: clamp(50px, 3.5vmin, 6=50px);
+        height: clamp(50px, 3.5vmin, 60px);
+        object-fit: contain;
+        flex: 0 0 40px;
+        display: block;
+        border-radius: 10px;
       }
 
       .kq-side-link-label {
@@ -472,6 +495,20 @@
         flex-direction: column;
         gap: 10px;
         width: 100%;
+      }
+
+      .kq-mobile-link {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+      }
+
+      .kq-mobile-link-icon {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+        flex: 0 0 22px;
+        display: block;
       }
 
       .kq-mobile-profile {
@@ -699,8 +736,8 @@
     const linksWrap = document.createElement("div");
     linksWrap.className = "kq-sidebar-links";
 
-    LINKS.forEach(([href, label, icon]) => {
-      linksWrap.appendChild(makeSidebarLink(href, label, icon, currentPath));
+    LINKS.forEach(([href, label, iconFile]) => {
+      linksWrap.appendChild(makeSidebarLink(href, label, iconFile, currentPath));
     });
 
     nav.appendChild(linksWrap);
@@ -735,7 +772,7 @@
     const top = document.createElement("div");
     top.className = "kq-mobile-top";
 
-    const homeLink = makeMobileLink("index.html", "Home", currentPath);
+    const homeLink = makeMobileLink("index.html", "Home", "nav-home.png", currentPath);
     homeLink.classList.add("kq-mobile-home");
 
     const right = document.createElement("div");
@@ -772,8 +809,8 @@
     const cascade = document.createElement("div");
     cascade.className = "kq-mobile-cascade";
 
-    LINKS.filter(([href]) => href !== "index.html").forEach(([href, label]) => {
-      cascade.appendChild(makeMobileLink(href, label, currentPath));
+    LINKS.filter(([href]) => href !== "index.html").forEach(([href, label, iconFile]) => {
+      cascade.appendChild(makeMobileLink(href, label, iconFile, currentPath));
     });
 
     menu.appendChild(cascade);
@@ -871,4 +908,6 @@
     ensureAuthModal();
     rebuildNav();
   });
+
+  window.KQ_NAV_ICONS = EXTRA_ICONS;
 })();
