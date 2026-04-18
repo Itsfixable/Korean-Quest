@@ -1,24 +1,18 @@
 (function () {
   const MOBILE_BREAKPOINT = 640;
-  const TABLET_BREAKPOINT = 1180;
   const FAKE_AUTH_KEY = "kq_fake_user";
+  const GAME_STATE_KEY = "kq-state";
 
   const LINKS = [
-    ["index.html", "Home"],
-    ["schedule.html", "Schedule"],
-    ["resources.html", "Resources"],
-    ["adventure.html", "Adventure"],
-    ["dashboard.html", "Dashboard"],
-    ["leaderboard.html", "Leaderboard"],
-    ["about.html", "About"],
+    ["index.html", "Home", "🏠"],
+    ["schedule.html", "Schedule", "🗓️"],
+    ["resources.html", "Resources", "🛡️"],
+    ["adventure.html", "Adventure", "📌"],
+    ["dashboard.html", "Dashboard", "🧰"],
+    ["shop.html", "Shop", "🛍️"],
+    ["leaderboard.html", "Leaderboard", "📚"],
+    ["about.html", "About", "🔎"],
   ];
-
-  const TABLET_PRIMARY_LINKS = new Set([
-    "index.html",
-    "resources.html",
-    "adventure.html",
-    "dashboard.html",
-  ]);
 
   function getFakeUser() {
     try {
@@ -41,7 +35,44 @@
     return file || "index.html";
   }
 
-  function makeLink(href, label, currentPath) {
+  function getInitials(name) {
+    const cleaned = String(name || "").trim();
+    if (!cleaned) return "KQ";
+    const parts = cleaned.split(/\s+/).slice(0, 2);
+    return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "KQ";
+  }
+
+  function getGameStats() {
+    try {
+      const raw = localStorage.getItem(GAME_STATE_KEY);
+      if (!raw) return { level: 1, coins: 0 };
+      const parsed = JSON.parse(raw);
+      return {
+        level: Number(parsed?.player?.level) || 1,
+        coins: Number(parsed?.player?.coins) || 0,
+      };
+    } catch {
+      return { level: 1, coins: 0 };
+    }
+  }
+
+  function makeSidebarLink(href, label, icon, currentPath) {
+    const a = document.createElement("a");
+    a.className = "pill kq-side-link";
+    a.href = href;
+    a.innerHTML = `
+      <span class="kq-side-link-icon" aria-hidden="true">${icon}</span>
+      <span class="kq-side-link-label">${label}</span>
+    `;
+
+    if (href === currentPath) {
+      a.setAttribute("aria-current", "page");
+    }
+
+    return a;
+  }
+
+  function makeMobileLink(href, label, currentPath) {
     const a = document.createElement("a");
     a.className = "pill";
     a.href = href;
@@ -60,185 +91,228 @@
     const style = document.createElement("style");
     style.id = "kq-nav-rebuild-styles";
     style.textContent = `
-      .site-header,
-      .site-nav,
-      .site-nav .brand,
-      .nav-links-desktop,
-      .nav-auth,
-      .nav-user-wrap,
-      .nav-more-wrap {
-        overflow: visible !important;
+      :root {
+        --kq-sidebar-width: 272px;
       }
 
-      .site-nav {
-        display: grid !important;
-        grid-template-columns: auto 1fr auto !important;
-        align-items: center !important;
-        column-gap: 16px !important;
-        width: 100% !important;
-        min-width: 0 !important;
+      body {
+        overflow-x: hidden;
+      }
+
+      /* =========================
+         DESKTOP / TABLET SIDEBAR
+      ========================= */
+
+      @media (min-width: ${MOBILE_BREAKPOINT + 1}px) {
+        body {
+          padding-left: calc(var(--kq-sidebar-width) + 34px) !important;
+        }
+
+        .site-header {
+          position: fixed !important;
+          top: 12px !important;
+          left: 12px !important;
+          width: var(--kq-sidebar-width) !important;
+          max-width: var(--kq-sidebar-width) !important;
+          height: calc(100vh - 24px) !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          z-index: 3000 !important;
+        }
+
+        .site-header.container {
+          width: var(--kq-sidebar-width) !important;
+          max-width: var(--kq-sidebar-width) !important;
+        }
+
+        .site-nav {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: stretch !important;
+          justify-content: flex-start !important;
+          gap: 16px !important;
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 0 !important;
+          border-radius: 28px !important;
+          padding: 18px 16px !important;
+          background: #eaf0fb !important;
+          box-shadow: 0 10px 28px rgba(0,0,0,0.06) !important;
+          overflow: hidden !important;
+        }
+
+        main.container,
+        .container:not(.site-header) {
+          width: auto !important;
+          max-width: none !important;
+        }
       }
 
       .site-nav .brand {
-        display: inline-flex !important;
+        display: flex !important;
         align-items: center !important;
+        justify-content: flex-start !important;
         gap: 10px !important;
-        white-space: nowrap !important;
+        padding: 4px 4px 10px !important;
         min-width: 0 !important;
-        flex: 0 0 auto !important;
       }
 
-      .nav-links-desktop,
-      .nav-links-tablet {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        min-width: 0 !important;
-        flex-wrap: nowrap !important;
+      .brand-logo {
+        width: 42px !important;
+        height: 42px !important;
+        object-fit: contain !important;
+        border-radius: 12px !important;
+        flex: 0 0 42px !important;
       }
 
-      .nav-links-desktop .pill,
-      .nav-links-tablet .pill {
-        white-space: nowrap !important;
-        flex: 0 0 auto !important;
-        font-family: "Nunito", sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 0.88rem !important;
-        padding: 8px 10px !important;
-      }
-
-      .nav-right-group {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 8px !important;
-        min-width: 0 !important;
-        flex: 0 0 auto !important;
-      }
-
-      .nav-auth {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
+      .brand-wordmark {
+        display: inline-flex !important;
+        align-items: baseline !important;
         gap: 6px !important;
-        white-space: nowrap !important;
         min-width: 0 !important;
-        flex: 0 0 auto !important;
-        position: relative !important;
+        flex-wrap: wrap !important;
       }
 
-      .nav-auth .pill {
-        white-space: nowrap !important;
+      .brand-korean,
+      .brand-quest {
+        font-weight: 900 !important;
         font-family: "Nunito", sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 0.84rem !important;
-        padding: 8px 6px !important;
+        font-size: 1rem !important;
       }
 
-      .nav-auth-ghost {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        color: #111827 !important;
-        padding: 8px 4px !important;
+      .kq-sidebar-profile {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
       }
 
-      .nav-auth-ghost:hover {
-        background: rgba(91, 114, 159, 0.08) !important;
+      .kq-sidebar-profile-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
       }
 
-      .nav-auth-login-text-short {
-        display: inline !important;
-      }
-
-      .nav-auth-login-text-long {
-        display: none !important;
-      }
-
-      .nav-user-wrap,
-      .nav-more-wrap {
-        position: relative !important;
-        overflow: visible !important;
-      }
-
-      .nav-user-trigger,
-      .nav-more-trigger {
-        border: none;
-        background: transparent;
-        color: #111827;
+      .kq-sidebar-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(255,255,255,0.20);
+        color: #fff;
         font-family: "Nunito", sans-serif;
-        font-size: 0.84rem;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 8px 6px;
-        border-radius: 999px;
+        font-weight: 900;
+        font-size: 1rem;
+        flex: 0 0 52px;
+        overflow: hidden;
+        border: 2px solid rgba(255,255,255,0.22);
+      }
+
+      .kq-sidebar-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .kq-sidebar-user-copy {
+        min-width: 0;
+      }
+
+      .kq-sidebar-user-copy strong {
+        display: block;
+        font-size: 1rem;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .kq-sidebar-user-copy span {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        white-space: nowrap;
+        gap: 8px;
+        margin-top: 4px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        opacity: 0.95;
+        flex-wrap: wrap;
       }
 
-      .nav-user-trigger:hover,
-      .nav-more-trigger:hover {
-        background: rgba(91, 114, 159, 0.08);
+      .kq-sidebar-links {
+        display: grid;
+        gap: 8px;
+        min-height: 0;
       }
 
-      .nav-user-caret,
-      .nav-more-caret {
-        font-size: 0.74rem;
-        color: #5b729f;
+      .kq-side-link {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        width: 100% !important;
+        padding: 12px 14px !important;
+        border-radius: 18px !important;
+        text-decoration: none !important;
+        color: #1e2a3f !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        font-family: "Nunito", sans-serif !important;
+        font-size: 0.98rem !important;
+        font-weight: 900 !important;
+        transition: transform 120ms ease, background 120ms ease, color 120ms ease;
       }
 
-      .nav-user-menu,
-      .nav-more-menu {
-        display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        min-width: 180px;
-        background: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        border-radius: 16px;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
-        padding: 8px;
-        z-index: 9999;
+      .kq-side-link:hover {
+        background: rgba(91, 114, 159, 0.08) !important;
+        transform: translateX(2px);
       }
 
-      .nav-user-wrap.open .nav-user-menu,
-      .nav-more-wrap.open .nav-more-menu {
-        display: block;
+      .kq-side-link[aria-current="page"] {
+        background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%) !important;
+        color: #fff !important;
       }
 
-      .nav-user-menu button,
-      .nav-more-menu a,
-      .nav-more-menu button {
+      .kq-side-link-icon {
+        width: 28px;
+        text-align: center;
+        font-size: 1.18rem;
+        flex: 0 0 28px;
+      }
+
+      .kq-side-link-label {
+        min-width: 0;
+      }
+
+      .kq-sidebar-bottom {
+        margin-top: auto;
+        display: grid;
+        gap: 10px;
+      }
+
+      .kq-sidebar-action {
         width: 100%;
         border: none;
-        background: transparent;
-        color: #111827;
+        border-radius: 999px;
+        padding: 12px 14px;
         font-family: "Nunito", sans-serif;
-        font-size: 0.95rem;
-        font-weight: 700;
-        text-align: left;
-        padding: 10px 12px;
-        border-radius: 12px;
+        font-size: 0.98rem;
+        font-weight: 900;
+        text-align: center;
         cursor: pointer;
-        display: block;
         text-decoration: none;
+        background: rgba(255,255,255,0.86);
+        color: #22324d;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
       }
 
-      .nav-user-menu button:hover,
-      .nav-more-menu a:hover,
-      .nav-more-menu button:hover {
-        background: rgba(91, 114, 159, 0.10);
-      }
-
-      .nav-more-divider {
-        height: 1px;
-        background: rgba(0, 0, 0, 0.08);
-        margin: 6px 0;
-      }
+      /* =========================
+         AUTH MODAL
+      ========================= */
 
       .kq-auth-overlay {
         position: fixed;
@@ -246,7 +320,7 @@
         background: rgba(0, 0, 0, 0.35);
         display: grid;
         place-items: center;
-        z-index: 3000;
+        z-index: 5000;
         padding: 20px;
       }
 
@@ -266,13 +340,6 @@
       .kq-auth-modal h3 {
         margin: 0 0 8px;
         font-size: 1.45rem;
-      }
-
-      .kq-auth-modal p {
-        margin: 0 0 16px;
-        color: #5e6678;
-        line-height: 1.5;
-        font-weight: 700;
       }
 
       .kq-auth-field {
@@ -316,13 +383,7 @@
         cursor: pointer;
         background: rgba(91, 114, 159, 0.10);
         color: #5b729f;
-        transition: transform 120ms ease, background 120ms ease;
         font-family: "Nunito", sans-serif;
-      }
-
-      .kq-auth-btn:hover {
-        transform: translateY(-1px);
-        background: rgba(91, 114, 159, 0.16);
       }
 
       .kq-auth-btn.primary {
@@ -330,7 +391,11 @@
         color: #fff;
       }
 
-      .nav-mobile-top {
+      /* =========================
+         MOBILE: ORIGINAL TOP NAV
+      ========================= */
+
+      .kq-mobile-top {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -338,20 +403,59 @@
         width: 100%;
       }
 
-      .nav-toggle {
+      .kq-mobile-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .kq-mobile-home {
+        white-space: nowrap;
+      }
+
+      .kq-mobile-user-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(91,114,159,0.10);
+        color: #22324d;
+        font-family: "Nunito", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 800;
+        max-width: 150px;
+      }
+
+      .kq-mobile-user-chip .kq-sidebar-avatar {
+        width: 28px;
+        height: 28px;
+        flex-basis: 28px;
+        font-size: 0.72rem;
+        border-width: 1px;
+      }
+
+      .kq-mobile-user-chip span:last-child {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .kq-mobile-toggle {
         border: none;
         background: transparent;
-        font-size: 1.4rem;
+        font-size: 1.35rem;
         cursor: pointer;
         padding: 6px 10px;
         border-radius: 10px;
       }
 
-      .nav-toggle:hover {
+      .kq-mobile-toggle:hover {
         background: rgba(91, 114, 159, 0.08);
       }
 
-      .nav-links {
+      .kq-mobile-menu {
         display: none;
         flex-direction: column;
         gap: 10px;
@@ -359,101 +463,70 @@
         margin-top: 12px;
       }
 
-      .nav-links.open {
+      .kq-mobile-menu.open {
         display: flex;
       }
 
-      .nav-mobile-auth {
+      .kq-mobile-cascade {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .kq-mobile-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0 2px;
+      }
+
+      .kq-mobile-profile .kq-sidebar-avatar {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        font-size: 0.86rem;
+      }
+
+      .kq-mobile-auth-actions {
+        display: grid;
         gap: 10px;
         padding-top: 8px;
       }
 
-      .nav-mobile-auth .pill {
-        font-family: "Nunito", sans-serif;
-        font-weight: 700;
-      }
-
-      .nav-mobile-user-wrap {
-        width: 100%;
-        position: relative;
-      }
-
-      .nav-mobile-user-wrap .nav-user-trigger,
-      .nav-mobile-user-wrap .nav-more-trigger {
-        width: 100%;
-        justify-content: center;
-        background: rgba(91, 114, 159, 0.08);
-      }
-
-      .nav-mobile-user-wrap .nav-user-menu,
-      .nav-mobile-user-wrap .nav-more-menu {
-        position: static;
-        margin-top: 8px;
-        box-shadow: none;
-        border-radius: 14px;
-      }
-
-      @media (min-width: 1400px) {
-        .nav-links-desktop .pill,
-        .nav-links-tablet .pill {
-          font-size: 0.9rem !important;
-          padding: 8px 10px !important;
-        }
-
-        .nav-auth .pill,
-        .nav-user-trigger,
-        .nav-more-trigger {
-          font-size: 0.88rem !important;
-        }
-
-        .nav-auth-login-text-long {
-          display: inline !important;
-        }
-
-        .nav-auth-login-text-short {
-          display: none !important;
-        }
-      }
-
-      @media (max-width: ${TABLET_BREAKPOINT}px) and (min-width: ${MOBILE_BREAKPOINT + 1}px) {
-        .site-nav {
-          display: grid !important;
-          grid-template-columns: auto 1fr auto !important;
-          column-gap: 12px !important;
-        }
-
-        .nav-links-tablet .pill {
-          font-size: 0.82rem !important;
-          padding: 7px 8px !important;
-        }
-
-        .nav-auth .pill,
-        .nav-user-trigger,
-        .nav-more-trigger {
-          font-size: 0.82rem !important;
-          padding: 7px 5px !important;
-        }
-      }
-
       @media (max-width: ${MOBILE_BREAKPOINT}px) {
+        body {
+          padding-left: 0 !important;
+        }
+
+        .site-header {
+          position: static !important;
+          width: auto !important;
+          max-width: none !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        .site-header.container {
+          width: auto !important;
+          max-width: none !important;
+        }
+
         .site-nav {
           display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          flex-wrap: wrap !important;
+          flex-direction: column !important;
+          align-items: stretch !important;
+          gap: 10px !important;
+          height: auto !important;
+          border-radius: 22px !important;
+          padding: 14px !important;
+          background: #f6f8fc !important;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.05) !important;
         }
 
-        .nav-links-desktop,
-        .nav-links-tablet,
-        .nav-right-group {
-          display: none !important;
-        }
-
-        .nav-mobile-auth .pill {
-          flex: 1 1 auto;
-          text-align: center;
+        .site-nav .brand {
+          padding: 0 0 2px !important;
         }
       }
     `;
@@ -472,7 +545,6 @@
     overlay.innerHTML = `
       <div class="kq-auth-modal" role="dialog" aria-modal="true" aria-labelledby="kqAuthTitle">
         <h3 id="kqAuthTitle">Login / Sign Up</h3>
-    
 
         <div class="kq-auth-field">
           <label for="kqFakeName">Name</label>
@@ -553,6 +625,7 @@
       email,
       password,
       loggedIn: true,
+      avatarInitials: getInitials(name),
     });
 
     overlay.hidden = true;
@@ -564,268 +637,174 @@
     rebuildNav();
   }
 
-  function closeAllUserMenus() {
-    document.querySelectorAll(".nav-user-wrap, .nav-more-wrap, .nav-mobile-user-wrap").forEach((wrap) => {
-      wrap.classList.remove("open");
-    });
+  function buildAvatar(user) {
+    const avatar = document.createElement("div");
+    avatar.className = "kq-sidebar-avatar";
 
-    document.querySelectorAll(".nav-user-trigger, .nav-more-trigger").forEach((btn) => {
-      btn.setAttribute("aria-expanded", "false");
-    });
+    if (user?.avatarImage) {
+      const img = document.createElement("img");
+      img.src = user.avatarImage;
+      img.alt = `${user.name || "User"} profile picture`;
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = user?.avatarInitials || getInitials(user?.name || "KQ");
+    }
+
+    return avatar;
   }
 
-  function attachPopupMenu(trigger, menu, wrapSelector) {
-    const wrap = trigger.closest(wrapSelector);
-    if (!wrap) return;
-
-    trigger.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const shouldOpen = !wrap.classList.contains("open");
-      closeAllUserMenus();
-
-      if (shouldOpen) {
-        wrap.classList.add("open");
-        trigger.setAttribute("aria-expanded", "true");
-      } else {
-        wrap.classList.remove("open");
-        trigger.setAttribute("aria-expanded", "false");
-      }
-    });
-
-    menu.querySelector("[data-signout]")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      logoutFakeUser();
-    });
-  }
-
-  function buildAuthDesktop() {
-    const wrap = document.createElement("div");
-    wrap.className = "nav-auth";
-
+  function buildProfileCard() {
     const user = getFakeUser();
+    const stats = getGameStats();
+
+    const wrap = document.createElement("div");
+    wrap.className = "kq-sidebar-profile";
 
     if (user?.loggedIn) {
-      const userWrap = document.createElement("div");
-      userWrap.className = "nav-user-wrap";
+      const top = document.createElement("div");
+      top.className = "kq-sidebar-profile-top";
 
-      const trigger = document.createElement("button");
-      trigger.type = "button";
-      trigger.className = "nav-user-trigger";
-      trigger.setAttribute("aria-expanded", "false");
-      trigger.textContent = user.name;
+      top.appendChild(buildAvatar(user));
 
-      const caret = document.createElement("span");
-      caret.className = "nav-user-caret";
-      caret.textContent = "▾";
-      trigger.appendChild(caret);
-
-      const menu = document.createElement("div");
-      menu.className = "nav-user-menu";
-      menu.innerHTML = `
-        <button type="button" data-signout="true">Sign Out</button>
+      const copy = document.createElement("div");
+      copy.className = "kq-sidebar-user-copy";
+      copy.innerHTML = `
+        <strong>${user.name}</strong>
+        <span>Level ${stats.level} · 🪙 ${stats.coins}</span>
       `;
 
-      userWrap.appendChild(trigger);
-      userWrap.appendChild(menu);
-      attachPopupMenu(trigger, menu, ".nav-user-wrap");
-
-      wrap.appendChild(userWrap);
+      top.appendChild(copy);
+      wrap.appendChild(top);
       return wrap;
     }
 
-    const login = document.createElement("a");
-    login.href = "#";
-    login.className = "pill nav-auth-ghost";
-    login.innerHTML = `
-      <span class="nav-auth-login-text-long">Login / Sign Up</span>
-      <span class="nav-auth-login-text-short">Login</span>
+    wrap.innerHTML = `
+      <div class="kq-sidebar-profile-top">
+        <div class="kq-sidebar-avatar">KQ</div>
+        <div class="kq-sidebar-user-copy">
+          <strong>Guest Learner</strong>
+          <span>Login to save your style</span>
+        </div>
+      </div>
     `;
 
-    login.addEventListener("click", (e) => {
-      e.preventDefault();
-      openAuthModal();
-    });
-
-    wrap.appendChild(login);
     return wrap;
   }
 
-  function buildMoreMenu(currentPath) {
-    const moreWrap = document.createElement("div");
-    moreWrap.className = "nav-more-wrap";
+  function buildDesktopSidebar(nav, brand, currentPath) {
+    nav.innerHTML = "";
+    nav.appendChild(brand);
+    nav.appendChild(buildProfileCard());
 
-    const trigger = document.createElement("button");
-    trigger.type = "button";
-    trigger.className = "nav-more-trigger";
-    trigger.setAttribute("aria-expanded", "false");
-    trigger.innerHTML = `More <span class="nav-more-caret">▾</span>`;
+    const linksWrap = document.createElement("div");
+    linksWrap.className = "kq-sidebar-links";
 
-    const menu = document.createElement("div");
-    menu.className = "nav-more-menu";
-
-    LINKS.filter(([href]) => !TABLET_PRIMARY_LINKS.has(href)).forEach(([href, label]) => {
-      menu.appendChild(makeLink(href, label, currentPath));
+    LINKS.forEach(([href, label, icon]) => {
+      linksWrap.appendChild(makeSidebarLink(href, label, icon, currentPath));
     });
 
-    menu.appendChild(document.createElement("div")).className = "nav-more-divider";
+    nav.appendChild(linksWrap);
+
+    const bottom = document.createElement("div");
+    bottom.className = "kq-sidebar-bottom";
 
     const user = getFakeUser();
     if (user?.loggedIn) {
-      const signOutBtn = document.createElement("button");
-      signOutBtn.type = "button";
-      signOutBtn.setAttribute("data-signout", "true");
-      signOutBtn.textContent = `Sign Out (${user.name})`;
-      menu.appendChild(signOutBtn);
+      const signOut = document.createElement("button");
+      signOut.type = "button";
+      signOut.className = "kq-sidebar-action";
+      signOut.textContent = "Sign Out";
+      signOut.addEventListener("click", logoutFakeUser);
+      bottom.appendChild(signOut);
     } else {
-      const loginBtn = document.createElement("button");
-      loginBtn.type = "button";
-      loginBtn.textContent = "Login / Sign Up";
-      loginBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        openAuthModal();
-        closeAllUserMenus();
-      });
-      menu.appendChild(loginBtn);
+      const login = document.createElement("button");
+      login.type = "button";
+      login.className = "kq-sidebar-action";
+      login.textContent = "Login / Sign Up";
+      login.addEventListener("click", openAuthModal);
+      bottom.appendChild(login);
     }
 
-    moreWrap.appendChild(trigger);
-    moreWrap.appendChild(menu);
-    attachPopupMenu(trigger, menu, ".nav-more-wrap");
-
-    return moreWrap;
-  }
-
-  function buildAuthMobile(closeMenu) {
-    const wrap = document.createElement("div");
-    wrap.className = "nav-mobile-auth";
-
-    const user = getFakeUser();
-
-    if (user?.loggedIn) {
-      const userWrap = document.createElement("div");
-      userWrap.className = "nav-mobile-user-wrap";
-
-      const trigger = document.createElement("button");
-      trigger.type = "button";
-      trigger.className = "nav-user-trigger";
-      trigger.setAttribute("aria-expanded", "false");
-      trigger.textContent = user.name;
-
-      const caret = document.createElement("span");
-      caret.className = "nav-user-caret";
-      caret.textContent = "▾";
-      trigger.appendChild(caret);
-
-      const menu = document.createElement("div");
-      menu.className = "nav-user-menu";
-      menu.innerHTML = `
-        <button type="button" data-signout="true">Sign Out</button>
-      `;
-
-      menu.querySelector("[data-signout]")?.addEventListener("click", (e) => {
-        e.preventDefault();
-        logoutFakeUser();
-        closeMenu();
-      });
-
-      trigger.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const isOpen = userWrap.classList.contains("open");
-        userWrap.classList.toggle("open", !isOpen);
-        trigger.setAttribute("aria-expanded", String(!isOpen));
-      });
-
-      userWrap.appendChild(trigger);
-      userWrap.appendChild(menu);
-      wrap.appendChild(userWrap);
-      return wrap;
-    }
-
-    const login = document.createElement("a");
-    login.href = "#";
-    login.className = "pill";
-    login.textContent = "Login / Sign Up";
-
-    login.addEventListener("click", (e) => {
-      e.preventDefault();
-      openAuthModal();
-      closeMenu();
-    });
-
-    wrap.appendChild(login);
-    return wrap;
-  }
-
-  function buildDesktop(nav, brand, currentPath) {
-    nav.innerHTML = "";
-    nav.appendChild(brand);
-
-    const linksWrap = document.createElement("div");
-    linksWrap.className = "nav-links-desktop";
-
-    LINKS.forEach(([href, label]) => {
-      linksWrap.appendChild(makeLink(href, label, currentPath));
-    });
-
-    const rightGroup = document.createElement("div");
-    rightGroup.className = "nav-right-group";
-    rightGroup.appendChild(buildAuthDesktop());
-
-    nav.appendChild(linksWrap);
-    nav.appendChild(rightGroup);
-  }
-
-  function buildTablet(nav, brand, currentPath) {
-    nav.innerHTML = "";
-    nav.appendChild(brand);
-
-    const linksWrap = document.createElement("div");
-    linksWrap.className = "nav-links-tablet";
-
-    LINKS.filter(([href]) => TABLET_PRIMARY_LINKS.has(href)).forEach(([href, label]) => {
-      linksWrap.appendChild(makeLink(href, label, currentPath));
-    });
-
-    const rightGroup = document.createElement("div");
-    rightGroup.className = "nav-right-group";
-    rightGroup.appendChild(buildMoreMenu(currentPath));
-
-    nav.appendChild(linksWrap);
-    nav.appendChild(rightGroup);
+    nav.appendChild(bottom);
   }
 
   function buildMobile(nav, brand, currentPath) {
     nav.innerHTML = "";
     nav.appendChild(brand);
 
-    const topRow = document.createElement("div");
-    topRow.className = "nav-mobile-top";
+    const top = document.createElement("div");
+    top.className = "kq-mobile-top";
 
-    const homeLink = makeLink("index.html", "Home", currentPath);
-    homeLink.classList.add("nav-home-link");
+    const homeLink = makeMobileLink("index.html", "Home", currentPath);
+    homeLink.classList.add("kq-mobile-home");
+
+    const right = document.createElement("div");
+    right.className = "kq-mobile-right";
+
+    const user = getFakeUser();
+    if (user?.loggedIn) {
+      const userChip = document.createElement("div");
+      userChip.className = "kq-mobile-user-chip";
+      userChip.appendChild(buildAvatar(user));
+
+      const name = document.createElement("span");
+      name.textContent = user.name;
+      userChip.appendChild(name);
+
+      right.appendChild(userChip);
+    }
 
     const toggle = document.createElement("button");
-    toggle.className = "nav-toggle";
     toggle.type = "button";
+    toggle.className = "kq-mobile-toggle";
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Open menu");
     toggle.textContent = "☰";
 
-    topRow.appendChild(homeLink);
-    topRow.appendChild(toggle);
+    right.appendChild(toggle);
+    top.appendChild(homeLink);
+    top.appendChild(right);
+    nav.appendChild(top);
 
     const menu = document.createElement("div");
-    menu.className = "nav-links";
-    menu.id = "mobileNavMenu";
+    menu.className = "kq-mobile-menu";
+
+    const cascade = document.createElement("div");
+    cascade.className = "kq-mobile-cascade";
 
     LINKS.filter(([href]) => href !== "index.html").forEach(([href, label]) => {
-      menu.appendChild(makeLink(href, label, currentPath));
+      cascade.appendChild(makeMobileLink(href, label, currentPath));
     });
+
+    menu.appendChild(cascade);
+
+    const authActions = document.createElement("div");
+    authActions.className = "kq-mobile-auth-actions";
+
+    if (user?.loggedIn) {
+      const signOut = document.createElement("button");
+      signOut.type = "button";
+      signOut.className = "kq-sidebar-action";
+      signOut.textContent = "Sign Out";
+      signOut.addEventListener("click", () => {
+        logoutFakeUser();
+        closeMenu();
+      });
+      authActions.appendChild(signOut);
+    } else {
+      const login = document.createElement("button");
+      login.type = "button";
+      login.className = "kq-sidebar-action";
+      login.textContent = "Login / Sign Up";
+      login.addEventListener("click", () => {
+        openAuthModal();
+        closeMenu();
+      });
+      authActions.appendChild(login);
+    }
+
+    menu.appendChild(authActions);
+    nav.appendChild(menu);
 
     function closeMenu() {
       menu.classList.remove("open");
@@ -841,24 +820,14 @@
       toggle.setAttribute("aria-label", "Close menu");
     }
 
-    menu.appendChild(buildAuthMobile(closeMenu));
-
-    nav.appendChild(topRow);
-    nav.appendChild(menu);
-
     toggle.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (menu.classList.contains("open")) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
+      if (menu.classList.contains("open")) closeMenu();
+      else openMenu();
     });
 
     document.addEventListener("click", (e) => {
-      if (!nav.contains(e.target)) {
-        closeMenu();
-      }
+      if (!nav.contains(e.target)) closeMenu();
     });
 
     menu.querySelectorAll("a").forEach((link) => {
@@ -878,30 +847,22 @@
     const currentPath = getCurrentPath();
     const width = window.innerWidth;
 
-    closeAllUserMenus();
-
     if (width <= MOBILE_BREAKPOINT) {
       buildMobile(nav, brand, currentPath);
-    } else if (width <= TABLET_BREAKPOINT) {
-      buildTablet(nav, brand, currentPath);
     } else {
-      buildDesktop(nav, brand, currentPath);
+      buildDesktopSidebar(nav, brand, currentPath);
     }
   }
+
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(rebuildNav, 120);
   });
 
-  document.addEventListener("click", (e) => {
-    if (
-      !e.target.closest(".nav-auth") &&
-      !e.target.closest(".nav-mobile-user-wrap") &&
-      !e.target.closest(".nav-user-wrap") &&
-      !e.target.closest(".nav-more-wrap")
-    ) {
-      closeAllUserMenus();
+  window.addEventListener("storage", (e) => {
+    if (e.key === FAKE_AUTH_KEY || e.key === GAME_STATE_KEY) {
+      rebuildNav();
     }
   });
 

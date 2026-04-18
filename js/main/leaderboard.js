@@ -1,5 +1,13 @@
-import { getLeaderboard, getPlayer, mountGuideBubble } from "./state.js";
-console.log("NEW leaderboard.js loaded");
+import {
+  getLeaderboard,
+  getPlayer,
+  mountGuideBubble,
+  on,
+  getEquippedProfile,
+  getCurrentDisplayTitle,
+  getCurrentDisplayEmoji,
+} from "./state.js";
+
 const FALLBACK_ROWS = [
   { name: "Ava", xp: 420, title: "Streak Queen", badge: "🔥", streak: 19 },
   { name: "Noah", xp: 380, title: "Word Wizard", badge: "📚", streak: 16 },
@@ -112,9 +120,35 @@ function ensureStyles() {
       gap: 12px;
     }
 
+    .kq-player-icon-wrap {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+    }
+
     .kq-player-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(91,114,159,0.10);
       font-size: 1.15rem;
-      flex-shrink: 0;
+    }
+
+    .kq-player-flair {
+      position: absolute;
+      right: -4px;
+      bottom: -4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
     }
 
     .kq-player-meta strong {
@@ -166,49 +200,7 @@ function ensureStyles() {
       vertical-align: middle;
     }
 
-    /* CURRENT USER ROW */
-
-
-    #lbTable tbody tr.kq-you-row td:first-child {
-      box-shadow: inset 5px 0 0 #4b83d8;
-    }
-
-    #lbTable tbody tr.kq-you-row:hover td {
-      background: linear-gradient(90deg, rgba(205, 226, 255, 0.98), rgba(231, 242, 255, 0.99));
-    }
-
-    /* TOP 3 */
-
-
-    #lbTable tbody tr.kq-rank-1 td:first-child {
-      box-shadow: inset 5px 0 0 #d8a514;
-    }
-
- 
-
-    #lbTable tbody tr.kq-rank-2 td:first-child {
-      box-shadow: inset 5px 0 0 #9aa7b4;
-    }
-
- 
-    #lbTable tbody tr.kq-rank-3 td:first-child {
-      box-shadow: inset 5px 0 0 #b87333;
-    }
-
-    /* if current user is also top 3, keep the blue highlight stronger */
-    #lbTable tbody tr.kq-you-row.kq-rank-1 td,
-    #lbTable tbody tr.kq-you-row.kq-rank-2 td,
-    #lbTable tbody tr.kq-you-row.kq-rank-3 td {
-      background: linear-gradient(90deg, rgba(214, 232, 255, 0.95), rgba(235, 244, 255, 0.98));
-      color: #1f4d8f;
-    }
-
-    #lbTable tbody tr.kq-you-row.kq-rank-1 td:first-child,
-    #lbTable tbody tr.kq-you-row.kq-rank-2 td:first-child,
-    #lbTable tbody tr.kq-you-row.kq-rank-3 td:first-child {
-      box-shadow: inset 5px 0 0 #4b83d8;
-    }
-          #lbTable tbody tr.kq-you-row td {
+    #lbTable tbody tr.kq-you-row td {
       background: linear-gradient(90deg, rgba(214, 232, 255, 0.95), rgba(235, 244, 255, 0.98)) !important;
       font-weight: 900 !important;
       color: #1f4d8f !important;
@@ -328,13 +320,15 @@ function normaliseRows() {
   }
 
   const me = getPlayer();
+  const profile = getEquippedProfile();
 
   merged.push({
     name: "You",
     xp: Number(me.totalXPEarned) || Number(me.xp) || 0,
-    title: me.badges?.[0] || "New Challenger",
-    badge: me.badges?.length ? "🏅" : "✨",
+    title: getCurrentDisplayTitle(),
+    badge: getCurrentDisplayEmoji(),
     streak: me.streak || 0,
+    flair: profile.flair?.emoji || "",
     isYou: true,
   });
 
@@ -418,8 +412,6 @@ function ensureTable(card) {
 }
 
 function renderLeaderboard() {
-  console.log("NEW renderLeaderboard running");
-
   ensureStyles();
   const card = ensureLeaderboardStructure();
   const rows = normaliseRows();
@@ -442,7 +434,10 @@ function renderLeaderboard() {
           <td><span class="kq-rank-medal">${rankMedal(index)}</span></td>
           <td>
             <div class="kq-player-cell">
-              <span class="kq-player-icon">${row.badge || "✨"}</span>
+              <div class="kq-player-icon-wrap">
+                <span class="kq-player-icon">${row.badge || "✨"}</span>
+                ${row.flair ? `<span class="kq-player-flair">${row.flair}</span>` : ""}
+              </div>
               <div class="kq-player-meta">
                 <strong>
                   ${row.name}${medal ? ` <span class="kq-name-medal">${medal}</span>` : ""}
@@ -458,11 +453,6 @@ function renderLeaderboard() {
       `;
     })
     .join("");
-
-  console.log("Rendered tbody:", tbody.innerHTML);
-  setTimeout(() => {
-    console.log("1 second later tbody:", tbody.innerHTML);
-}, 1000);
 }
 
 if (document.readyState === "loading") {
@@ -471,21 +461,13 @@ if (document.readyState === "loading") {
   renderLeaderboard();
 }
 
+on("state:changed", renderLeaderboard);
+
 mountGuideBubble(
   [
     "Your row is now highlighted so judges can instantly spot the current user.",
     "The top 3 players are color-coded gold, silver, and bronze.",
-    "The podium image is aligned with the leaderboard header and table width.",
+    "Your equipped shop avatar, flair, and title now appear in your leaderboard row.",
   ],
   { label: "Score Coach", id: "kq-leaderboard-bubble", side: "right" }
 );
-const target = document.querySelector("#lbTable tbody");
-
-if (target) {
-  const observer = new MutationObserver(() => {
-    console.log("TBODY CHANGED BY SOMETHING ELSE:", target.innerHTML);
-    console.trace();
-  });
-
-  observer.observe(target, { childList: true, subtree: true });
-}

@@ -7,6 +7,8 @@ import {
   needXP,
   mountGuideBubble,
   on,
+  getEquippedProfile,
+  getCurrentDisplayTitle,
 } from "./state.js";
 
 function setText(id, value) {
@@ -197,19 +199,133 @@ function ensureStyles() {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-
       width: 46px;
       height: 46px;
-
       border-radius: 999px;
-
       background: rgba(91, 114, 159, 0.10);
       color: var(--brand, #5b729f);
-
       font-size: 1.5rem;
       font-weight: 900;
-
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .kq-profile-card {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(240,245,255,0.96));
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    }
+
+    .kq-profile-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .kq-profile-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .kq-profile-avatar-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      flex: 0 0 88px;
+    }
+
+    .kq-profile-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 2.2rem;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+      position: relative;
+      z-index: 2;
+    }
+
+    .kq-profile-frame {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .kq-profile-bg {
+      position: absolute;
+      right: 18px;
+      top: 10px;
+      font-size: 3rem;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .kq-profile-title {
+      margin: 0 0 6px;
+      font-size: 1.12rem;
+    }
+
+    .kq-profile-sub {
+      margin: 0;
+      color: var(--muted, #5e6678);
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .kq-profile-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .kq-profile-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(91,114,159,0.12);
+      color: var(--brand, #5b729f);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .kq-profile-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .kq-profile-shop-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: #5b729f;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(91,114,159,0.22);
+    }
+
+    .kq-profile-shop-link:hover {
+      background: #4f648a;
     }
 
     @media (max-width: 860px) {
@@ -218,6 +334,10 @@ function ensureStyles() {
       }
 
       .kq-stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kq-profile-top {
         grid-template-columns: 1fr;
       }
     }
@@ -274,6 +394,31 @@ function ensureEnhancementCard() {
       </div>
       <div id="kqAchievementGrid" class="kq-achievement-grid"></div>
     </div>
+  `;
+
+  if (columns) {
+    columns.parentElement.insertBefore(card, columns);
+  } else {
+    (document.querySelector("main") || document.body).appendChild(card);
+  }
+
+  return card;
+}
+
+function ensureProfileCard() {
+  let card = document.getElementById("kqProfileCard");
+  if (card) return card;
+
+  const columns = document.querySelector(".dashboard-columns");
+  card = document.createElement("section");
+  card.id = "kqProfileCard";
+  card.className = "dashboard-card kq-profile-card";
+  card.innerHTML = `
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">🛍️</span>
+      <h2>Quest Profile</h2>
+    </div>
+    <div id="kqProfileBody"></div>
   `;
 
   if (columns) {
@@ -415,6 +560,49 @@ function renderJourney(progress, player, achievements) {
     .join("");
 }
 
+function renderProfileCard(player) {
+  ensureProfileCard();
+
+  const body = document.getElementById("kqProfileBody");
+  if (!body) return;
+
+  const profile = getEquippedProfile();
+
+  body.innerHTML = `
+    <div class="kq-profile-top">
+      <div class="kq-profile-head">
+        <div class="kq-profile-avatar-wrap">
+          <div class="kq-profile-bg">${profile.background?.emoji || "🏯"}</div>
+          <div class="kq-profile-avatar">${profile.avatar?.emoji || "👑"}</div>
+          <div class="kq-profile-frame">${profile.frame?.emoji || "☁️"}</div>
+        </div>
+
+        <div>
+          <h3 class="kq-profile-title">${getCurrentDisplayTitle()}</h3>
+          <p class="kq-profile-sub">
+            ${profile.background?.name || "Hanok Courtyard"} ·
+            ${player.coins} coins ·
+            Level ${player.level}
+          </p>
+        </div>
+      </div>
+
+      <div class="kq-profile-actions">
+        <a class="kq-profile-shop-link" href="shop.html">Open Shop</a>
+      </div>
+    </div>
+
+    <div class="kq-profile-tags">
+      <span class="kq-profile-tag">${profile.avatar?.emoji || "👑"} ${profile.avatar?.name || "Starter Avatar"}</span>
+      <span class="kq-profile-tag">${profile.frame?.emoji || "☁️"} ${profile.frame?.name || "Cloud Frame"}</span>
+      <span class="kq-profile-tag">${profile.background?.emoji || "🏯"} ${profile.background?.name || "Hanok Courtyard"}</span>
+      ${profile.flair ? `<span class="kq-profile-tag">${profile.flair.emoji} ${profile.flair.name}</span>` : ""}
+      ${profile.pet ? `<span class="kq-profile-tag">${profile.pet.emoji} ${profile.pet.name}</span>` : ""}
+      ${profile.title ? `<span class="kq-profile-tag">${profile.title.emoji} ${profile.title.name}</span>` : ""}
+    </div>
+  `;
+}
+
 function renderDashboard() {
   ensureStyles();
 
@@ -434,6 +622,7 @@ function renderDashboard() {
   renderQuestList(quests);
   renderRecentWork(progress);
   renderJourney(progress, player, achievements);
+  renderProfileCard(player);
 }
 
 renderDashboard();
@@ -443,7 +632,8 @@ mountGuideBubble(
   [
     "Every completed lesson now unlocks more of the Adventure Map...",
     "Achievement badges are live...",
-    "Your dashboard progress now combines lessons..."
+    "Your dashboard progress now combines lessons...",
+    "Your equipped shop cosmetics now appear in your Quest Profile card."
   ],
   { label: "Quest Guide", id: "kq-dashboard-bubble", side: "right" },
 );

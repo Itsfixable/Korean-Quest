@@ -1,6 +1,6 @@
-/* state.js — central game state, progression, achievements, adventure unlocks, and guide bubbles */
+/* state.js — central game state, progression, achievements, adventure unlocks, guide bubbles */
 
-export const KQ_VERSION = "1.5.0";
+export const KQ_VERSION = "1.6.0";
 const GUIDE_BUBBLE_PREF_KEY = "kq-guide-bubbles-enabled";
 const KEY = "kq-state";
 const DAILY_QUEST_XP_BONUS = 15;
@@ -73,7 +73,16 @@ const DEFAULT = {
     streak: 0,
     lastLoginDate: null,
     inventory: [],
-    equipped: { hat: null, bg: null },
+    equipped: {
+      hat: null,
+      bg: null,
+      avatar: null,
+      frame: null,
+      background: null,
+      flair: null,
+      pet: null,
+      title: null,
+    },
   },
   progress: {
     lessonsDone: 0,
@@ -117,6 +126,10 @@ const DEFAULT = {
 
 let KQ = null;
 const subs = {};
+
+/* =========================
+   BASIC PUB/SUB + STORAGE
+========================= */
 
 export function on(topic, fn) {
   (subs[topic] ??= []).push(fn);
@@ -174,7 +187,8 @@ function mergeState(saved) {
 
   merged.progress.lessonsDone = merged.progress.completedLessonIds.length;
   merged.progress.adventureCap = deriveAdventureCap(merged.progress.completedLessonIds);
-  merged.player.totalXPEarned = Number(merged.player.totalXPEarned) || Number(merged.player.xp) || 0;
+  merged.player.totalXPEarned =
+    Number(merged.player.totalXPEarned) || Number(merged.player.xp) || 0;
 
   return merged;
 }
@@ -244,6 +258,10 @@ export function resetAll() {
   emit("state:changed", KQ);
 }
 
+/* =========================
+   DAILY / PLAYER / QUESTS
+========================= */
+
 export function ensureDaily() {
   const s = load();
   const today = nowStr();
@@ -309,16 +327,22 @@ export function needXP(level) {
 function updateWeeklyProgress(amount) {
   const s = load();
   const weekly = asArray(s.quests.weekly);
+
   weekly.forEach((quest) => {
     if (quest.done) return;
+
     quest.progress = Math.min(quest.target, (Number(quest.progress) || 0) + amount);
+
     if (quest.progress >= quest.target) {
       quest.done = true;
+
       if (quest.reward?.coins) addCoins(quest.reward.coins);
       if (quest.reward?.badge) addBadge(quest.reward.badge);
+
       addRecentWork(`Completed weekly quest: ${quest.desc}`, "Quest");
     }
   });
+
   save();
 }
 
@@ -393,6 +417,7 @@ export function addRecentWork(title, type) {
 export function incQuest(id, amount = 1) {
   const s = load();
   ensureDaily();
+
   const q = s.quests.daily.find((item) => item.id === id);
 
   if (!q || q.done) {
@@ -426,6 +451,10 @@ export function incQuest(id, amount = 1) {
   save();
   emit("state:changed", s);
 }
+
+/* =========================
+   ADVENTURE / LESSONS
+========================= */
 
 function deriveAdventureCap(completedLessonIds = []) {
   let cap = 1;
@@ -484,7 +513,10 @@ export function markLessonComplete({ id, title, adventureUnlockCap } = {}) {
   if (safeId && !s.progress.completedLessonIds.includes(safeId)) {
     s.progress.completedLessonIds.push(safeId);
     s.progress.lessonsDone = s.progress.completedLessonIds.length;
-    s.progress.adventureCap = Math.max(s.progress.adventureCap || 1, adventureUnlockCap || LESSON_UNLOCKS[safeId]?.cap || 1);
+    s.progress.adventureCap = Math.max(
+      s.progress.adventureCap || 1,
+      adventureUnlockCap || LESSON_UNLOCKS[safeId]?.cap || 1,
+    );
     firstCompletion = true;
     save();
   }
@@ -528,6 +560,10 @@ export function markBattleWin(title = "Won 1 battle", options = {}) {
   emit("state:changed", s);
 }
 
+/* =========================
+   JAMO / RSVP
+========================= */
+
 export function getJamoStars(ch) {
   return load().progress.jamoStars?.[ch] ?? 0;
 }
@@ -548,89 +584,94 @@ export function toggleRSVP(eventId) {
   emit("state:changed", s);
 }
 
+/* =========================
+   GUIDE BUBBLES
+========================= */
+
 let bubbleTimer = null;
 const GUIDE_STYLE_ID = "kq-guide-bubble-style";
 
 function ensureGuideStyle() {
   if (document.getElementById(GUIDE_STYLE_ID)) return;
+
   const style = document.createElement("style");
   style.id = GUIDE_STYLE_ID;
   style.textContent = `
-  .kq-guide-bubble {
-    position: fixed;
-    max-width: 280px;
-    z-index: 995;
-    padding: 12px 14px;
-    border-radius: 18px;
-    background: rgba(255,255,255,0.97);
-    color: #1d2430;
-    border: 1px solid rgba(90, 110, 150, 0.18);
-    box-shadow: 0 12px 32px rgba(22, 34, 56, 0.14);
-    font-size: 0.96rem;
-    font-weight: 700;
-    line-height: 1.45;
-    transition: opacity 180ms ease, transform 180ms ease;
-    backdrop-filter: blur(10px);
-    margin-bottom: 10px;
-  }
-
-  .kq-guide-bubble::after {
-    content: "";
-    position: absolute;
-    bottom: -12px;
-    width: 20px;
-    height: 20px;
-    background: inherit;
-    transform: rotate(45deg);
-  }
-
-  .kq-guide-bubble[data-side="left"]::after {
-    left: 22px;
-    border-right: 1px solid rgba(90, 110, 150, 0.18);
-    border-bottom: 1px solid rgba(90, 110, 150, 0.18);
-  }
-
-  .kq-guide-bubble[data-side="right"]::after {
-    right: 22px;
-    border-right: 1px solid rgba(90, 110, 150, 0.18);
-    border-bottom: 1px solid rgba(90, 110, 150, 0.18);
-  }
-
-  .kq-guide-bubble.is-hidden {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  .kq-guide-bubble strong {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 0.82rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #5b729f;
-  }
-
-  html[data-theme="dark"] .kq-guide-bubble {
-    background: rgba(21, 28, 40, 0.95);
-    color: #f5f7fb;
-    border-color: rgba(255,255,255,0.1);
-    box-shadow: 0 12px 34px rgba(0,0,0,0.35);
-  }
-
-  @media (max-width: 768px) {
     .kq-guide-bubble {
-      left: 16px !important;
-      right: 16px !important;
-      max-width: none;
-      bottom: 98px !important;
+      position: fixed;
+      max-width: 280px;
+      z-index: 995;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.97);
+      color: #1d2430;
+      border: 1px solid rgba(90, 110, 150, 0.18);
+      box-shadow: 0 12px 32px rgba(22, 34, 56, 0.14);
+      font-size: 0.96rem;
+      font-weight: 700;
+      line-height: 1.45;
+      transition: opacity 180ms ease, transform 180ms ease;
+      backdrop-filter: blur(10px);
+      margin-bottom: 10px;
     }
 
     .kq-guide-bubble::after {
-      left: 22px !important;
-      right: auto !important;
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      width: 20px;
+      height: 20px;
+      background: inherit;
+      transform: rotate(45deg);
     }
-  }
-`;
+
+    .kq-guide-bubble[data-side="left"]::after {
+      left: 22px;
+      border-right: 1px solid rgba(90, 110, 150, 0.18);
+      border-bottom: 1px solid rgba(90, 110, 150, 0.18);
+    }
+
+    .kq-guide-bubble[data-side="right"]::after {
+      right: 22px;
+      border-right: 1px solid rgba(90, 110, 150, 0.18);
+      border-bottom: 1px solid rgba(90, 110, 150, 0.18);
+    }
+
+    .kq-guide-bubble.is-hidden {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .kq-guide-bubble strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #5b729f;
+    }
+
+    html[data-theme="dark"] .kq-guide-bubble {
+      background: rgba(21, 28, 40, 0.95);
+      color: #f5f7fb;
+      border-color: rgba(255,255,255,0.1);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.35);
+    }
+
+    @media (max-width: 768px) {
+      .kq-guide-bubble {
+        left: 16px !important;
+        right: 16px !important;
+        max-width: none;
+        bottom: 98px !important;
+      }
+
+      .kq-guide-bubble::after {
+        left: 22px !important;
+        right: auto !important;
+      }
+    }
+  `;
   document.head.appendChild(style);
 }
 
@@ -654,15 +695,7 @@ export function mountGuideBubbleToggle() {
   const wrap = document.createElement("div");
   wrap.id = "kqGuideBubbleToggle";
   wrap.className = "kq-guide-toggle";
-
-  wrap.innerHTML = `
-    
-  `;
-    // <label class="kq-guide-toggle-label">
-    //   <span>Guide Bubbles</span>
-    //   <input type="checkbox" id="kqGuideBubbleCheckbox" ${areGuideBubblesEnabled() ? "checked" : ""}>
-    //   <span class="kq-guide-toggle-slider"></span>
-    // </label>
+  wrap.innerHTML = ``;
   document.body.appendChild(wrap);
 
   const checkbox = wrap.querySelector("#kqGuideBubbleCheckbox");
@@ -670,8 +703,10 @@ export function mountGuideBubbleToggle() {
     setGuideBubblesEnabled(checkbox.checked);
   });
 }
+
 export function mountGuideBubble(messages = [], options = {}) {
   if (!Array.isArray(messages) || messages.length === 0) return;
+
   ensureGuideStyle();
   mountGuideBubbleToggle();
 
@@ -752,4 +787,202 @@ export function mountGuideBubble(messages = [], options = {}) {
     if (bubbleTimer) window.clearInterval(bubbleTimer);
     bubbleTimer = window.setInterval(paint, Number(options.interval) || 7500);
   });
+}
+
+/* =========================
+   SHOP SYSTEM
+========================= */
+
+export const KQ_SHOP_CATALOG = [
+  { id: "avatar-sejong", name: "King Sejong", emoji: "👑", image: "", category: "avatars", slot: "avatar", cost: 0, rarity: "starter", description: "A starter avatar inspired by Korean learning and leadership." },
+  { id: "avatar-bunny", name: "Bunny Pal", emoji: "🐰", image: "", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A playful bunny-themed shop avatar." },
+  { id: "avatar-tiger", name: "Tiger Spirit", emoji: "🐯", image: "", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A bold tiger avatar for confident learners." },
+  { id: "avatar-scholar", name: "Scholar Spirit", emoji: "📚", image: "", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A bookish profile look for focused students." },
+  { id: "avatar-kitty", name: "Kitty Pal", emoji: "🐱", image: "", category: "avatars", slot: "avatar", cost: 120, rarity: "epic", description: "A premium companion avatar." },
+
+  { id: "frame-cloud", name: "Cloud Frame", emoji: "☁️", image: "", category: "frames", slot: "frame", cost: 0, rarity: "starter", description: "A clean starter frame." },
+  { id: "frame-jade", name: "Jade Frame", emoji: "💚", image: "", category: "frames", slot: "frame", cost: 70, rarity: "common", description: "A calm green border frame." },
+  { id: "frame-gold", name: "Royal Gold Frame", emoji: "✨", image: "", category: "frames", slot: "frame", cost: 130, rarity: "rare", description: "A polished gold frame." },
+  { id: "frame-neon", name: "Neon Study Frame", emoji: "💠", image: "", category: "frames", slot: "frame", cost: 180, rarity: "epic", description: "A bright prestige frame." },
+
+  { id: "bg-hanok", name: "Hanok Courtyard", emoji: "🏯", image: "", category: "backgrounds", slot: "background", cost: 0, rarity: "starter", description: "A classic Korea Quest starter background." },
+  { id: "bg-night", name: "Seoul Night", emoji: "🌃", image: "", category: "backgrounds", slot: "background", cost: 100, rarity: "common", description: "A city-night profile background." },
+  { id: "bg-spring", name: "Cherry Blossom", emoji: "🌸", image: "", category: "backgrounds", slot: "background", cost: 125, rarity: "rare", description: "A soft springtime background." },
+  { id: "bg-palace", name: "Royal Palace", emoji: "🏛️", image: "", category: "backgrounds", slot: "background", cost: 170, rarity: "epic", description: "A premium palace background." },
+
+  { id: "flair-spark", name: "Spark Flair", emoji: "✨", image: "", category: "flairs", slot: "flair", cost: 45, rarity: "common", description: "Adds a sparkle accent to your profile." },
+  { id: "flair-flame", name: "Streak Flame", emoji: "🔥", image: "", category: "flairs", slot: "flair", cost: 80, rarity: "rare", description: "A bold flair for streak-focused learners." },
+  { id: "flair-star", name: "Star Burst", emoji: "🌟", image: "", category: "flairs", slot: "flair", cost: 95, rarity: "rare", description: "A bright star accent." },
+
+  { id: "pet-dumpling", name: "Dumpling Pet", emoji: "🥟", image: "", category: "pets", slot: "pet", cost: 75, rarity: "common", description: "A fun little desk companion." },
+  { id: "pet-tiger", name: "Tiger Pet", emoji: "🐯", image: "", category: "pets", slot: "pet", cost: 115, rarity: "rare", description: "A tiger companion beside your profile." },
+  { id: "pet-cloud", name: "Cloud Pet", emoji: "☁️", image: "", category: "pets", slot: "pet", cost: 145, rarity: "epic", description: "A floating cloud companion." },
+
+  { id: "title-rookie", name: "New Challenger", emoji: "🎒", image: "", category: "titles", slot: "title", cost: 0, rarity: "starter", description: "Your starter title." },
+  { id: "title-hangul", name: "Hangul Hero", emoji: "🇰🇷", image: "", category: "titles", slot: "title", cost: 90, rarity: "common", description: "A title for students growing their Hangul skills." },
+  { id: "title-captain", name: "Quest Captain", emoji: "🧭", image: "", category: "titles", slot: "title", cost: 130, rarity: "rare", description: "A title for steady learners." },
+  { id: "title-master", name: "K-Quest Master", emoji: "🏆", image: "", category: "titles", slot: "title", cost: 190, rarity: "epic", description: "A premium title for top learners." },
+];
+
+const KQ_SHOP_STARTERS = [
+  "avatar-sejong",
+  "frame-cloud",
+  "bg-hanok",
+  "title-rookie",
+];
+
+const KQ_SHOP_SLOT_LABELS = {
+  avatar: "Avatar",
+  frame: "Frame",
+  background: "Background",
+  flair: "Flair",
+  pet: "Pet",
+  title: "Title",
+};
+
+function kqShopFind(itemId) {
+  return KQ_SHOP_CATALOG.find((item) => item.id === itemId) || null;
+}
+
+function ensureShopState() {
+  const s = load();
+  const player = s.player || (s.player = {});
+
+  if (!Array.isArray(player.inventory)) player.inventory = [];
+  if (!player.equipped || typeof player.equipped !== "object") player.equipped = {};
+
+  player.equipped = {
+    hat: player.equipped.hat || null,
+    bg: player.equipped.bg || null,
+    avatar: player.equipped.avatar || null,
+    frame: player.equipped.frame || null,
+    background: player.equipped.background || null,
+    flair: player.equipped.flair || null,
+    pet: player.equipped.pet || null,
+    title: player.equipped.title || null,
+  };
+
+  KQ_SHOP_STARTERS.forEach((id) => {
+    if (!player.inventory.includes(id)) player.inventory.push(id);
+  });
+
+  if (!player.equipped.avatar) player.equipped.avatar = "avatar-sejong";
+  if (!player.equipped.frame) player.equipped.frame = "frame-cloud";
+  if (!player.equipped.background) player.equipped.background = player.equipped.bg || "bg-hanok";
+  if (!player.equipped.title) player.equipped.title = "title-rookie";
+
+  if (player.equipped.bg === "bgPalace") player.equipped.background = "bg-palace";
+  if (player.inventory.includes("bgPalace") && !player.inventory.includes("bg-palace")) {
+    player.inventory.push("bg-palace");
+  }
+  if (player.inventory.includes("petTiger") && !player.inventory.includes("pet-tiger")) {
+    player.inventory.push("pet-tiger");
+  }
+
+  save();
+  return s;
+}
+
+export function getShopCatalog(category = "all") {
+  ensureShopState();
+  if (!category || category === "all") return [...KQ_SHOP_CATALOG];
+  return KQ_SHOP_CATALOG.filter((item) => item.category === category);
+}
+
+export function getShopItem(itemId) {
+  ensureShopState();
+  return kqShopFind(itemId);
+}
+
+export function getOwnedItemIds() {
+  return [...ensureShopState().player.inventory];
+}
+
+export function getOwnedShopItems() {
+  const owned = new Set(getOwnedItemIds());
+  return KQ_SHOP_CATALOG.filter((item) => owned.has(item.id));
+}
+
+export function isShopItemOwned(itemId) {
+  return getOwnedItemIds().includes(itemId);
+}
+
+export function getEquippedCosmetics() {
+  const s = ensureShopState();
+  return { ...s.player.equipped };
+}
+
+export function getEquippedProfile() {
+  const equipped = getEquippedCosmetics();
+  return {
+    avatar: kqShopFind(equipped.avatar),
+    frame: kqShopFind(equipped.frame),
+    background: kqShopFind(equipped.background),
+    flair: kqShopFind(equipped.flair),
+    pet: kqShopFind(equipped.pet),
+    title: kqShopFind(equipped.title),
+  };
+}
+
+export function purchaseShopItem(itemId) {
+  const s = ensureShopState();
+  const item = kqShopFind(itemId);
+
+  if (!item) return { ok: false, reason: "missing-item" };
+  if (s.player.inventory.includes(itemId)) return { ok: false, reason: "owned", item };
+  if ((Number(s.player.coins) || 0) < item.cost) return { ok: false, reason: "coins", item };
+
+  s.player.coins -= item.cost;
+  s.player.inventory.push(itemId);
+  save();
+  addRecentWork(`Bought ${item.name} for ${item.cost} coins`, "Shop");
+  emit("state:changed", s);
+
+  return { ok: true, item };
+}
+
+export function equipShopItem(itemId) {
+  const s = ensureShopState();
+  const item = kqShopFind(itemId);
+
+  if (!item) return { ok: false, reason: "missing-item" };
+  if (!item.slot) return { ok: false, reason: "not-equipable", item };
+  if (!s.player.inventory.includes(itemId)) return { ok: false, reason: "not-owned", item };
+
+  s.player.equipped[item.slot] = itemId;
+
+  if (item.slot === "background") {
+    s.player.equipped.bg = itemId === "bg-palace" ? "bgPalace" : itemId;
+  }
+
+  save();
+  addRecentWork(`Equipped ${item.name}`, "Shop");
+  emit("state:changed", s);
+
+  return { ok: true, item };
+}
+
+export function unequipShopSlot(slot) {
+  const s = ensureShopState();
+  if (!["flair", "pet"].includes(slot)) return { ok: false, reason: "locked-slot" };
+
+  s.player.equipped[slot] = null;
+  save();
+  emit("state:changed", s);
+
+  return { ok: true };
+}
+
+export function getShopSlotLabels() {
+  return { ...KQ_SHOP_SLOT_LABELS };
+}
+
+export function getCurrentDisplayTitle() {
+  const profile = getEquippedProfile();
+  return profile.title?.name || getPlayer().badges?.[0] || "New Challenger";
+}
+
+export function getCurrentDisplayEmoji() {
+  const profile = getEquippedProfile();
+  return profile.avatar?.emoji || "👑";
 }
