@@ -13,7 +13,7 @@ function getFakeUser() {
 function saveFakeUser(user) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
 }
-
+9
 function clearFakeUser() {
   localStorage.removeItem(STORAGE_KEY);
 }

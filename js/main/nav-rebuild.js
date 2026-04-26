@@ -26,6 +26,7 @@
     leaderboard: `${ICON_BASE}nav-leaderboard.png`,
     statistics: `${ICON_BASE}nav-statistics.png`,
     avatar: `${ICON_BASE}nav-avatar.png`,
+    about: `${ICON_BASE}nav-about.png`,
   };
 
   function getFakeUser() {
@@ -113,7 +114,23 @@
     style.id = "kq-nav-rebuild-styles";
     style.textContent = `
       :root {
-        --kq-sidebar-width: 272px;
+        --kq-sidebar-width: clamp(220px, 24vw, 272px);
+        --kq-sidebar-offset: clamp(12px, 1.25vw, 16px);
+        --kq-sidebar-gap: clamp(10px, 1vw, 16px);
+        --kq-sidebar-pad-x: clamp(12px, 1.3vw, 16px);
+        --kq-sidebar-pad-y: clamp(14px, 1.6vw, 18px);
+        --kq-card-radius: clamp(20px, 2vw, 28px);
+        --kq-brand-logo-size: clamp(34px, 3vw, 42px);
+        --kq-profile-avatar-size: clamp(42px, 4vw, 52px);
+        --kq-profile-font: clamp(0.82rem, 1vw, 1rem);
+        --kq-link-font: clamp(0.88rem, 1vw, 0.98rem);
+        --kq-link-gap: clamp(8px, 1vw, 12px);
+        --kq-link-pad-y: clamp(10px, 1vw, 12px);
+        --kq-link-pad-x: clamp(10px, 1vw, 14px);
+        --kq-link-radius: clamp(14px, 1.5vw, 18px);
+        --kq-side-icon-size: clamp(28px, 3vw, 44px);
+        --kq-mobile-icon-size: clamp(20px, 5vw, 24px);
+        --kq-bottom-btn-font: clamp(0.88rem, 1vw, 0.98rem);
       }
 
       body {
@@ -126,16 +143,16 @@
 
       @media (min-width: ${MOBILE_BREAKPOINT + 1}px) {
         body {
-          padding-left: calc(var(--kq-sidebar-width) + 34px) !important;
+          padding-left: calc(var(--kq-sidebar-width) + (var(--kq-sidebar-offset) * 2) + 10px) !important;
         }
 
         .site-header {
           position: fixed !important;
-          top: 12px !important;
-          left: 12px !important;
+          top: var(--kq-sidebar-offset) !important;
+          left: var(--kq-sidebar-offset) !important;
           width: var(--kq-sidebar-width) !important;
           max-width: var(--kq-sidebar-width) !important;
-          height: calc(100vh - 24px) !important;
+          height: calc(100vh - (var(--kq-sidebar-offset) * 2)) !important;
           margin: 0 !important;
           padding: 0 !important;
           z-index: 3000 !important;
@@ -151,12 +168,12 @@
           flex-direction: column !important;
           align-items: stretch !important;
           justify-content: flex-start !important;
-          gap: 16px !important;
+          gap: var(--kq-sidebar-gap) !important;
           width: 100% !important;
           height: 100% !important;
           min-height: 0 !important;
-          border-radius: 28px !important;
-          padding: 18px 16px !important;
+          border-radius: var(--kq-card-radius) !important;
+          padding: var(--kq-sidebar-pad-y) var(--kq-sidebar-pad-x) !important;
           background: #eaf0fb !important;
           box-shadow: 0 10px 28px rgba(0,0,0,0.06) !important;
           overflow: hidden !important;
@@ -173,17 +190,17 @@
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        gap: 10px !important;
-        padding: 4px 4px 10px !important;
+        gap: clamp(8px, 0.9vw, 10px) !important;
+        padding: 4px 4px 8px !important;
         min-width: 0 !important;
       }
 
       .brand-logo {
-        width: 42px !important;
-        height: 42px !important;
+        width: var(--kq-brand-logo-size) !important;
+        height: var(--kq-brand-logo-size) !important;
         object-fit: contain !important;
         border-radius: 12px !important;
-        flex: 0 0 42px !important;
+        flex: 0 0 var(--kq-brand-logo-size) !important;
       }
 
       .brand-wordmark {
@@ -198,14 +215,14 @@
       .brand-quest {
         font-weight: 900 !important;
         font-family: "Nunito", sans-serif !important;
-        font-size: 1rem !important;
+        font-size: clamp(0.94rem, 1.05vw, 1.1rem) !important;
       }
 
       .kq-sidebar-profile {
         display: grid;
-        gap: 10px;
-        padding: 14px;
-        border-radius: 22px;
+        gap: clamp(8px, 0.9vw, 10px);
+        padding: clamp(12px, 1.2vw, 14px);
+        border-radius: clamp(18px, 2vw, 22px);
         background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%);
         color: #fff;
         box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
@@ -214,13 +231,13 @@
       .kq-sidebar-profile-top {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: clamp(10px, 1vw, 12px);
         min-width: 0;
       }
 
       .kq-sidebar-avatar {
-        width: 52px;
-        height: 52px;
+        width: var(--kq-profile-avatar-size);
+        height: var(--kq-profile-avatar-size);
         border-radius: 50%;
         display: grid;
         place-items: center;
@@ -228,8 +245,8 @@
         color: #fff;
         font-family: "Nunito", sans-serif;
         font-weight: 900;
-        font-size: 1rem;
-        flex: 0 0 52px;
+        font-size: clamp(0.86rem, 1vw, 1rem);
+        flex: 0 0 var(--kq-profile-avatar-size);
         overflow: hidden;
         border: 2px solid rgba(255,255,255,0.22);
       }
@@ -247,7 +264,7 @@
 
       .kq-sidebar-user-copy strong {
         display: block;
-        font-size: 1rem;
+        font-size: var(--kq-profile-font);
         line-height: 1.2;
         white-space: nowrap;
         overflow: hidden;
@@ -259,7 +276,7 @@
         align-items: center;
         gap: 8px;
         margin-top: 4px;
-        font-size: 0.9rem;
+        font-size: clamp(0.76rem, 0.92vw, 0.9rem);
         font-weight: 700;
         opacity: 0.95;
         flex-wrap: wrap;
@@ -267,23 +284,24 @@
 
       .kq-sidebar-links {
         display: grid;
-        gap: 8px;
+        gap: clamp(6px, 0.8vw, 8px);
         min-height: 0;
       }
 
       .kq-side-link {
         display: flex !important;
         align-items: center !important;
-        gap: 12px !important;
+        gap: var(--kq-link-gap) !important;
         width: 100% !important;
-        padding: 12px 14px !important;
-        border-radius: 18px !important;
+        min-height: clamp(52px, 5vw, 66px) !important;
+        padding: var(--kq-link-pad-y) var(--kq-link-pad-x) !important;
+        border-radius: var(--kq-link-radius) !important;
         text-decoration: none !important;
         color: #1e2a3f !important;
         background: transparent !important;
         box-shadow: none !important;
         font-family: "Nunito", sans-serif !important;
-        font-size: 0.98rem !important;
+        font-size: var(--kq-link-font) !important;
         font-weight: 900 !important;
         transition: transform 120ms ease, background 120ms ease, color 120ms ease;
       }
@@ -299,31 +317,32 @@
       }
 
       .kq-side-link-icon {
-        width: clamp(50px, 3.5vmin, 6=50px);
-        height: clamp(50px, 3.5vmin, 60px);
+        width: var(--kq-side-icon-size);
+        height: var(--kq-side-icon-size);
         object-fit: contain;
-        flex: 0 0 40px;
+        flex: 0 0 var(--kq-side-icon-size);
         display: block;
-        border-radius: 10px;
+        border-radius: clamp(8px, 1vw, 10px);
       }
 
       .kq-side-link-label {
         min-width: 0;
+        line-height: 1.2;
       }
 
       .kq-sidebar-bottom {
         margin-top: auto;
         display: grid;
-        gap: 10px;
+        gap: clamp(8px, 0.9vw, 10px);
       }
 
       .kq-sidebar-action {
         width: 100%;
         border: none;
         border-radius: 999px;
-        padding: 12px 14px;
+        padding: clamp(10px, 1vw, 12px) clamp(12px, 1vw, 14px);
         font-family: "Nunito", sans-serif;
-        font-size: 0.98rem;
+        font-size: var(--kq-bottom-btn-font);
         font-weight: 900;
         text-align: center;
         cursor: pointer;
@@ -504,10 +523,10 @@
       }
 
       .kq-mobile-link-icon {
-        width: 22px;
-        height: 22px;
+        width: var(--kq-mobile-icon-size);
+        height: var(--kq-mobile-icon-size);
         object-fit: contain;
-        flex: 0 0 22px;
+        flex: 0 0 var(--kq-mobile-icon-size);
         display: block;
       }
 

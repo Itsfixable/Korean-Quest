@@ -213,3 +213,28 @@
     height: 28px;
   }
 }
+/* Force chatbot to always use Korea Quest dark blue */
+.chatbot-header {
+  background: #5b729f !important;
+  color: #ffffff !important;
+}
+
+.chatbot-header h3,
+.chatbot-close-btn {
+  color: #ffffff !important;
+}
+
+.chatbot-send-btn,
+.chatbot-user {
+  background: #5b729f !important;
+  color: #ffffff !important;
+}
+
+.chatbot-send-btn:hover {
+  background: #4f648a !important;
+}
+
+#chatbot-input:focus {
+  border-color: #5b729f !important;
+  box-shadow: 0 0 0 3px rgba(91, 114, 159, 0.28) !important;
+}
