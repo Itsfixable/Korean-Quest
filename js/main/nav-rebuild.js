@@ -8,7 +8,7 @@
   const LINKS = [
     ["index.html", "Home", "nav-home.png"],
     ["schedule.html", "Schedule", "nav-schedule.png"],
-    ["resources.html", "Resources", "nav-learn.png"],
+    ["resources.html", "Learn", "nav-learn.png"],
     ["adventure.html", "Adventure", "nav-adventure.png"],
     ["dashboard.html", "Dashboard", "nav-dashboard.png"],
     ["shop.html", "Shop", "nav-shop.png"],
