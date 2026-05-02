@@ -17,14 +17,15 @@
     <link rel="stylesheet" href="css/components/theme-toggle.css" />
     <link rel="stylesheet" href="css/chatbot.css" />
     <script defer src="js/main/nav-rebuild.js"></script>
-    <script defer src="js/main/state.js"></script>
+    <script type="module" src="js/main/motion.js"></script>
+    <script type="module" src="js/main/state.js"></script>
     <script defer src="js/main/resources.js"></script>
     <script type="module" src="js/main/auth.js"></script>
     <script type="module" src="js/main/theme.js"></script>
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
   </head>
 
-  <body>
+  <body class="kq-motion-loading">
     <header class="container site-header">
       <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
@@ -85,7 +86,7 @@
           sentences.
         </p>
 
-        <div class="lesson-list" id="lesson-list">
+        <div class="lesson-list kq-stagger" id="lesson-list">
           <article class="lesson" data-lesson-id="L1_hangul">
             <header>
               <h2>Hangul 1: ㄱ ㄴ ㄷ ㅁ ㅂ + ㅏ</h2>

@@ -497,7 +497,7 @@ function ensureShell() {
       <div id="kqEquippedSummary" class="kq-shop-equip-summary"></div>
     </section>
 
-    <section class="kq-shop-grid" id="kqShopGrid"></section>
+    <section class="kq-shop-grid kq-stagger" id="kqShopGrid"></section>
   `;
 
   main.innerHTML = "";
@@ -533,7 +533,10 @@ function renderTopStats(player, equipped) {
   const xpPct = Math.max(0, Math.min(100, Math.round((player.xp / xpNeeded) * 100)));
 
   $("#kqLevelChip").textContent = `Level ${player.level}`;
-  $("#kqXpBarFill").style.width = `${xpPct}%`;
+  $("#kqXpBarFill").style.width = "0%";
+  setTimeout(() => {
+    $("#kqXpBarFill").style.width = `${xpPct}%`;
+  }, 50);
   $("#kqXpText").textContent = `${player.xp} / ${xpNeeded} XP`;
   $("#kqCoinCount").textContent = `🪙 ${player.coins}`;
   $("#kqBadgeCount").textContent = `🏅 ${player.badges?.length || 0}`;
@@ -668,6 +671,10 @@ function render() {
   renderTabs();
   renderEquippedSummary(profile, equipped);
   renderGrid(items, ownedIds, equipped);
+
+  requestAnimationFrame(() => {
+    document.body.classList.add("kq-motion-ready");
+  });
 }
 
 render();

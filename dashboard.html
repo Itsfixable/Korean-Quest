@@ -17,15 +17,16 @@
     <link rel="stylesheet" href="css/components/theme-toggle.css" />
     <link rel="stylesheet" href="css/chatbot.css" />
 
-    <script defer src="js/main/state.js"></script>
+    <script type="module" src="js/main/state.js"></script>
     <script type="module" src="js/main/auth.js"></script>
     <script type="module" src="js/main/theme.js"></script>
     <script type="module" src="js/main/dashboard.js"></script>
     <script defer src="js/main/nav-rebuild.js"></script>
+    <script type="module" src="js/main/motion.js"></script>
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
   </head>
 
-  <body>
+  <body class="kq-motion-loading">
     <header class="container site-header">
       <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
@@ -48,7 +49,7 @@
 
         <div class="student-dashboard-body">
           <div class="student-dashboard-left">
-            <div class="dashboard-stats">
+            <div class="dashboard-stats kq-stagger">
               <div class="stat-box">
                 <span class="stat-label">Level</span>
                 <strong id="levelValue" class="stat-value">1</strong>
@@ -103,7 +104,7 @@
             <h2>Recent Work</h2>
           </div>
 
-          <ul id="recentWorkList" class="recent-list">
+          <ul id="recentWorkList" class="recent-list kq-stagger">
             <li>Completed 1 adventure quest</li>
           </ul>
         </section>
@@ -115,7 +116,7 @@
             <h2>Daily Quests</h2>
           </div>
 
-          <ul id="dailyQuestList" class="quest-list">
+          <ul id="dailyQuestList" class="quest-list kq-stagger">
             <li>Earn 30 XP today — 0/30</li>
             <li>Complete 1 lesson — 0/1</li>
             <li>Win 1 battle — 0/1</li>

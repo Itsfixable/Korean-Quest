@@ -597,8 +597,656 @@ function ensureStyles() {
     background: rgba(255, 252, 246, 0.96) !important;
   }
 }
+#mapCard > header,
+#mapCard > p,
+#mapCard .kq-adventure-controls {
+  display: none !important;
+}
+
+#mapGrid {
+  margin-top: 0 !important;
+}
+
+.kq-treasure-adventure {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+}
+
+.kq-map-tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.kq-map-tab {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 900;
+  color: #304263;
+  background: rgba(91, 114, 159, 0.12);
+  cursor: pointer;
+}
+
+.kq-map-tab.active {
+  background: linear-gradient(180deg, #6d84b7, #5971a1);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(91,114,159,0.22);
+}
+
+.kq-map-tab:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.kq-map-board {
+  width: 100%;
+  margin: 0 auto;
+  background: #102027;
+  border-radius: 28px;
+  padding: clamp(14px, 2vw, 24px);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.18);
+  display: grid;
+  gap: 14px;
+}
+
+.kq-map-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  color: #fff;
+  font-weight: 900;
+}
+
+.kq-map-back {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.kq-map-currency {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.kq-scroll-stage {
+  position: relative;
+  width: min(100%, 980px);
+  aspect-ratio: 500 / 649;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.kq-scroll-stage.locked {
+  filter: grayscale(0.7);
+}
+
+.kq-scroll-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.kq-map-title {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  text-align: center;
+  color: #6a4115;
+  font-weight: 1000;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.4);
+  width: 70%;
+}
+
+.kq-map-title small {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(0.8rem, 1.6vw, 1.05rem);
+  color: #7b5624;
+}
+
+.kq-dashed-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.kq-dashed-path path {
+  fill: none;
+  stroke: rgba(119, 82, 37, 0.82);
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-dasharray: 3 3.8;
+  vector-effect: non-scaling-stroke;
+  animation: kqPathDash 3s linear infinite;
+}
+
+@keyframes kqPathDash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.kq-start-node,
+.kq-map-node,
+.kq-treasure-chest {
+  position: absolute;
+  z-index: 4;
+  border: none;
+  background: transparent;
+  transform: translate(-50%, -50%) !important;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+}
+
+.kq-start-node {
+  position: absolute;
+  left: 55%;
+  top: 26%;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none;
+  z-index: 7;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.kq-start-circle,
+.kq-start-label {
+  pointer-events: auto;
+}
+
+.kq-start-circle {
+  width: 44px;
+  height: 44px;
+  font-size: 1.2rem;
+  animation: kqStartPulse 1.4s ease-in-out infinite;
+}
+
+.kq-start-label {
+  font-size: 0.7rem;
+  padding: 4px 8px;
+}
+
+.kq-start-label {
+  background: #f06bb8;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 1000;
+  box-shadow: 0 4px 0 rgba(157,61,122,0.45);
+}
+
+.kq-node-circle {
+  width: clamp(50px, 7vw, 76px);
+  height: clamp(50px, 7vw, 76px);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  font-weight: 1000;
+  background: linear-gradient(180deg, #f87ccc, #df57b0);
+  color: #fff;
+  box-shadow: 0 8px 0 rgba(121,57,101,0.45), 0 10px 20px rgba(0,0,0,0.16);
+  transition: transform 260ms var(--ease-pop), filter 260ms var(--ease-kq);
+}
+
+.kq-start-circle,
+.kq-node-circle {
+  transition: transform 260ms var(--ease-pop), filter 260ms var(--ease-kq);
+}
+
+@keyframes kqStartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.kq-map-node {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.kq-map-node .kq-node-circle {
+  background: linear-gradient(180deg, #4e6673, #263942);
+  box-shadow: 0 8px 0 rgba(22,31,38,0.45), 0 10px 20px rgba(0,0,0,0.16);
+}
+
+.kq-map-node.done .kq-node-circle {
+  background: linear-gradient(180deg, #35bdf2, #1594d0);
+}
+
+.kq-map-node.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.kq-map-node.boss .kq-node-circle {
+  background: linear-gradient(180deg, #c78a3e, #9b6124);
+}
+
+.kq-start-node:hover,
+.kq-map-node:hover,
+.kq-treasure-chest:hover {
+  transform: translate(-50%, -50%) !important;
+}
+
+.kq-start-node:hover .kq-start-circle,
+.kq-map-node:hover .kq-node-circle,
+.kq-treasure-chest:hover .kq-chest-icon {
+  transform: scale(1.035);
+  filter: brightness(1.04);
+}
+
+.kq-node-label {
+  background: #1c2524;
+  color: #fff;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: clamp(0.68rem, 1.2vw, 0.86rem);
+  font-weight: 1000;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+  white-space: nowrap;
+}
+
+.kq-map-stars {
+  display: flex;
+  gap: 1px;
+  font-size: clamp(0.9rem, 1.7vw, 1.15rem);
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.5));
+}
+
+.kq-treasure-chest:not(.ready) {
+  opacity: 0.68;
+}
+
+.kq-treasure-chest.ready {
+  animation: kqTreasurePulse 1.1s ease-in-out infinite;
+}
+
+@keyframes kqTreasurePulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.035);
+  }
+}
+
+.kq-map-tip {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: #fff;
+  font-weight: 800;
+  text-align: center;
+}
+
+.kq-map-tip strong {
+  background: rgba(255,255,255,0.12);
+  padding: 10px 14px;
+  border-radius: 14px;
+}
+
+.kq-adventure-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 5000;
+  background: #1c2524;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 999px;
+  font-weight: 1000;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.kq-map-decoration {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  pointer-events: none;
+  opacity: 0.92;
+  /* CLEAN FLOAT */
+  animation: kqFloatY 4.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes kqFloatY {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-6px);
+  }
+}
+
+.kq-map-decoration:nth-child(odd) {
+  animation-duration: 4.6s;
+}
+
+.kq-map-decoration:nth-child(even) {
+  animation-duration: 3.8s;
+}
+
+.kq-map-decoration:nth-child(3n) {
+  animation-delay: 0.6s;
+}
+
+.kq-map-decoration:nth-child(4n) {
+  animation-delay: 1.2s;
+}
+
+.kq-map-node {
+  animation: kqNodeFloat 5s ease-in-out infinite;
+}
+
+.kq-map-node:nth-of-type(2n) {
+  animation-delay: 0.45s;
+}
+
+.kq-map-node:nth-of-type(3n) {
+  animation-delay: 0.85s;
+}
+
+@keyframes kqNodeFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) translateY(-3px);
+  }
+}
+
+.kq-dashed-path path {
+  fill: none;
+  stroke: rgba(119, 82, 37, 0.9);
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 5 5.5;
+  vector-effect: non-scaling-stroke;
+  animation: kqPathDash 3.4s linear infinite;
+}
+
+.kq-treasure-chest {
+  left: 46%;
+  top: 86%;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  color: #fff;
+}
+
+.kq-x-mark {
+  position: absolute;
+
+  /* move it LEFT and DOWN away from boss */
+  left: -18px;
+  top: -12px;
+
+  z-index: 4;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: #ee4c2f;
+  line-height: 0.8;
+  text-shadow: 0 3px 0 rgba(85,28,17,0.3);
+  transform: rotate(-10deg);
+}
+
+.kq-chest-bubble {
+  position: absolute;
+  left: 82%;
+  top: 40%;
+  transform: translateY(-50%);
+  min-width: 132px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 9px 10px 8px;
+  border-radius: 16px;
+  background: rgba(28, 37, 36, 0.96);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.24);
+}
+
+.kq-chest-bubble::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 45%;
+  width: 18px;
+  height: 18px;
+  background: inherit;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 4px;
+}
+
+.kq-chest-icon {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.kq-chest-label {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  color: #fff;
+  padding: 0;
+  border-radius: 0;
+  font-size: clamp(0.72rem, 1.2vw, 0.9rem);
+  font-weight: 1000;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.kq-chest-bubble small {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 234, 167, 0.14);
+  color: #ffeaa7;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: clamp(0.62rem, 1vw, 0.75rem);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.kq-treasure-chest:hover .kq-chest-bubble {
+  transform: translateY(-50%) scale(1.035);
+}
+
+.kq-treasure-chest:hover .kq-x-mark {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.kq-adventure-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Make Adventure page fill the available width beside sidebar */
+body:has(.kq-treasure-adventure) main.container,
+body:has(.kq-treasure-adventure) .container:not(.site-header) {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body:has(.kq-treasure-adventure) #mapCard {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body:has(.kq-treasure-adventure) .adventure-levels-wrapper,
+body:has(.kq-treasure-adventure) #mapGrid,
+body:has(.kq-treasure-adventure) .kq-treasure-adventure {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body:has(.kq-treasure-adventure) .kq-map-board {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body:has(.kq-treasure-adventure) .kq-scroll-stage {
+  width: min(100%, 980px) !important;
+}
+
+/* ========================= Treasure Map Premium Motion Parallax + wind + sparkle ========================= */
+
+/* subtle depth layers */
+.kq-scroll-stage {
+  perspective: 900px;
+}
+
+.kq-map-decoration {
+  animation: kqFloatY 4.2s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+/* trees gently sway like wind */
+.kq-map-decoration[src*="tree"] {
+  animation: kqTreeSway 4.8s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+/* rocks/stone barely move */
+.kq-map-decoration[src*="rock"],
+.kq-map-decoration[src*="stone"] {
+  animation: kqHeavyFloat 5.6s ease-in-out infinite;
+}
+
+/* skulls glow/flicker slightly */
+.kq-map-decoration[src*="skull"] {
+  animation: kqSkullFloat 4.4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 5px rgba(88, 56, 25, 0.18)) drop-shadow(0 0 8px rgba(255, 235, 180, 0.22));
+}
+
+/* wood drifts gently */
+.kq-map-decoration[src*="wood"] {
+  animation: kqWoodBob 5s ease-in-out infinite;
+}
+
+@keyframes kqTreeSway {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-5px) rotate(1.5deg);
+  }
+}
+
+@keyframes kqHeavyFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-2px);
+  }
+}
+
+@keyframes kqSkullFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-5px) scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes kqWoodBob {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px) rotate(-1deg);
+  }
+}
+
+/* treasure sparkle particles */
+.kq-treasure-chest::before,
+.kq-treasure-chest::after {
+  content: "✦";
+  position: absolute;
+  z-index: 8;
+  color: #ffeaa7;
+  font-size: 1.1rem;
+  pointer-events: none;
+  opacity: 0;
+  text-shadow: 0 0 8px rgba(255, 234, 167, 0.75);
+  animation: kqSparkle 1.8s ease-in-out infinite;
+}
+
+.kq-treasure-chest::before {
+  left: -26px;
+  top: -28px;
+}
+
+.kq-treasure-chest::after {
+  right: -34px;
+  top: 8px;
+  animation-delay: 0.7s;
+}
+
+@keyframes kqSparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) translateY(4px);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.15) translateY(-4px);
+  }
+}
+
+/* animated treasure bubble */
+.kq-chest-bubble {
+  animation: kqBubbleFloat 3.8s ease-in-out infinite;
+}
+
+@keyframes kqBubbleFloat {
+  0%, 100% {
+    transform: translateY(-50%) translateY(0);
+  }
+  50% {
+    transform: translateY(-50%) translateY(-5px);
+  }
+}
   `;
   document.head.appendChild(style);
+
 }
 
 function ensureSummary() {
@@ -679,106 +1327,339 @@ function renderSummary() {
   });
 }
 
+const TREASURE_KEY = "kq_adventure_treasure_claimed_v1";
+
+const TREASURE_REWARDS = {
+  1: { coins: 500, xp: 80 },
+  2: { coins: 750, xp: 120 },
+  3: { coins: 1000, xp: 160 },
+};
+
+const TREASURE_LAYOUTS = {
+  1: [
+    { x: 55, y: 31 }, // Level 1
+    { x: 38, y: 48 }, // Level 2
+    { x: 63, y: 61 }, // Level 3
+    { x: 42, y: 78 }, // Boss 4
+  ],
+  2: [
+    { x: 38, y: 31 },
+    { x: 66, y: 45 },
+    { x: 46, y: 63 },
+    { x: 39, y: 79 },
+  ],
+  3: [
+    { x: 62, y: 31 },
+    { x: 40, y: 47 },
+    { x: 67, y: 59 },
+    { x: 43, y: 75 },
+  ],
+};
+
+const TREASURE_PATHS = {
+  1: `
+    M55 31
+    C44 32 39 37 43 42
+    C48 48 31 48 38 54
+    C45 60 62 52 63 61
+    C64 68 48 67 47 72
+    C46 76 43 76 42 78
+  `,
+  2: `
+    M38 31
+    C48 34 58 34 66 45
+    C73 55 52 53 48 59
+    C43 66 32 67 39 74
+    C45 80 39 78 39 79
+  `,
+  3: `
+    M62 31
+    C54 38 43 37 40 47
+    C37 57 65 49 67 59
+    C70 70 49 65 45 70
+    C41 74 43 75 43 75
+  `,
+};
+
+const MAP_DECORATIONS = {
+  1: [
+    { src: "favicon/adventure/tree1.png", x: 28, y: 26, size: 42, delay: "0s" },
+    { src: "favicon/adventure/skull1.png", x: 33, y: 36, size: 46, delay: ".4s" },
+    { src: "favicon/adventure/rock1.png", x: 67, y: 43, size: 34, delay: ".8s" },
+    { src: "favicon/adventure/tree2.png", x: 27, y: 63, size: 48, delay: "1.1s" },
+    { src: "favicon/adventure/wood1.png", x: 32, y: 84, size: 58, delay: ".6s" },
+    { src: "favicon/adventure/stone1.png", x: 70, y: 72, size: 34, delay: "1.4s" },
+  ],
+  2: [
+    { src: "favicon/adventure/tree1.png", x: 30, y: 28, size: 44, delay: ".2s" },
+    { src: "favicon/adventure/rock1.png", x: 68, y: 34, size: 36, delay: ".9s" },
+    { src: "favicon/adventure/skull2.png", x: 30, y: 68, size: 44, delay: ".5s" },
+    { src: "favicon/adventure/tree2.png", x: 70, y: 70, size: 50, delay: "1.2s" },
+    { src: "favicon/adventure/wood1.png", x: 36, y: 84, size: 56, delay: ".7s" },
+  ],
+  3: [
+    { src: "favicon/adventure/skull1.png", x: 30, y: 30, size: 48, delay: ".1s" },
+    { src: "favicon/adventure/tree1.png", x: 70, y: 34, size: 48, delay: ".5s" },
+    { src: "favicon/adventure/rock1.png", x: 38, y: 57, size: 34, delay: ".9s" },
+    { src: "favicon/adventure/skull2.png", x: 72, y: 70, size: 44, delay: "1.2s" },
+    { src: "favicon/adventure/tree2.png", x: 32, y: 82, size: 52, delay: ".4s" },
+  ],
+};
+
+function loadTreasureClaims() {
+  try {
+    return JSON.parse(localStorage.getItem(TREASURE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveTreasureClaims(claims) {
+  localStorage.setItem(TREASURE_KEY, JSON.stringify(claims));
+}
+
+function isTreasureClaimed(worldId) {
+  return Boolean(loadTreasureClaims()[worldId]);
+}
+
+function showAdventureToast(message) {
+  let toast = document.getElementById("kqAdventureToast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "kqAdventureToast";
+    toast.className = "kq-adventure-toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.remove("show");
+
+  requestAnimationFrame(() => {
+    toast.classList.add("show");
+  });
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
+function startLevelFromMap(level) {
+  if (level > P.unlocked) {
+    showAdventureToast(`🔒 Clear Level ${level - 1} first.`);
+    return;
+  }
+
+  if (P.cleared[level]) {
+    showAdventureToast("You already cleared this level!");
+    return;
+  }
+
+  const enemy = ENEMIES[(level - 1) % ENEMIES.length];
+  const boss = BOSS_LEVELS.has(level);
+  const hp = 16 + Math.floor(level * 2.1);
+
+  startBattle({
+    level,
+    hp,
+    boss,
+    enemy,
+    topic: topicSelect?.value || "mixed",
+    difficulty: diffSelect?.value || "easy",
+  });
+}
+
+function startNextPlayableLevel(world) {
+  const nextLevel = world.levels.find((level) => {
+    return level <= P.unlocked && !P.cleared[level];
+  });
+
+  if (!nextLevel) {
+    showAdventureToast("All nodes cleared! Claim the treasure chest.");
+    return;
+  }
+
+  startLevelFromMap(nextLevel);
+}
+
+function claimWorldTreasure(world) {
+  if (!isWorldComplete(world.id)) {
+    showAdventureToast("Complete every node first to unlock the treasure!");
+    return;
+  }
+
+  if (isTreasureClaimed(world.id)) {
+    showAdventureToast("You already claimed this treasure.");
+    return;
+  }
+
+  const rewards = TREASURE_REWARDS[world.id] || { coins: 250, xp: 50 };
+  const claims = loadTreasureClaims();
+
+  claims[world.id] = true;
+  saveTreasureClaims(claims);
+
+  addCoins(rewards.coins);
+  addXP(rewards.xp);
+
+  showAdventureToast(`🎁 Treasure claimed! +${rewards.coins} coins · +${rewards.xp} XP`);
+  buildMap();
+}
+
 function buildMap() {
   if (!mapGrid) return;
 
-  const adventure = getAdventureProgress();
   const world = getVisibleWorld();
   activeWorldId = world.id;
 
   mapGrid.innerHTML = "";
 
-  const worldUnlocked = isWorldUnlocked(world.id);
   const completedCount = world.levels.filter((lvl) => P.cleared[lvl]).length;
+  const worldUnlocked = isWorldUnlocked(world.id);
+  const worldComplete = isWorldComplete(world.id);
+  const treasureClaimed = isTreasureClaimed(world.id);
+  const rewards = TREASURE_REWARDS[world.id] || { coins: 250, xp: 50 };
+  const positions = TREASURE_LAYOUTS[world.id] || TREASURE_LAYOUTS[1];
 
   const section = document.createElement("section");
-  section.className = `kq-world-section ${world.bgClass}`;
+  section.className = "kq-treasure-adventure";
 
   section.innerHTML = `
-    <div class="kq-world-header">
-      <div>
-        <h3>${world.rangeLabel} — ${world.title}</h3>
-        <p>${completedCount}/${world.levels.length} levels cleared</p>
-      </div>
-      <span class="kq-world-badge">
-        ${worldUnlocked ? "🌍 Unlocked" : "🔒 Locked"}
-      </span>
+    <div class="kq-map-tabs">
+      ${WORLDS.map((w) => `
+        <button
+          type="button"
+          class="kq-map-tab ${activeWorldId === w.id ? "active" : ""}"
+          data-world-tab="${w.id}"
+          ${isWorldUnlocked(w.id) ? "" : "disabled"}
+        >
+          ${isWorldUnlocked(w.id) ? "🗺️" : "🔒"} Level ${w.id}
+        </button>
+      `).join("")}
     </div>
-    <div class="kq-world-grid" id="kq-world-grid-${world.id}"></div>
+
+    <div class="kq-map-board">
+      <div class="kq-map-topbar">
+        <button class="kq-map-back" type="button" onclick="location.href='index.html'">← Back Home</button>
+        <div class="kq-map-currency">
+          <span>🪙 ${TREASURE_REWARDS[world.id]?.coins || 0}</span>
+          <span>⭐ ${completedCount}</span>
+        </div>
+      </div>
+
+      <div class="kq-scroll-stage ${worldUnlocked ? "" : "locked"}">
+        <img class="kq-scroll-bg" src="favicon/adventure/treasure-scroll.png" alt="" aria-hidden="true" />
+
+        ${(MAP_DECORATIONS[world.id] || []).map((obj, index) => `
+          <img
+            class="kq-map-decoration"
+            src="${obj.src}"
+            alt=""
+            aria-hidden="true"
+            style="
+              left:${obj.x}%;
+              top:${obj.y}%;
+              width:${obj.size}px;
+              animation-delay:${obj.delay};
+              --float-distance:${index % 2 === 0 ? "6px" : "4px"};
+            "
+          />
+        `).join("")}
+
+        <div class="kq-map-title">
+          <div>Level ${world.id}</div>
+          <small>${world.title}</small>
+        </div>
+
+        <svg class="kq-dashed-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="${TREASURE_PATHS[world.id] || TREASURE_PATHS[1]}" />
+        </svg>
+
+        <button class="kq-start-node" type="button" data-start="true">
+          <span class="kq-start-label">START!</span>
+          <span class="kq-start-circle">▶</span>
+        </button>
+
+        ${world.levels.map((level, index) => {
+          const enemy = ENEMIES[(level - 1) % ENEMIES.length];
+          const boss = BOSS_LEVELS.has(level);
+          const cleared = Boolean(P.cleared[level]);
+          const locked = level > P.unlocked;
+          const pos = positions[index] || positions[positions.length - 1];
+
+          return `
+            <button
+              class="kq-map-node ${cleared ? "done" : ""} ${locked ? "locked" : ""} ${boss ? "boss" : ""}"
+              type="button"
+              style="left:${pos.x}%; top:${pos.y}%;"
+              data-level="${level}"
+              ${locked ? "disabled" : ""}
+            >
+              <span class="kq-node-circle">${cleared ? "✓" : boss ? "👑" : enemy.sprite}</span>
+              <span class="kq-node-label">${boss ? `Boss ${level}` : `Level ${level}`}</span>
+              <div class="kq-map-stars" aria-hidden="true">
+                <span>${cleared ? "⭐" : "☆"}</span>
+                <span>${cleared ? "⭐" : "☆"}</span>
+                <span>${cleared ? "⭐" : "☆"}</span>
+              </div>
+            </button>
+          `;
+        }).join("")}
+
+        <button
+          class="kq-treasure-chest ${worldComplete ? "ready" : ""} ${treasureClaimed ? "claimed" : ""}"
+          type="button"
+          data-chest="true"
+        >
+          <span class="kq-x-mark">✕</span>
+
+          <span class="kq-chest-bubble">
+            <span class="kq-chest-icon">${treasureClaimed ? "✅" : "🧰"}</span>
+            <span class="kq-chest-label">${treasureClaimed ? "CLAIMED!" : "TREASURE!"}</span>
+            <small>+${rewards.coins} coins · +${rewards.xp} XP</small>
+          </span>
+        </button>
+      </div>
+
+      <div class="kq-map-tip">
+        <strong>💡 Adventure Tip</strong>
+        <span>Complete every node on the map to unlock the treasure chest bonus.</span>
+      </div>
+    </div>
   `;
 
   mapGrid.appendChild(section);
 
-  const worldGrid = section.querySelector(`#kq-world-grid-${world.id}`);
+  section.querySelectorAll("[data-world-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = Number(btn.dataset.worldTab);
 
-  world.levels.forEach((level) => {
-    const node = document.createElement("button");
-    node.type = "button";
-    node.className = "map-node";
-
-    const enemy = ENEMIES[(level - 1) % ENEMIES.length];
-    const boss = BOSS_LEVELS.has(level);
-    const hp = 16 + Math.floor(level * 2.1);
-    const sequentialLocked = level > P.unlocked;
-
-    let statusText = "Ready";
-    let reasonText = `HP ${hp} • ${enemy.name}`;
-
-    if (boss) {
-      statusText = "Boss Battle";
-      node.classList.add("boss-node");
-    }
-
-    if (P.cleared[level]) {
-      statusText = "✅ Cleared";
-      node.classList.add("cleared");
-    } else if (!sequentialLocked) {
-      node.classList.add("playable");
-    }
-
-    if (sequentialLocked) {
-      node.classList.add("locked");
-      statusText = "Clear previous level";
-      reasonText = `Beat Level ${level - 1} first to continue.`;
-    }
-
-    node.innerHTML = `
-      <div class="kq-node-top">
-
-        <div class="kq-node-title">
-          <span class="kq-node-sub">
-            ${boss ? "👑" : "🗺️"} ${enemy.sprite}
-            ${boss ? "Boss Stage" : "Adventure Stage"}
-          </span>
-
-          <span class="kq-node-label">
-            ${boss ? `Boss ${level}` : `Level ${level}`}
-          </span>
-        </div>
-
-      </div>
-
-      <div class="kq-node-meta">${reasonText}</div>
-      <div class="kq-node-status">${statusText}</div>
-    `;
-
-    node.addEventListener("click", () => {
-      if (sequentialLocked) {
-        setFeedback(`🔒 Clear Level ${level - 1} first.`);
+      if (!isWorldUnlocked(id)) {
+        showAdventureToast("🔒 Complete the previous map first.");
         return;
       }
 
-      startBattle({
-        level,
-        hp,
-        boss,
-        enemy,
-        topic: topicSelect?.value || "mixed",
-        difficulty: diffSelect?.value || "easy",
-      });
+      activeWorldId = id;
+      renderSummary();
+      buildMap();
     });
+  });
 
-    worldGrid.appendChild(node);
+  section.querySelector("[data-start]")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    startNextPlayableLevel(world);
+  });
+
+  section.querySelectorAll("[data-level]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      startLevelFromMap(Number(btn.dataset.level));
+    });
+  });
+
+  section.querySelector("[data-chest]")?.addEventListener("click", () => {
+    claimWorldTreasure(world);
   });
 }
 

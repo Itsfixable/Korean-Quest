@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="css/chatbot.css" /> 
   </head>
 
-  <body>
+  <body class="kq-motion-loading">
     <header class="container site-header">
       <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
@@ -99,7 +99,7 @@
         <aside class="card">
           <h2>Progress</h2>
 
-          <div class="kpi" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="kpi kq-stagger" style="grid-template-columns: repeat(2, 1fr);">
             <div class="metric">
               <div class="muted">Known</div>
               <div class="kpi-value" id="knownCount">0</div>
@@ -154,7 +154,7 @@
           <button class="btn secondary" id="knownClose" type="button">Close</button>
         </div>
 
-        <div class="known-list" id="knownList">
+        <div class="known-list kq-stagger" id="knownList">
           <!-- JS renders -->
         </div>
       </div>
@@ -164,7 +164,8 @@
     <script type="module" src="./js/main/router.js"></script>
     <script type="module" src="./js/main/auth.js"></script>
     <script type="module" src="./js/main/flashcards.js"></script>
-    <script defer src="js/main/nav-rebuild.js"></script>    
+    <script defer src="js/main/nav-rebuild.js"></script>
+    <script type="module" src="js/main/motion.js"></script>    
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
   </body>
 </html>

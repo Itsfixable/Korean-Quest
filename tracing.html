@@ -13,14 +13,15 @@
     <link rel="stylesheet" href="css/chatbot.css" /> 
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
     <script defer src="js/main/nav-rebuild.js"></script>
+    <script type="module" src="js/main/motion.js"></script>
     <script type="module" src="js/main/auth.js"></script>
-    <script defer src="js/main/state.js"></script>
+    <script type="module" src="js/main/state.js"></script>
     <script type="module" defer src="js/levels/tracing-level.js"></script>
     <script type="module" src="js/main/theme.js"></script>
 
 
   </head>
-  <body>
+  <body class="kq-motion-loading">
      <header class="container site-header">
       <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
@@ -54,7 +55,7 @@
               Character: <strong id="traceChar">ㄱ</strong>
             </div>
             <button class="btn" id="btnClear" type="button">Clear</button>
-            <!-- <button class="btn" id="btnGrade" type="button">Grade</button> -->
+            <button class="btn" id="btnGrade" type="button">Grade</button>
             <!-- <details class="trace-legend">
               <summary>Stroke Order</summary>
               <ol id="strokeLegend"></ol>

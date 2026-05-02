@@ -15,6 +15,7 @@ body {
 
 body {
   margin: 0;
+  padding-top: 80px; /* Space for fixed navbar */
   font-family: "Nunito", sans-serif;
   font-size: 16px;
   line-height: 1.55;
@@ -50,6 +51,38 @@ a:hover {
 
 main {
   background-color: transparent !important;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+body.kq-motion-loading main {
+  opacity: 0;
+  visibility: hidden;
+}
+
+body.kq-motion-ready main {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Keep navbar visible during loading */
+body.kq-motion-loading .site-header,
+body.kq-motion-loading .site-nav,
+body.kq-motion-loading .nav,
+body.kq-motion-loading .brand {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* Prevent navbar animations globally */
+.site-header,
+.site-nav,
+.nav,
+.brand {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 .grid {
@@ -75,8 +108,12 @@ header {
 }
 
 .site-header {
-  width: 100%;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: calc(100% - 24px);
   margin-bottom: 18px;
+  z-index: 3000;
 }
 
 .nav {
@@ -627,6 +664,13 @@ a.btn:focus-visible {
   }
 }
 
+/* Fixed navbar spacing for larger screens */
+@media (min-width: 640px) {
+  body {
+    padding-left: 24px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -635,174 +679,336 @@ a.btn:focus-visible {
     scroll-behavior: auto !important;
   }
 }
-/* =========================
-   NAVBAR LAYOUT FIX
-   ========================= */
 
-.site-header {
-  width: 100%;
+/* =========================================================
+   Korea Quest Motion System
+   Smooth global transitions + page entrance animations
+========================================================= */
+
+:root {
+  --ease-kq: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-pop: cubic-bezier(0.2, 1.2, 0.25, 1);
+  --motion-fast: 220ms;
+  --motion-med: 420ms;
+  --motion-slow: 700ms;
 }
 
-.site-header .nav {
-  width: 100%;
+@keyframes kqPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.site-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-
-  /* prevents Login / Sign Up from dropping */
-  flex-wrap: nowrap;
+/* Universal smooth interaction targets */
+button,
+.pill,
+.card,
+.dashboard-card,
+.resource-card,
+.lesson-card,
+.kq-shop-item,
+.kq-side-link,
+.kq-mobile-link,
+.flashcard,
+.adventure-node,
+.quest-card,
+.stat-card,
+.badge,
+input,
+select,
+textarea {
+  transition:
+    transform var(--motion-med) var(--ease-kq),
+    box-shadow var(--motion-med) var(--ease-kq),
+    background-color var(--motion-med) var(--ease-kq),
+    border-color var(--motion-med) var(--ease-kq),
+    color var(--motion-fast) var(--ease-kq),
+    opacity var(--motion-fast) var(--ease-kq);
 }
 
-/* brand/logo section */
-.site-nav .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+/* Premium card hover lift */
+.card:hover,
+.dashboard-card:hover,
+.resource-card:hover,
+.lesson-card:hover,
+.kq-shop-item:hover,
+.quest-card:hover,
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(25, 38, 70, 0.13);
 }
 
-/* main navigation links */
-.nav-links-desktop {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  margin-left: auto;
-
-  /* keep everything on one row */
-  flex-wrap: nowrap;
+/* Button / pill press feel */
+button:hover,
+.pill:hover,
+.kq-side-link:hover,
+.kq-mobile-link:hover {
+  transform: translateY(-2px);
 }
 
-/* nav buttons (Home / Schedule / etc) */
-.nav-links-desktop .pill {
-  white-space: nowrap;
-  font-family: "Nunito", sans-serif;
-  font-weight: 700;
+button:active,
+.pill:active,
+.kq-side-link:active,
+.kq-mobile-link:active {
+  transform: translateY(1px) scale(0.98);
 }
 
-/* auth container */
-.nav-auth {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  /* prevents shrinking and wrapping */
-  flex-shrink: 0;
+/* Smooth image polish */
+img {
+  transition:
+    transform var(--motion-med) var(--ease-kq),
+    filter var(--motion-med) var(--ease-kq),
+    opacity var(--motion-med) var(--ease-kq);
 }
 
-/* Login / Sign Up button */
-.nav-auth .pill {
-  white-space: nowrap;
-  font-family: "Nunito", sans-serif;
-  font-weight: 700;
+/* Stagger helper for grids/lists */
+
+@keyframes kqFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* logged in username */
-.nav-user-trigger {
-  border: none;
-  background: transparent;
-  font-family: "Nunito", sans-serif;
-  font-weight: 700;
-  font-size: 1rem;
-
-  padding: 10px 12px;
-  border-radius: 999px;
-
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  white-space: nowrap;
+body.kq-motion-ready .card,
+body.kq-motion-ready .dashboard-card,
+body.kq-motion-ready .resource-card,
+body.kq-motion-ready .kq-shop-card,
+body.kq-motion-ready .kq-shop-item,
+body.kq-motion-ready .leaderboard-card,
+body.kq-motion-ready .adventure-node {
+  animation: kqFadeUp 420ms var(--ease-kq) both;
 }
 
-.nav-user-trigger:hover {
-  background: rgba(91,114,159,0.08);
+body.kq-motion-ready .kq-stagger > * {
+  animation: kqFadeUp 700ms var(--ease-kq) both;
 }
 
-/* dropdown arrow */
-.nav-user-caret {
-  font-size: 0.8rem;
-  color: #5b729f;
+body.kq-motion-ready .kq-stagger > *:nth-child(1) { animation-delay: 80ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(2) { animation-delay: 140ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(3) { animation-delay: 200ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(4) { animation-delay: 260ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(5) { animation-delay: 320ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(6) { animation-delay: 240ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(7) { animation-delay: 280ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(8) { animation-delay: 320ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(9) { animation-delay: 360ms; }
+body.kq-motion-ready .kq-stagger > *:nth-child(10) { animation-delay: 400ms; }
+
+/* Pop animation helper */
+.kq-pop-in {
+  animation: kqPopIn 360ms var(--ease-pop) both;
 }
 
-/* dropdown menu */
-.nav-user-menu {
+@keyframes kqPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Progress bars animate smoothly */
+.progress-bar,
+.xp-bar,
+.kq-xp-bar,
+.kq-overall-bar,
+.kq-quest-mini-bar {
+  overflow: hidden;
+}
+
+.progress-bar span,
+.xp-bar span,
+.kq-xp-bar span,
+.kq-overall-bar span,
+.kq-quest-mini-bar span,
+#dBar,
+#kqXpBarFill,
+#kqJourneyBar {
+  transition: width 700ms var(--ease-kq);
+}
+
+/* Nav icon polish */
+.kq-side-link-icon,
+.kq-mobile-link-icon,
+.brand-logo {
+  transition:
+    transform var(--motion-med) var(--ease-pop),
+    filter var(--motion-med) var(--ease-kq);
+}
+
+.kq-side-link:hover .kq-side-link-icon,
+.kq-mobile-link:hover .kq-mobile-link-icon {
+  transform: scale(1.08) rotate(-2deg);
+}
+
+/* Respect accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+.kq-side-link[aria-current="page"] {
+  position: relative;
+}
+
+.kq-side-link[aria-current="page"]::before {
+  content: "";
   position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-
-  min-width: 160px;
-
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.08);
-
-  border-radius: 16px;
-  padding: 8px;
-
-  box-shadow: 0 16px 36px rgba(0,0,0,0.14);
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  border-radius: 999px;
+  background: #5b729f;
 }
 
-.nav-user-menu button {
-  width: 100%;
-  border: none;
-  background: transparent;
+body.kq-transition-out main {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
 
-  font-family: "Nunito", sans-serif;
+.kq-shop-item:hover img {
+  transform: scale(1.08);
+}
+
+.kq-floating-reward {
+  position: fixed;
+  left: 70%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  padding: 0.8rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
   font-weight: 700;
-
-  text-align: left;
-
-  padding: 10px 12px;
-  border-radius: 12px;
-
-  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(25, 38, 70, 0.14);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  animation: kqFloatingReward 900ms ease-out forwards;
 }
 
-.nav-user-menu button:hover {
-  background: rgba(91,114,159,0.10);
+@keyframes kqFloatingReward {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -28px);
+  }
 }
-/* NAVBAR TEXT SIZE FIX */
+/* Adventure map nodes: prevent global hover motion from moving buttons away */
+.kq-start-node:hover,
+.kq-map-node:hover,
+.kq-treasure-chest:hover {
+  transform: translate(-50%, -50%) !important;
+}
 
-.nav-links-desktop .pill {
-  font-size: 0.9rem;   /* ~14.4px instead of 16px */
-  padding: 8px 5px;
+.kq-start-node:active,
+.kq-map-node:active,
+.kq-treasure-chest:active {
+  transform: translate(-50%, -50%) scale(0.98) !important;
 }
 
-.nav-auth .pill {
-  font-size: 0.9rem;
-  padding: 8px 12px;
-}
-
-/* slightly reduce spacing between links */
-.nav-links-desktop {
-  gap: 5px;
-}
 /* =========================
-   MOBILE ADJUSTMENTS
-   ========================= */
-
-@media (max-width: 900px) {
-
-  .nav-links-desktop {
-    gap: 10px;
-  }
-
-  .nav-auth .pill {
-    font-size: 0.95rem;
-  }
-
+   Animated Jamo Star Upgrades
+========================= */
+.kq-jamo-card {
+  position: relative;
+  overflow: hidden;
 }
 
-@media (max-width: 640px) {
+.kq-jamo-card.kq-stars-1,
+.kq-jamo-card.kq-stars-2,
+.kq-jamo-card.kq-stars-3 {
+  animation: kqJamoCardUpgrade 620ms var(--ease-pop, cubic-bezier(0.2, 1.2, 0.25, 1)) both;
+}
 
-  .nav-links-desktop {
-    display: none;
+@keyframes kqJamoCardUpgrade {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
   }
+  60% {
+    transform: translateY(-3px) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
+.kq-star-display {
+  animation: kqStarsPop 720ms var(--ease-pop, cubic-bezier(0.2, 1.2, 0.25, 1)) both;
+}
+
+@keyframes kqStarsPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-8deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.22) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* Gold sparkle sweep */
+.kq-stars-3::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    120deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 65%
+  );
+  transform: translateX(-80%) rotate(12deg);
+  animation: kqGoldSweep 1.1s ease both;
+  pointer-events: none;
+}
+
+@keyframes kqGoldSweep {
+  from {
+    transform: translateX(-80%) rotate(12deg);
+  }
+  to {
+    transform: translateX(80%) rotate(12deg);
+  }
+}
+
+/* Hover polish */
+.kq-jamo-card:hover .kq-star-display {
+  transform: scale(1.08);
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18));
+}
 }

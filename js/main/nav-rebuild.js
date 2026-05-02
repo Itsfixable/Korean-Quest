@@ -922,10 +922,39 @@
     }
   });
 
+  document.body.classList.remove("kq-transition-out");
+
   document.addEventListener("DOMContentLoaded", () => {
     ensureNavStyles();
     ensureAuthModal();
     rebuildNav();
+    document.body.classList.remove("kq-transition-out");
+
+    document.querySelectorAll(".site-nav a[href], .nav a[href], .mobile-nav a[href]").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("#") || link.target === "_blank") return;
+
+      link.addEventListener("click", (event) => {
+        try {
+          const destination = new URL(href, window.location.href);
+          if (destination.origin === window.location.origin && destination.href !== window.location.href) {
+            event.preventDefault();
+            requestAnimationFrame(() => {
+              document.body.classList.add("kq-transition-out");
+              setTimeout(() => {
+                window.location.href = destination.href;
+              }, 240);
+            });
+          }
+        } catch (error) {
+          // ignore invalid URLs
+        }
+      });
+    });
+  });
+
+  window.addEventListener("pageshow", () => {
+    document.body.classList.remove("kq-transition-out");
   });
 
   window.KQ_NAV_ICONS = EXTRA_ICONS;

@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="css/chatbot.css" />
 </head>
 
-<body>
+<body class="kq-motion-loading">
   <!-- Header / Nav -->
   <header class="container site-header">
     <nav class="nav site-nav" aria-label="Primary">
@@ -129,7 +129,7 @@
       <p class="kq-section-tag">Your Roadmap</p>
       <h2>Follow a clear path from beginner to confident learner</h2>
 
-      <ol class="learning-path">
+      <ol class="learning-path kq-stagger">
         <li><strong>Hangul</strong> — write & read consonants (초성/종성), vowels (중성), and build syllables.</li>
         <li><strong>Common Words</strong> — numbers, family, food, school, and everyday essentials.</li>
         <li><strong>Phrases</strong> — greetings, introductions, requests, and likes/dislikes.</li>
@@ -167,6 +167,7 @@
   <script type="module" src="js/main/state.js?v=2"></script>
   <script type="module" src="js/main/theme.js"></script>
   <script defer src="js/main/nav-rebuild.js"></script>
+    <script type="module" src="js/main/motion.js"></script>
   <script type="module" src="js/main/index-stats.js"></script>
   <script type="module" src="./js/main/chatbot.js?v=5"></script>
   <script type="module" src="js/main/home-layout.js"></script>

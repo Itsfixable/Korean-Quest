@@ -1,4 +1,5 @@
 /* state.js — central game state, progression, achievements, adventure unlocks, guide bubbles */
+import { showReward } from "../utils/animations.js";
 
 export const KQ_VERSION = "1.6.0";
 const GUIDE_BUBBLE_PREF_KEY = "kq-guide-bubbles-enabled";
@@ -361,6 +362,10 @@ export function addXP(amount, options = {}) {
 
   updateWeeklyProgress(safeAmount);
 
+  if (safeAmount > 0) {
+    showReward(`+${safeAmount} XP`);
+  }
+
   if (s.player.totalXPEarned >= 250) addBadge("XP Collector");
 
   if (countForQuest) {
@@ -373,7 +378,13 @@ export function addXP(amount, options = {}) {
 
 export function addCoins(amount) {
   const s = load();
-  s.player.coins += Math.max(0, Number(amount) || 0);
+  const amountValue = Math.max(0, Number(amount) || 0);
+  s.player.coins += amountValue;
+
+  if (amountValue > 0) {
+    showReward(`+${amountValue} coins`);
+  }
+
   save();
   emit("state:changed", s);
 }

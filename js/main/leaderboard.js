@@ -418,7 +418,7 @@ function renderLeaderboard() {
   const table = ensureTable(card);
   const tbody = table.querySelector("tbody");
   if (!tbody) return;
-
+  tableBody.classList.add("kq-stagger");
   tbody.innerHTML = rows
     .map((row, index) => {
       const medal = medalForName(index);

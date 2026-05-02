@@ -435,7 +435,10 @@ function renderXPBar(player) {
   if (!bar) return;
 
   const pct = clamp(Math.round((player.xp / needXP(player.level)) * 100), 0, 100);
-  bar.style.width = `${pct}%`;
+  bar.style.width = "0%";
+  setTimeout(() => {
+    bar.style.width = `${pct}%`;
+  }, 50);
   bar.setAttribute("aria-valuenow", String(pct));
 }
 
@@ -523,7 +526,12 @@ function renderJourney(progress, player, achievements) {
   const percent = computeJourneyPercent(progress, player);
 
   const bar = document.getElementById("kqJourneyBar");
-  if (bar) bar.style.width = `${percent}%`;
+  if (bar) {
+  bar.style.width = "0%";
+  setTimeout(() => {
+    bar.style.width = `${percent}%`;
+  }, 50);
+}
 
   setText("kqJourneyLabel", `${percent}% complete`);
   setText("kqJourneyUnlock", `Adventure unlocked through Level ${adventure.cap}`);
@@ -544,7 +552,7 @@ function renderJourney(progress, player, achievements) {
       '<div class="kq-achievement-empty">No badges yet — finish a lesson or win a battle to start collecting achievements.</div>';
     return;
   }
-
+  grid.classList.add("kq-stagger");
   grid.innerHTML = achievements
     .map(
       (badge) => `
@@ -623,6 +631,10 @@ function renderDashboard() {
   renderRecentWork(progress);
   renderJourney(progress, player, achievements);
   renderProfileCard(player);
+
+  requestAnimationFrame(() => {
+    document.body.classList.add("kq-motion-ready");
+  });
 }
 
 renderDashboard();

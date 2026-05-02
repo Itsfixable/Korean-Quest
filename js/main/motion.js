@@ -15,7 +15,7 @@ export function initMotion() {
     const dx = (mouseX - cx) / cx;
     const dy = (mouseY - cy) / cy;
 
-    elements.forEach(el => {
+    elements.forEach((el) => {
       const depth = parseFloat(el.dataset.depth) || 5;
 
       const moveX = dx * depth;
@@ -30,4 +30,19 @@ export function initMotion() {
     mouseY = e.clientY;
     requestAnimationFrame(update);
   });
+}
+
+export function startMotion() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.body.classList.remove("kq-motion-loading");
+      document.body.classList.add("kq-motion-ready");
+    });
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", startMotion);
+} else {
+  startMotion();
 }

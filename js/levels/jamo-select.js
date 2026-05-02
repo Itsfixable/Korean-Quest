@@ -39,12 +39,82 @@ const JAMO = [
 
 function starsHTML(n){ return `<span>${'⭐'.repeat(n)}${'☆'.repeat(3-n)}</span>`; }
 
+function ensureJamoStarStyles() {
+  if (document.getElementById("kq-jamo-star-styles")) return;
+
+  const style = document.createElement("style");
+  style.id = "kq-jamo-star-styles";
+  style.textContent = `
+    .kq-jamo-card {
+      transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+    }
+
+    .kq-jamo-card:hover {
+      transform: translateY(-6px) scale(1.05);
+    }
+
+    .kq-stars-0 {
+      background: linear-gradient(180deg, #f4f6fb, #e6ebf5);
+      color: #1f2937;
+    }
+
+    .kq-stars-1 {
+      background: linear-gradient(180deg, #d6a36a, #b97c3c);
+      box-shadow: 0 10px 20px rgba(165, 107, 49, 0.35);
+      color: #2a1a0c;
+    }
+
+    .kq-stars-2 {
+      background: linear-gradient(180deg, #d7dde6, #aab4c4);
+      box-shadow: 0 10px 20px rgba(140, 150, 165, 0.35);
+      color: #1e2630;
+    }
+
+    .kq-stars-3 {
+      background: linear-gradient(180deg, #ffe38a, #d4a92c);
+      box-shadow: 0 12px 24px rgba(212, 169, 44, 0.45);
+      color: #3a2a00;
+    }
+
+    .kq-star-display {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin-top: 10px;
+      letter-spacing: 0.8px;
+    }
+
+    .kq-stars-1:hover,
+    .kq-stars-1:focus-visible {
+      background: linear-gradient(180deg, #d6a36a, #b97c3c) !important;
+      box-shadow: 0 10px 20px rgba(165, 107, 49, 0.35) !important;
+    }
+
+    .kq-stars-2:hover,
+    .kq-stars-2:focus-visible {
+      background: linear-gradient(180deg, #d7dde6, #aab4c4) !important;
+      box-shadow: 0 10px 20px rgba(140, 150, 165, 0.35) !important;
+    }
+
+    .kq-stars-3:hover,
+    .kq-stars-3:focus-visible {
+      background: linear-gradient(180deg, #ffe38a, #d4a92c) !important;
+      box-shadow: 0 12px 24px rgba(212, 169, 44, 0.45) !important;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
 if (GRID) {
+  ensureJamoStarStyles();
+
   GRID.innerHTML = JAMO.map(({ ch, kind }) => {
     const earned = getJamoStars(ch);
+
     return `
       <article
-        class="aw-level-card"
+        class="aw-level-card kq-jamo-card kq-stars-${earned}"
         data-char="${ch}"
         role="listitem"
         tabindex="0"
@@ -63,24 +133,11 @@ if (GRID) {
             aria-label="Stroke order preview for ${ch}"
           ></canvas>
         </div>
+
+        <div class="kq-star-display">${starsHTML(earned)}</div>
       </article>
     `;
   }).join("");
-  //   return `
-  //     <article class="aw-level-card" role="button" tabindex="0" data-char="${ch}" aria-label="Practice ${ch}">
-  //       <header class="flex" style="justify-content:space-between">
-  //         <h3>${ch}</h3>
-  //         <span class="btn id-badge">${kind}</span>
-  //       </header>
-  //       <div class="muted">Progress: ${starsHTML(earned)}</div>
-  //       <canvas width="128" height="128" data-char="${ch}" aria-label="${ch} stroke preview"></canvas>
-  //       <div class="flex">
-  //         <a class="btn" href="${TRACE_URL}?char=${encodeURIComponent(ch)}">Practice</a>
-          
-  //       </div>
-  //     </article>
-  //   `;
-  // }).join("");
 
   /* Whole card navigates to tracing (except Replay button) */
   GRID.querySelectorAll(".aw-level-card").forEach(card => {

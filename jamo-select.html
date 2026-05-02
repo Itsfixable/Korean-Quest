@@ -9,6 +9,7 @@
   <script type="module" src="js/main/auth.js"></script>
   <script type="module" src="js/main/theme.js"></script>
   <script defer src="js/main/nav-rebuild.js"></script>
+    <script type="module" src="js/main/motion.js"></script>
   <link rel="stylesheet" href="css/master.css" />
   <link rel="stylesheet" href="css/contrast-overrides.css" />
 
@@ -43,7 +44,7 @@
     .aw-level-card header h3 { margin: 0; }
   </style>
 </head>
-<body>
+<body class="kq-motion-loading">
     <header class="container site-header">
       <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
@@ -62,7 +63,7 @@
       <p class="muted">Tap a character to practice. The preview animates the <strong>traditional stroke order</strong>. 
 
       <!-- REAL GRID (5 cols desktop → 3/2/1 responsive) -->
-      <div class="aw-grid" id="jamoGrid" role="list">
+      <div class="aw-grid kq-stagger" id="jamoGrid" role="list">
         <!-- JS populates the cards -->
       </div>
 

@@ -15,14 +15,15 @@
     <link rel="stylesheet" href="css/chatbot.css" /> 
 
     <script type="module" src="js/main/auth.js"></script>
-    <script defer src="js/main/state.js"></script>
+    <script type="module" src="js/main/state.js"></script>
     <script defer type="module" src="js/main/adventure.js"></script>
     <script type="module" src="js/main/theme.js"></script>
     <script type="module" src="./js/main/chatbot.js?v=5"></script>
     <script defer src="js/main/nav-rebuild.js"></script>
+    <script type="module" src="js/main/motion.js"></script>
 
   </head>
-  <body>
+  <body class="kq-motion-loading">
     <header class="container site-header">
       <nav class="nav site-nav" aria-label="Primary">
         <a class="brand" href="index.html" aria-label="Korean Quest Home">
@@ -57,7 +58,7 @@
 
         <p class="muted">Pick a node to start a battle. Correct answers power up your attacks — miss and the monster strikes back!</p>
         <section class="adventure-levels-wrapper">
-          <div class="map" id="mapGrid">
+          <div class="map kq-stagger kq-treasure-map" id="mapGrid">
             <!-- JS populates nodes -->
           </div>
         </section>  
@@ -97,7 +98,7 @@
             <div class="muted" id="turnHint">Answer to attack!</div>
           </div>
           <p id="qPrompt" style="font-size:1.05rem; margin:8px 0">—</p>
-          <div id="qChoices" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:8px;">
+          <div id="qChoices" class="grid kq-stagger" style="grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:8px;">
             <!-- buttons injected -->
           </div>
           <div class="muted" id="qFeedback" style="margin-top:6px"></div>
