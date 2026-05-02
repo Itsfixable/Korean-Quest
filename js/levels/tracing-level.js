@@ -500,6 +500,7 @@ function awardStageStar(starCount) {
     setScore(`✅ Stage ${starCount} already completed.<br>${starsHTML(prev)}`);
   }
 
+  stage = Math.min(3, Math.max(stage + 1, starCount + 1));
   clearInk();
   updateStageUI();
   render();
