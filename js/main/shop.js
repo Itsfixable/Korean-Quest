@@ -45,9 +45,18 @@ function getInitials(name) {
 
 function renderItemVisual(item, extraClass = "") {
   if (item?.image) {
-    return `<img src="${item.image}" alt="${item.name}" class="kq-shop-art ${extraClass}" />`;
+    return `
+      <!-- IMAGE HERE: ${item.name} -->
+      <img src="${item.image}" alt="${item.name}" class="kq-shop-art ${extraClass}" />
+    `;
   }
-  return `<div class="kq-shop-emoji ${extraClass}" aria-hidden="true">${item?.emoji || "✨"}</div>`;
+
+  return `
+    <!-- IMAGE HERE: ${item?.name || "Shop Item"} -->
+    <div class="kq-shop-placeholder ${extraClass}" aria-hidden="true">
+      <span>IMAGE HERE</span>
+    </div>
+  `;
 }
 
 function ensureStyles() {
@@ -71,44 +80,19 @@ function ensureStyles() {
       box-shadow: 0 12px 28px rgba(0,0,0,0.06);
     }
 
-    .kq-shop-hero {
-      display: grid;
-      grid-template-columns: 1.2fr 260px;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .kq-shop-hero h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 3vw, 3rem);
-      line-height: 1;
-    }
-
-    .kq-shop-hero p {
-      margin: 0;
-      color: var(--muted, #5e6678);
-      font-size: 1.08rem;
-      font-weight: 700;
-      line-height: 1.55;
-      max-width: 720px;
-    }
-
-    .kq-shop-mascot {
-      min-height: 180px;
-      border-radius: 24px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, rgba(248,244,225,0.96), rgba(255,255,255,0.96));
-      border: 1px solid rgba(0,0,0,0.06);
-      font-size: 5.2rem;
-      overflow: hidden;
-    }
-
-    .kq-shop-mascot img {
+    .kq-shop-banner {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #ffffff;
+    }
+
+    .kq-shop-banner img {
+      width: 100%;
       display: block;
+      object-fit: cover;
     }
 
     .kq-shop-top-strip {
@@ -311,15 +295,6 @@ function ensureStyles() {
       overflow: hidden;
     }
 
-    .kq-shop-item-frame {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      font-size: 1.8rem;
-      pointer-events: none;
-    }
-
     .kq-shop-art {
       width: 82%;
       height: 82%;
@@ -327,9 +302,34 @@ function ensureStyles() {
       display: block;
     }
 
-    .kq-shop-emoji {
-      font-size: 4.6rem;
-      line-height: 1;
+    .kq-shop-placeholder {
+      width: 82%;
+      height: 82%;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: repeating-linear-gradient(
+        45deg,
+        #e3e8f2,
+        #e3e8f2 10px,
+        #d4dbe8 10px,
+        #d4dbe8 20px
+      );
+      color: #5b729f;
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      border: 2px dashed rgba(91,114,159,0.3);
+      text-align: center;
+      padding: 10px;
+    }
+
+    .kq-shop-item-frame {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
     }
 
     .kq-shop-item h3 {
@@ -420,10 +420,6 @@ function ensureStyles() {
     }
 
     @media (max-width: 1080px) {
-      .kq-shop-hero {
-        grid-template-columns: 1fr;
-      }
-
       .kq-shop-progress-shell {
         grid-template-columns: 1fr;
       }
@@ -461,12 +457,8 @@ function ensureShell() {
   shell.id = "kqShopPage";
   shell.className = "kq-shop-page";
   shell.innerHTML = `
-    <section class="kq-shop-card kq-shop-hero">
-      <div>
-        <h1>Shop</h1>
-        <p>Spend your coins to get new avatars, frames, backgrounds, flairs, pets, and profile titles.</p>
-      </div>
-      <div class="kq-shop-mascot" id="kqShopMascot">🐰</div>
+    <section class="kq-shop-banner" aria-label="Shop banner">
+      <img src="favicon/shop/shopBanner.png" alt="Shop — spend coins, customize your profile, and unlock rewards" />
     </section>
 
     <section class="kq-shop-card kq-shop-top-strip">
@@ -519,7 +511,9 @@ function renderUserBlock(profile) {
   wrap.innerHTML = `
     <div class="kq-shop-user-avatar">
       ${avatarHtml}
-      <div class="kq-avatar-frame">${profile.frame?.emoji || "☁️"}</div>
+      <div class="kq-avatar-frame">
+        ${profile.frame?.image ? `<img src="${profile.frame.image}" alt="" />` : ""}
+      </div>
     </div>
     <div class="kq-shop-user-copy">
       <h2>${username}</h2>
@@ -534,9 +528,11 @@ function renderTopStats(player, equipped) {
 
   $("#kqLevelChip").textContent = `Level ${player.level}`;
   $("#kqXpBarFill").style.width = "0%";
+
   setTimeout(() => {
     $("#kqXpBarFill").style.width = `${xpPct}%`;
   }, 50);
+
   $("#kqXpText").textContent = `${player.xp} / ${xpNeeded} XP`;
   $("#kqCoinCount").textContent = `🪙 ${player.coins}`;
   $("#kqBadgeCount").textContent = `🏅 ${player.badges?.length || 0}`;
@@ -564,21 +560,21 @@ function renderTabs() {
   });
 }
 
-function renderEquippedSummary(profile, equipped) {
+function renderEquippedSummary(profile) {
   const wrap = $("#kqEquippedSummary");
   if (!wrap) return;
 
   const chips = [];
 
-  if (profile.avatar) chips.push(`<span class="kq-equip-chip">${profile.avatar.emoji || "✨"} ${profile.avatar.name}</span>`);
-  if (profile.frame) chips.push(`<span class="kq-equip-chip">${profile.frame.emoji || "✨"} ${profile.frame.name}</span>`);
-  if (profile.background) chips.push(`<span class="kq-equip-chip">${profile.background.emoji || "✨"} ${profile.background.name}</span>`);
-  if (profile.title) chips.push(`<span class="kq-equip-chip">${profile.title.emoji || "✨"} ${profile.title.name}</span>`);
+  if (profile.avatar) chips.push(`<span class="kq-equip-chip">${profile.avatar.name}</span>`);
+  if (profile.frame) chips.push(`<span class="kq-equip-chip">${profile.frame.name}</span>`);
+  if (profile.background) chips.push(`<span class="kq-equip-chip">${profile.background.name}</span>`);
+  if (profile.title) chips.push(`<span class="kq-equip-chip">${profile.title.name}</span>`);
 
   if (profile.flair) {
     chips.push(`
       <span class="kq-equip-chip">
-        ${profile.flair.emoji || "✨"} ${profile.flair.name}
+        ${profile.flair.name}
         <button type="button" data-clear="flair">Clear</button>
       </span>
     `);
@@ -587,13 +583,13 @@ function renderEquippedSummary(profile, equipped) {
   if (profile.pet) {
     chips.push(`
       <span class="kq-equip-chip">
-        ${profile.pet.emoji || "✨"} ${profile.pet.name}
+        ${profile.pet.name}
         <button type="button" data-clear="pet">Clear</button>
       </span>
     `);
   }
 
-  wrap.innerHTML = chips.join("");
+  wrap.innerHTML = chips.length ? chips.join("") : `<span class="kq-equip-chip">No cosmetics equipped yet</span>`;
 
   wrap.querySelectorAll("[data-clear]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -615,7 +611,7 @@ function renderGrid(items, ownedIds, equipped) {
       <article class="kq-shop-item">
         <div class="kq-shop-item-visual">
           ${renderItemVisual(item)}
-          ${item.slot === "frame" ? `<div class="kq-shop-item-frame">${item.emoji || "✨"}</div>` : ""}
+          ${item.slot === "frame" && item.image ? `<div class="kq-shop-item-frame"><img src="${item.image}" alt="" /></div>` : ""}
         </div>
 
         <div>
@@ -669,7 +665,7 @@ function render() {
   renderUserBlock(profile);
   renderTopStats(player, equipped);
   renderTabs();
-  renderEquippedSummary(profile, equipped);
+  renderEquippedSummary(profile);
   renderGrid(items, ownedIds, equipped);
 
   requestAnimationFrame(() => {
