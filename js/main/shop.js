@@ -22,6 +22,17 @@ const CATEGORIES = [
   ["titles", "Titles"],
 ];
 
+const AVATAR_IMAGE_OVERRIDES = [
+  "favicon/shop/avatars/avatar1.png",
+  "favicon/shop/avatars/avatar2.png",
+  "favicon/shop/avatars/avatar3.png",
+  "favicon/shop/avatars/avatar4.png",
+  "favicon/shop/avatars/avatar5.png",
+  "favicon/shop/avatars/avatar6.png",
+  "favicon/shop/avatars/avatar7.png",
+  "favicon/shop/avatars/avatar8.png",
+];
+
 let activeCategory = "avatars";
 
 function $(sel) {
@@ -282,6 +293,42 @@ function ensureStyles() {
       gap: 14px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.04);
     }
+      .kq-shop-item {
+        transition:
+          transform 260ms var(--ease-pop, cubic-bezier(0.2, 1.2, 0.25, 1)),
+          box-shadow 260ms ease,
+          border-color 260ms ease,
+          background 260ms ease;
+      }
+
+      .kq-shop-item.is-selected {
+        transform: scale(1.045);
+        border-color: rgba(91,114,159,0.45);
+        box-shadow:
+          0 18px 36px rgba(91,114,159,0.22),
+          0 0 0 4px rgba(91,114,159,0.12);
+        background: linear-gradient(180deg, rgba(239,246,255,0.98), rgba(255,252,246,0.98));
+        z-index: 2;
+      }
+
+      .kq-shop-item.is-selected::before {
+        content: "Selected";
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 5;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #6d84b7, #5971a1);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 900;
+        box-shadow: 0 6px 14px rgba(91,114,159,0.22);
+      }
+
+      .kq-shop-item {
+        position: relative;
+      }
 
     .kq-shop-item-visual {
       width: 100%;
@@ -419,6 +466,96 @@ function ensureStyles() {
       padding: 0;
     }
 
+    .kq-avatar-shop-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .kq-avatar-card {
+      padding: 12px;
+      border-radius: 20px;
+      gap: 8px;
+      background: linear-gradient(180deg, #fffdf9, #fff7f0);
+    }
+
+    .kq-avatar-card .kq-shop-item-visual {
+      aspect-ratio: 1.1 / 1.4;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fff7ef, #eef6ff);
+    }
+
+    .kq-avatar-card .kq-shop-art {
+      width: 100%;
+      height: 98%;
+      object-fit: contain;
+      padding: 4px;
+    }
+
+    .kq-avatar-card h3 {
+      font-size: 0.86rem;
+      margin-top: 4px;
+    }
+
+    .kq-avatar-card .kq-shop-rarity {
+      font-size: 0.72rem;
+    }
+
+    .kq-avatar-card .kq-shop-buy-row {
+      gap: 6px;
+    }
+
+    .kq-avatar-card .kq-shop-price-btn,
+    .kq-avatar-card .kq-shop-equip-btn {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+    }
+
+    .kq-avatar-card.is-selected {
+      transform: scale(1.045);
+      border-color: #C6E2CB;
+      box-shadow:
+        0 14px 28px rgba(198, 226, 203, 0.22),
+        0 0 0 4px rgba(198, 226, 203, 0.14);
+    }
+
+    .kq-avatar-card.is-selected .kq-shop-equip-btn {
+      background: #6a9f71;
+      color: #ffffff;
+    }
+
+    .kq-avatar-card.is-coming-soon {
+      opacity: 0.72;
+      filter: grayscale(0.2);
+    }
+
+    .kq-avatar-lock {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      background: rgba(255,255,255,0.52);
+      backdrop-filter: blur(1px);
+    }
+
+    /* Zoom out avatars 1-3 */
+    .kq-avatar-card[data-avatar-index="0"] .kq-shop-art,
+    .kq-avatar-card[data-avatar-index="1"] .kq-shop-art,
+    .kq-avatar-card[data-avatar-index="2"] .kq-shop-art {
+      width: 92%;
+      height: 92%;
+    }
+
+    /* Zoom in avatars 4-7 */
+    .kq-avatar-card[data-avatar-index="3"] .kq-shop-art,
+    .kq-avatar-card[data-avatar-index="4"] .kq-shop-art,
+    .kq-avatar-card[data-avatar-index="5"] .kq-shop-art,
+    .kq-avatar-card[data-avatar-index="6"] .kq-shop-art {
+      width: 120%;
+      height: 120%;
+    }
+
     @media (max-width: 1080px) {
       .kq-shop-progress-shell {
         grid-template-columns: 1fr;
@@ -483,10 +620,6 @@ function ensureShell() {
 
     <section class="kq-shop-card">
       <div id="kqShopTabs" class="kq-shop-tabs"></div>
-    </section>
-
-    <section class="kq-shop-card">
-      <div id="kqEquippedSummary" class="kq-shop-equip-summary"></div>
     </section>
 
     <section class="kq-shop-grid kq-stagger" id="kqShopGrid"></section>
@@ -603,20 +736,32 @@ function renderGrid(items, ownedIds, equipped) {
   const grid = $("#kqShopGrid");
   if (!grid) return;
 
-  grid.innerHTML = items.map((item) => {
+  const visibleItems =
+    activeCategory === "avatars"
+      ? items.slice(0, 7).map((item, index) => ({
+          ...item,
+          image: AVATAR_IMAGE_OVERRIDES[index],
+        }))
+      : items;
+
+  grid.classList.toggle("kq-avatar-shop-grid", activeCategory === "avatars");
+
+  grid.innerHTML = visibleItems.map((item, index) => {
     const isOwned = ownedIds.has(item.id);
     const isEquipped = equipped[item.slot] === item.id;
+    const isComingSoon = false;
 
     return `
-      <article class="kq-shop-item">
+      <article class="kq-shop-item ${activeCategory === "avatars" ? "kq-avatar-card" : ""} ${isEquipped ? "is-selected" : ""}" data-avatar-index="${index}">
         <div class="kq-shop-item-visual">
           ${renderItemVisual(item)}
-          ${item.slot === "frame" && item.image ? `<div class="kq-shop-item-frame"><img src="${item.image}" alt="" /></div>` : ""}
         </div>
 
         <div>
           <h3>${item.name}</h3>
-          <div class="kq-shop-rarity kq-rarity-${String(item.rarity || "common").toLowerCase()}">${item.rarity}</div>
+          <div class="kq-shop-rarity kq-rarity-${String(item.rarity || "common").toLowerCase()}">
+            ${item.rarity}
+          </div>
         </div>
 
         <div class="kq-shop-buy-row">
@@ -625,8 +770,14 @@ function renderGrid(items, ownedIds, equipped) {
           </button>
 
           ${isOwned ? `
-            <button class="kq-shop-equip-btn ${isEquipped ? "is-equipped" : ""}" type="button" data-equip="${item.id}">
-              ${isEquipped ? "Equipped" : "Equip"}
+            <button
+              class="kq-shop-equip-btn ${isEquipped ? "is-equipped" : ""}"
+              type="button"
+              data-equip="${item.id}"
+              data-slot="${item.slot}"
+              data-equipped="${isEquipped ? "true" : "false"}"
+            >
+              ${isEquipped ? "Equipped ✓" : "Equip"}
             </button>
           ` : ""}
         </div>
@@ -640,18 +791,37 @@ function renderGrid(items, ownedIds, equipped) {
       if (!result.ok && result.reason === "coins") {
         window.alert("You do not have enough coins for that item yet.");
       }
-      render();
+      renderSoft();
     });
   });
 
   grid.querySelectorAll("[data-equip]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      equipShopItem(btn.dataset.equip);
-      render();
+      const slot = btn.dataset.slot;
+      const alreadyEquipped = btn.dataset.equipped === "true";
+
+      if (alreadyEquipped) {
+        unequipShopSlot(slot);
+      } else {
+        equipShopItem(btn.dataset.equip);
+      }
+
+      renderSoft();
     });
   });
 }
+function renderSoft() {
+  const player = getPlayer();
+  const equipped = getEquippedCosmetics();
+  const profile = getEquippedProfile();
+  const ownedIds = new Set(getOwnedItemIds());
+  const items = getShopCatalog(activeCategory);
 
+  renderUserBlock(profile);
+  renderTopStats(player, equipped);
+  renderEquippedSummary(profile);
+  renderGrid(items, ownedIds, equipped);
+}
 function render() {
   ensureStyles();
   ensureShell();

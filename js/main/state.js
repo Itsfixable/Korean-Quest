@@ -805,11 +805,14 @@ export function mountGuideBubble(messages = [], options = {}) {
 ========================= */
 
 export const KQ_SHOP_CATALOG = [
-  { id: "avatar-sejong", name: "King Sejong", emoji: "👑", image: "", category: "avatars", slot: "avatar", cost: 0, rarity: "starter", description: "A starter avatar inspired by Korean learning and leadership." },
-  { id: "avatar-bunny", name: "Bunny Pal", emoji: "🐰", image: "", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A playful bunny-themed shop avatar." },
-  { id: "avatar-tiger", name: "Tiger Spirit", emoji: "🐯", image: "", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A bold tiger avatar for confident learners." },
-  { id: "avatar-scholar", name: "Scholar Spirit", emoji: "📚", image: "", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A bookish profile look for focused students." },
-  { id: "avatar-kitty", name: "Kitty Pal", emoji: "🐱", image: "", category: "avatars", slot: "avatar", cost: 120, rarity: "epic", description: "A premium companion avatar." },
+  { id: "avatar-sejong", name: "King Sejong", emoji: "👑", image: "favicon/shop/avatars/avatar1.png", category: "avatars", slot: "avatar", cost: 0, rarity: "starter", description: "A starter avatar inspired by Korean learning and leadership." },
+  { id: "avatar-bunny", name: "Bunny Pal", emoji: "🐰", image: "favicon/shop/avatars/avatar2.png", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A playful bunny-themed shop avatar." },
+  { id: "avatar-tiger", name: "Tiger Spirit", emoji: "🐯", image: "favicon/shop/avatars/avatar3.png", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A bold tiger avatar for confident learners." },
+  { id: "avatar-scholar", name: "Scholar Spirit", emoji: "📚", image: "favicon/shop/avatars/avatar4.png", category: "avatars", slot: "avatar", cost: 90, rarity: "rare", description: "A bookish profile look for focused students." },
+  { id: "avatar-kitty", name: "Kitty Pal", emoji: "🐱", image: "favicon/shop/avatars/avatar5.png", category: "avatars", slot: "avatar", cost: 120, rarity: "epic", description: "A premium companion avatar." },
+  { id: "avatar-6", name: "Royal Chef", emoji: "👨‍🍳", image: "favicon/shop/avatars/avatar6.png", category: "avatars", slot: "avatar", cost: 100, rarity: "rare", description: "A chef avatar for culinary learners." },
+  { id: "avatar-7", name: "Adventure Hero", emoji: "🧗", image: "favicon/shop/avatars/avatar7.png", category: "avatars", slot: "avatar", cost: 100, rarity: "rare", description: "An adventurous spirit avatar." },
+  { id: "avatar-8", name: "Coming Soon", emoji: "🔒", image: "favicon/shop/avatars/avatar8.png", category: "avatars", slot: "avatar", cost: 150, rarity: "epic", description: "Stay tuned for this exclusive avatar." },
 
   { id: "frame-cloud", name: "Cloud Frame", emoji: "☁️", image: "", category: "frames", slot: "frame", cost: 0, rarity: "starter", description: "A clean starter frame." },
   { id: "frame-jade", name: "Jade Frame", emoji: "💚", image: "", category: "frames", slot: "frame", cost: 70, rarity: "common", description: "A calm green border frame." },

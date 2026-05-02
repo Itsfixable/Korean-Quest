@@ -328,6 +328,200 @@ function ensureStyles() {
       background: #4f648a;
     }
 
+    .kq-cosmetics-display {
+      width: 100%;
+      min-height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(240,245,255,0.6), rgba(255,252,246,0.8));
+      border: 1px solid rgba(91,114,159,0.12);
+      position: relative;
+    }
+
+    .student-dashboard-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .kq-scene-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 40px 30px 30px;
+      overflow: hidden;
+      min-height: 320px;
+    }
+
+    .kq-scene-background {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .kq-scene-background .kq-bg-image,
+    .kq-scene-background .kq-bg-emoji {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      font-size: 8rem;
+      display: grid;
+      place-items: center;
+      color: rgba(91,114,159,0.08);
+    }
+
+    .kq-scene-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.75));
+      backdrop-filter: blur(12px);
+      z-index: 1;
+    }
+
+    /* Pet companion (left side) */
+    .kq-scene-pet {
+      position: absolute;
+      left: 20px;
+      bottom: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 5;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .kq-scene-pet img,
+    .kq-scene-pet span {
+      font-size: 2.5rem;
+      display: grid;
+      place-items: center;
+      width: 70px;
+      height: 70px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255,255,255,0.5);
+      object-fit: contain;
+      padding: 8px;
+    }
+
+    .kq-pet-label {
+      font-size: 0.7rem;
+      font-weight: 900;
+      color: #5b729f;
+      text-align: center;
+      max-width: 80px;
+      line-height: 1.1;
+    }
+
+    /* Main avatar (center) */
+    .kq-scene-avatar-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 15px;
+      height: 240px;
+    }
+
+    .kq-scene-frame {
+      position: absolute;
+      top: -20px;
+      z-index: 11;
+      font-size: 3rem;
+      width: 180px;
+      height: 180px;
+      display: grid;
+      place-items: center;
+      color: rgba(91,114,159,0.3);
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.12));
+    }
+
+    .kq-scene-avatar {
+      width: 140px;
+      height: 240px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,248,255,0.9));
+      border: 3px solid rgba(91,114,159,0.2);
+      box-shadow:
+        0 20px 48px rgba(91,114,159,0.25),
+        inset 0 0 0 1px rgba(255,255,255,0.8);
+      position: relative;
+      z-index: 12;
+      overflow: hidden;
+    }
+
+    .kq-scene-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 8px;
+    }
+
+    .kq-scene-avatar span {
+      font-size: 3.5rem;
+    }
+
+    /* Nameplate and info */
+    .kq-scene-nameplate {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 15;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(91,114,159,0.18);
+      border-radius: 14px;
+      padding: 10px 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      min-width: 260px;
+    }
+
+    .kq-scene-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .kq-scene-items span {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(91,114,159,0.08);
+      color: #5b729f;
+      font-size: 0.75rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
     @media (max-width: 860px) {
       .kq-learning-row {
         grid-template-columns: 1fr;
@@ -339,6 +533,22 @@ function ensureStyles() {
 
       .kq-profile-top {
         grid-template-columns: 1fr;
+      }
+
+      .kq-scene-avatar-container {
+        height: 200px;
+      }
+
+      .kq-scene-avatar {
+        width: 120px;
+        height: 200px;
+      }
+
+      .kq-scene-frame {
+        font-size: 2.5rem;
+        width: 150px;
+        height: 150px;
+        top: -15px;
       }
     }
   `;
@@ -428,6 +638,67 @@ function ensureProfileCard() {
   }
 
   return card;
+}
+
+function renderCosmeticsDisplay() {
+  const dashboardRight = document.querySelector(".student-dashboard-right");
+  if (!dashboardRight) return;
+
+  const profile = getEquippedProfile();
+
+  // Create a cinematic scene composition
+  dashboardRight.innerHTML = `
+    <div class="kq-scene-stage">
+      <!-- Background layer -->
+      <div class="kq-scene-background">
+        ${
+          profile.background?.image
+            ? `<img src="${profile.background.image}" alt="${profile.background.name}" class="kq-bg-image" />`
+            : `<div class="kq-bg-emoji">${profile.background?.emoji || "🏯"}</div>`
+        }
+        <div class="kq-scene-overlay"></div>
+      </div>
+
+      <!-- Pet companion (left side) -->
+      ${
+        profile.pet
+          ? `
+            <div class="kq-scene-pet">
+              ${
+                profile.pet.image
+                  ? `<img src="${profile.pet.image}" alt="${profile.pet.name}" />`
+                  : `<span>${profile.pet.emoji}</span>`
+              }
+              <div class="kq-pet-label">${profile.pet.name}</div>
+            </div>
+          `
+          : ""
+      }
+
+      <!-- Main avatar (center) -->
+      <div class="kq-scene-avatar-container">
+        <div class="kq-scene-frame">
+          ${profile.frame?.emoji || "☁️"}
+        </div>
+        <div class="kq-scene-avatar">
+          ${
+            profile.avatar?.image
+              ? `<img src="${profile.avatar.image}" alt="${profile.avatar.name}" />`
+              : `<span>${profile.avatar?.emoji || "👑"}</span>`
+          }
+        </div>
+      </div>
+
+      <!-- Title and info (bottom) -->
+      <div class="kq-scene-nameplate">
+        <div class="kq-scene-items">
+          ${profile.avatar ? `<span>${profile.avatar.emoji} ${profile.avatar.name}</span>` : ""}
+          ${profile.pet ? `<span>${profile.pet.emoji} ${profile.pet.name}</span>` : ""}
+          ${profile.background ? `<span>${profile.background.emoji} ${profile.background.name}</span>` : ""}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderXPBar(player) {
@@ -581,7 +852,13 @@ function renderProfileCard(player) {
       <div class="kq-profile-head">
         <div class="kq-profile-avatar-wrap">
           <div class="kq-profile-bg">${profile.background?.emoji || "🏯"}</div>
-          <div class="kq-profile-avatar">${profile.avatar?.emoji || "👑"}</div>
+          <div class="kq-profile-avatar">
+            ${
+              profile.avatar?.image
+                ? `<img src="${profile.avatar.image}" alt="${profile.avatar.name}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; padding: 8px;" />`
+                : profile.avatar?.emoji || "👑"
+            }
+          </div>
           <div class="kq-profile-frame">${profile.frame?.emoji || "☁️"}</div>
         </div>
 
@@ -604,9 +881,7 @@ function renderProfileCard(player) {
       <span class="kq-profile-tag">${profile.avatar?.emoji || "👑"} ${profile.avatar?.name || "Starter Avatar"}</span>
       <span class="kq-profile-tag">${profile.frame?.emoji || "☁️"} ${profile.frame?.name || "Cloud Frame"}</span>
       <span class="kq-profile-tag">${profile.background?.emoji || "🏯"} ${profile.background?.name || "Hanok Courtyard"}</span>
-      ${profile.flair ? `<span class="kq-profile-tag">${profile.flair.emoji} ${profile.flair.name}</span>` : ""}
       ${profile.pet ? `<span class="kq-profile-tag">${profile.pet.emoji} ${profile.pet.name}</span>` : ""}
-      ${profile.title ? `<span class="kq-profile-tag">${profile.title.emoji} ${profile.title.name}</span>` : ""}
     </div>
   `;
 }
@@ -631,6 +906,7 @@ function renderDashboard() {
   renderRecentWork(progress);
   renderJourney(progress, player, achievements);
   renderProfileCard(player);
+  renderCosmeticsDisplay();
 
   requestAnimationFrame(() => {
     document.body.classList.add("kq-motion-ready");
