@@ -52,7 +52,9 @@
 
   function getInitials(name) {
     const cleaned = String(name || "").trim();
+
     if (!cleaned) return "KQ";
+
     const parts = cleaned.split(/\s+/).slice(0, 2);
     return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "KQ";
   }
@@ -362,8 +364,9 @@
         background: rgba(0, 0, 0, 0.35);
         display: grid;
         place-items: center;
-        z-index: 5000;
+        z-index: 99999;
         padding: 20px;
+        pointer-events: auto;
       }
 
       .kq-auth-overlay[hidden] {
@@ -377,6 +380,7 @@
         padding: 22px;
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
         border: 1px solid rgba(0, 0, 0, 0.08);
+        pointer-events: auto;
       }
 
       .kq-auth-modal h3 {
@@ -921,6 +925,8 @@
       rebuildNav();
     }
   });
+
+  window.addEventListener("kq:fake-user-updated", rebuildNav);
 
   document.body.classList.remove("kq-transition-out");
 
