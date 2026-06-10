@@ -166,7 +166,7 @@ export default function JamoSelectView() {
 
   return (
     <section className="card">
-      <h1>🔠 Choose a Jamo</h1>
+      <h1>Choose a Jamo</h1>
       <p className="muted">
         Tap a character to practice. The preview animates the <strong>traditional stroke order</strong>.
       </p>

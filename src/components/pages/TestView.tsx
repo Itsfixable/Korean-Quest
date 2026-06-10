@@ -263,7 +263,7 @@ export default function TestView() {
       <section className="card">
         <div className="flex setup-top">
           <div>
-            <h1>📝 Test</h1>
+            <h1>Test</h1>
             <Link href="/resources" className="btn secondary back-btn">
               ← Back to Resources
             </Link>
@@ -467,7 +467,7 @@ export default function TestView() {
         <section className="card" id="resultCard">
           <div className="report-top">
             <div className="report-left">
-              <h2 style={{ margin: 0 }}>📊 Report</h2>
+              <h2 style={{ margin: 0 }}>Report</h2>
               <p className="muted" id="resultText" style={{ marginTop: 6 }}>
                 Score: {correct}/{questions.length} ({resultPct}%)
               </p>

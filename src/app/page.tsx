@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { HomePageStyles } from "@/components/PageStyles";
 import { HomeStats } from "@/components/pages/HomeStats";
@@ -42,17 +43,23 @@ export default function HomePage() {
           </div>
           <div className="kq-feature-grid">
             <article className="kq-feature-card">
-              <div className="kq-feature-icon">📝</div>
+              <div className="kq-feature-icon">
+                <Image src="/favicon/nav/nav-learn.png" alt="" width={56} height={56} />
+              </div>
               <h3>Quick Lessons</h3>
               <p>Learn the essentials in short, beginner-friendly lessons built for fast progress.</p>
             </article>
             <article className="kq-feature-card">
-              <div className="kq-feature-icon">🎮</div>
+              <div className="kq-feature-icon">
+                <Image src="/favicon/nav/nav-adventure.png" alt="" width={56} height={56} />
+              </div>
               <h3>Game Adventure</h3>
               <p>Turn practice into motivation with battles, unlocks, and world progression.</p>
             </article>
             <article className="kq-feature-card">
-              <div className="kq-feature-icon">🔥</div>
+              <div className="kq-feature-icon">
+                <Image src="/favicon/index/streakEmoji.png" alt="" width={56} height={56} />
+              </div>
               <h3>Daily Momentum</h3>
               <p>Build streaks, complete quests, and stay consistent with bite-sized daily goals.</p>
             </article>

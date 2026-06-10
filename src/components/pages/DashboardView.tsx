@@ -327,7 +327,16 @@ export default function DashboardView() {
           </div>
           <ul id="recentWorkList" className="recent-list kq-stagger">
             {recentWork.length === 0 ? (
-              <li>No work recorded yet.</li>
+              <li className="kq-empty">
+                <span className="kq-empty-title">Nothing here yet</span>
+                <span className="kq-empty-hint">
+                  Complete a lesson or flashcard session and your activity will show up
+                  here.
+                </span>
+                <Link className="btn kq-empty-cta" href="/resources">
+                  Start a lesson
+                </Link>
+              </li>
             ) : (
               recentWork.map((item) => (
                 <li key={`${item.ts}-${item.title}`}>
@@ -348,7 +357,12 @@ export default function DashboardView() {
           </div>
           <ul id="dailyQuestList" className="quest-list kq-stagger">
             {dailyQuests.length === 0 ? (
-              <li className="kq-quest-item">No quests for today yet.</li>
+              <li className="kq-empty">
+                <span className="kq-empty-title">No quests yet</span>
+                <span className="kq-empty-hint">
+                  Today&apos;s quests will appear here — check back soon.
+                </span>
+              </li>
             ) : (
               dailyQuests.map((q) => {
                 const prog = Math.min(q.progress, q.target);

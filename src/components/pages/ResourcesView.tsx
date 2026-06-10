@@ -214,7 +214,7 @@ export default function ResourcesView() {
       </section>
 
       <section className="card">
-        <h2>⬇️ Downloadables</h2>
+        <h2>Downloadables</h2>
         <div id="kqDownloadablesGrid" className="kq-download-grid">
           {DOWNLOADABLES.map((pdf) => (
             <article key={pdf.filename} className="kq-pdf-card">

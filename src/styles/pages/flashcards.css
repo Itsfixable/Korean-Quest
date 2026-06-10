@@ -435,12 +435,7 @@
 }
 .known-item .muted {
   font-size: 0.95rem;
-} .flash-main-card:hover,
-.flash-progress-card:hover {
-  transform: none;
-}
-
-/* reduce motion */
+} /* reduce motion */
 @media (prefers-reduced-motion: reduce) {
   .flash-3d,
   .flash-stage.anim-next .flash-3d#flash3d,

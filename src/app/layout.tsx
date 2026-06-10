@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -27,6 +28,7 @@ export default function RootLayout({
         <AppProviders>
           <Sidebar />
           <PageTransition>{children}</PageTransition>
+          <SiteFooter />
         </AppProviders>
       </body>
     </html>

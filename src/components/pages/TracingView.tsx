@@ -461,7 +461,7 @@ export default function TracingView({ char }: TracingViewProps) {
 
   return (
     <section className="card">
-      <h1>✍️ Tracing Practice</h1>
+      <h1>Tracing Practice</h1>
       <Link href="/jamo-select" className="btn secondary back-btn">
         ← Back to Jamo Select
       </Link>

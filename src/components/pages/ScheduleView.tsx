@@ -251,7 +251,12 @@ export default function ScheduleView() {
 
         <ul id="myBookings" className="my-list">
           {sortedBookings.length === 0 ? (
-            <li className="muted">No bookings yet.</li>
+            <li className="kq-empty">
+              <span className="kq-empty-title">No bookings yet</span>
+              <span className="kq-empty-hint">
+                Pick a date and time above to schedule your first study quest.
+              </span>
+            </li>
           ) : (
             sortedBookings.map((b) => (
               <li key={`${b.date}_${b.time}`} className="booking-row">

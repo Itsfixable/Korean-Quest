@@ -105,7 +105,7 @@ export default function LeaderboardView() {
     <section className="card lb-page-card">
       <div className="lb-header">
         <div className="lb-header-copy">
-          <h1>🏆 Leaderboard</h1>
+          <h1>Leaderboard</h1>
           <p className="muted">
             Weekly XP standings motivate consistency and friendly competition.
           </p>

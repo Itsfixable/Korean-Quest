@@ -428,9 +428,9 @@ textarea::placeholder {
 .btn.secondary,
 a.btn.secondary,
 button.btn.secondary {
-  background: var(--kq-btn) !important;
-  border-color: var(--kq-btn) !important;
-  color: #ffffff !important;
+  background: #d5dff1 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #000000 !important;
 }
 
 .btn:focus-visible,
@@ -807,14 +807,12 @@ textarea {
     opacity var(--motion-fast) var(--ease-kq);
 }
 
-/* Premium card hover lift */
-.card:hover,
-.dashboard-card:hover,
+/* Hover lift — interactive cards only (static cards should not
+   signal clickability) */
 .resource-card:hover,
 .lesson-card:hover,
 .kq-shop-item:hover,
-.quest-card:hover,
-.stat-card:hover {
+.quest-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 34px rgba(25, 38, 70, 0.13);
 }

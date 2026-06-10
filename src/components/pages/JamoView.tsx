@@ -48,7 +48,7 @@ export default function JamoView() {
 
   return (
     <section className="card jamo-builder">
-      <h1>🧱 Build a Syllable</h1>
+      <h1>Build a Syllable</h1>
       <p className="muted">Pick 초성/중성/종성 to form a valid Hangul block.</p>
 
       <div className="jamo-row">

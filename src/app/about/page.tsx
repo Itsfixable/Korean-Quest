@@ -77,7 +77,7 @@ export default function AboutPage() {
         </div>
         <div className="about-hero-art">
           <Image
-            src="/favicon/index/welcome.png"
+            src="/favicon/dashboard/archery.png"
             alt="Korean Quest mascot"
             width={260}
             height={260}
