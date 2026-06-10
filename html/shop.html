@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Korean Quest — Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="../css/master.css" />
+    <link rel="stylesheet" href="../css/pages/shop.css" />
+    <link rel="stylesheet" href="../css/components/theme-toggle.css" /> 
+
+    <script type="module" src="../js/main/auth.js"></script>
+    <script defer src="../js/main/state.js"></script>
+    <script defer src="../js/main/shop.js"></script>
+    <script type="module" src="../js/main/theme.js"></script>
+
+
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav" aria-label="Primary">
+        <div class="logo">🇰🇷 Korean Quest</div>
+        <a class="pill" href="index.html" aria-current="page">Home</a>
+        <a class="pill" href="schedule.html">Schedule</a>
+        <a class="pill" href="resources.html">Resources</a>
+        <a class="pill" href="adventure.html">Adventure</a>
+        <a class="pill" href="dashboard.html">Dashboard</a>
+        <a class="pill" href="shop.html">Shop</a>
+        <a class="pill" href="leaderboard.html">Leaderboard</a>
+        <a class="pill" href="about.html">About</a>
+        <a class="pill" href="test.html">test</a>
+        <label class="kq-switch" aria-label="Toggle theme">
+          <input id="themeToggle" type="checkbox" />
+          <span class="kq-track"></span>
+          <span class="kq-thumb" aria-hidden="true"></span>
+          <span class="kq-switch-label">Theme</span>
+        </label>
+        
+
+        <span class="spacer"></span>
+        <span id="userBadge" class="muted"></span>
+        <button id="loginBtn"  class="pill" type="button">Sign in</button>
+        <button id="logoutBtn" class="pill" type="button" hidden>Sign out</button>
+      </nav>
+    </header>
+
+    <main class="container grid">
+      <section class="card">
+        <h1>🛍️ Shop</h1>
+        <p>Your coins: <strong id="coinCount">0</strong></p>
+
+        <div class="shop-grid" id="shopGrid" role="list">
+          <!-- JS renders items:
+          <div class="shop-item" role="listitem">
+            <span>🎓 Study Hat</span>
+            <button class="btn" data-item="hat1" data-cost="30">Buy — 30</button>
+          </div>
+        --></div>
+      </section>
+
+      <section class="card">
+        <h2>Equipped</h2>
+        <ul id="equippedList">
+          <!-- JS shows current cosmetics -->
+        </ul>
+      </section>
+    </main>
+
+    <footer class="container footer">
+      <small
+        >Cosmetics are educationally safe: visual customization only (no
+        gameplay advantage).</small
+      >
+    </footer>
+    <div id="authModal" class="modal" hidden>
+      <div class="modal-card">
+        <h3>Sign in</h3>
+        <form id="authForm">
+          <label>Email</label>
+          <input id="authEmail" type="email" required />
+          <label>Password</label>
+          <input id="authPass" type="password" required minlength="6" />
+          <div class="row">
+            <button id="emailSignIn" class="btn primary" type="submit">Sign in</button>
+            <button id="emailSignUp" class="btn secondary" type="button">Create account</button>
+          </div>
+        </form>
+        <div class="row">
+          <button id="googleBtn" class="btn" type="button">Continue with Google</button>
+          <button id="authClose" class="btn" type="button">Close</button>
+        </div>
+        <p id="authMsg" class="muted" aria-live="polite"></p>
+      </div>
+    </div>
+  </body>
+</html>

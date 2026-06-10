@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@import "../styles/master.css";
+@import "../styles/contrast-overrides.css";
+@import "../styles/responsive.css";
+@import "../styles/chatbot.css";
+@import "../styles/nav.css";
+@import "../styles/components/theme-toggle.css";
+@import "../styles/page-polish.css";
+
+@theme inline {
+  --color-bg: #edf4fa;
+  --color-panel: #ffffff;
+  --color-text: #0f1218;
+  --color-muted: #586071;
+  --color-brand: #5b729f;
+  --color-brand-hover: #4f648a;
+  --color-accent: #b3d1d3;
+  --color-danger: #cd4a4a;
+  --color-success: #6a9f71;
+  --font-sans: "Nunito", sans-serif;
+  --radius-default: 14px;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #edf4fa !important;
+  font-family: "Nunito", sans-serif;
+}

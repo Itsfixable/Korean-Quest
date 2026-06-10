@@ -1,0 +1,108 @@
+/* css/pages/tracing.css
+   FBLA DESIGN-SPEC COMPLIANT (LIGHT MODE ONLY)
+   - Forces light palette on tracing page even if theme.js toggles dark mode.
+   - Keeps your existing layout/controls the same.
+*/
+
+/* ========= FORCE LIGHT THEME FOR THIS PAGE ========= */
+/* Override tokens locally + force colors regardless of data-theme */
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"]{
+  --bg: #EDF4FA;
+  --panel: #FFFFFF;
+  --text: #000000;
+  --muted: #586071;
+
+  /* Spec colors */
+  --brand: #5B729F;     /* main buttons */
+  --brand-2: #7490C8;   /* accents / home pill */
+  --accent: #B3D1D3;
+  --danger: #CD4A4A;
+
+  --ring: rgba(91,114,159,.35);
+
+  --surface-1: #FFFFFF;
+  --surface-2: #F6F8FC;
+  --surface-3: #E6EEF9;
+
+  --border-weak: rgba(0,0,0,.06);
+  --border-mid: rgba(0,0,0,.08);
+  --border-strong: rgba(0,0,0,.12);
+  --border-solid: #D5DBE6;
+
+  --overlay: rgba(0,0,0,.25);
+  --shadow: 0 10px 30px rgba(0,0,0,.10);
+  --radius: 14px;
+  --container: 1100px;
+
+  /* Tracing-specific line colors (visible on light) */
+  --preview-template: #6b7ea0;
+  --preview-draw: #000000;
+}
+
+/* Also force actual element colors in case other CSS sets them */
+html, body{
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* ========= EXISTING TRACING LAYOUT (kept same) ========= */
+.trace-wrap{
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.trace-canvas{
+  border: 2px solid var(--border-solid);
+  border-radius: 12px;
+  background: #FFFFFF;
+  width: 320px;
+  height: 320px;
+  max-width: 100%;
+}
+
+.trace-controls{
+  display: grid;
+  gap: 8px;
+  align-content: flex-start;
+}
+
+.trace-legend{
+  color: var(--muted);
+}
+
+/* Buttons and selects in tracing controls should follow spec */
+.trace-controls .btn,
+button.btn,
+a.btn{
+  background: #5B729F !important;
+  color: #FFFFFF !important;
+  border-color: rgba(0,0,0,.08) !important;
+}
+
+.trace-controls .btn.secondary,
+.trace-controls .btn[aria-pressed="false"].secondary{
+  background: #EFEFEF !important;
+  border: 1px solid #C3C3C3 !important;
+  color: #000000 !important;
+}
+
+.trace-controls select,
+.trace-controls input,
+.trace-controls textarea{
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-mid) !important;
+  color: var(--text) !important;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* If you have a 'clear' / 'reset' button on tracing, map it to spec danger */
+#clearBtn, #resetBtn, .btn.danger, button.danger{
+  background: #CD4A4A !important;
+  color: #FFFFFF !important;
+  border: none !important;
+}

@@ -1,0 +1,337 @@
+/* css/pages/test.css */
+:root {
+  /* Light-only palette (FBLA spec) */
+  --bg: #edf4fa;
+  --panel: #ffffff;
+  --text: #000000;
+  --muted: #586071;
+  --brand: #5b729f; /* main buttons */
+  --brand-2: #7490c8; /* gradients / accents */
+  --accent: #b3d1d3;
+  --danger: #cd4a4a;
+  --ring: rgba(91, 114, 159, 0.35);
+  --surface-1: #ffffff;
+  --surface-2: #f6f8fc;
+  --surface-3: #e6eef9;
+  --border-weak: rgba(0, 0, 0, 0.06);
+  --border-mid: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --border-solid: #d5dbe6;
+  --overlay: rgba(0, 0, 0, 0.25);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --radius: 14px;
+  --container: 1100px; /* extra (used by some pages) */
+  --btn-on-brand: #ffffff;
+} /* ===== Dark mode text fix ===== */
+body {
+  color: var(--text);
+  background: var(--bg);
+}
+.card,
+section,
+main,
+header,
+nav {
+  color: var(--text);
+}
+select,
+option,
+input,
+textarea,
+button {
+  color: var(--text) !important;
+}
+select,
+input,
+textarea {
+  background: var(--surface-2) !important;
+  border-color: var(--border-mid) !important;
+}
+option {
+  background: var(--panel) !important;
+}
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 85%, transparent) !important;
+} /* nav (page scoped) */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.nav .logo {
+  font-weight: 800;
+  white-space: nowrap;
+}
+.nav .pill {
+  white-space: nowrap;
+}
+.kq-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+@media (max-width: 800px) {
+  .kq-switch-label {
+    display: none;
+  }
+  .nav {
+    gap: 8px;
+  }
+} /* setup */
+.setup-top {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+.setup-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+  gap: 10px;
+  align-items: end;
+}
+.setup-field {
+  display: grid;
+  gap: 6px;
+}
+.setup-start {
+  align-self: end;
+}
+@media (max-width: 900px) {
+  .setup-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .setup-start {
+    grid-column: span 2;
+  }
+}
+.select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.text-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 12px 12px;
+  font-size: 1rem;
+} /* test card */
+.test-card {
+  margin-top: 14px;
+}
+.test-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+.test-progress {
+  flex: 1;
+  max-width: 520px;
+  margin: 0 10px;
+} /* choices */
+.choices {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+@media (max-width: 700px) {
+  .choices {
+    grid-template-columns: 1fr;
+  }
+}
+.choice {
+  text-align: left;
+  width: 100%;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-1);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    filter 140ms ease;
+}
+.choice:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.choice:disabled {
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+.choice.correct {
+  border-color: color-mix(in srgb, var(--brand) 75%, transparent);
+}
+.choice.wrong {
+  border-color: color-mix(in srgb, var(--danger) 75%, transparent);
+}
+.test-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+} /* question animation stage */
+.q-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.q-stage.anim-next .q-panel {
+  animation: q_in 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.q-stage.anim-wrong .q-panel {
+  animation: q_shake 260ms ease;
+}
+@keyframes q_in {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes q_shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  60% {
+    transform: translateX(6px);
+  }
+} /* ===== REPORT layout: ring locked RIGHT ===== */
+.report-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: nowrap;
+}
+.report-left {
+  flex: 1;
+  min-width: 260px;
+}
+.report-actions {
+  flex-wrap: wrap;
+} /* RING sizing */
+.ring-wrap {
+  position: relative;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+}
+.ring-large {
+  margin-left: auto;
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+.ring-large .ring {
+  width: 220px;
+  height: 220px;
+  transform: rotate(-90deg);
+}
+.ring-bg {
+  fill: none;
+  stroke: color-mix(in srgb, var(--muted) 22%, transparent);
+  stroke-width: 14;
+}
+.ring-fg {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-dasharray: 276.46; /* matches r=44 */
+  stroke-dashoffset: 276.46;
+  transition: stroke 180ms ease;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.18));
+}
+.ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+}
+.ring-percent {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+} /* missed review */
+.review-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-top: 10px;
+}
+.review-item {
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid var(--border-mid);
+  background: var(--surface-2);
+  display: grid;
+  gap: 6px;
+}
+.review-item.bad {
+  border-color: color-mix(in srgb, var(--danger) 60%, var(--border-mid));
+}
+.review-item strong {
+  font-size: 1.05rem;
+}
+.review-item code {
+  background: var(--surface-1);
+  border: 1px solid var(--border-mid);
+  padding: 2px 6px;
+  border-radius: 10px;
+} /* mobile: stack ring below */
+@media (max-width: 850px) {
+  .report-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ring-large {
+    margin-left: 0;
+    margin-top: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-stage.anim-next .q-panel,
+  .q-stage.anim-wrong .q-panel {
+    animation: none !important;
+  }
+  .choice {
+    transition: none !important;
+  }
+  .ring-fg {
+    transition: none !important;
+  }
+} /* ========================= FBLA Color Overrides — Test ========================= */
+#startBtn,
+#submitBtn,
+#retryWrongBtn {
+  background: #6a9f71 !important;
+  color: #ffffff !important;
+}
+#skipBtn,
+#retryBtn {
+  background: #efefef !important;
+  border: 1px solid #c3c3c3 !important;
+  color: #000000 !important;
+}

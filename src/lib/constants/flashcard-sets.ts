@@ -1,0 +1,47 @@
+import type { FlashcardSet } from "@/lib/types";
+
+export const FLASHCARD_SETS: FlashcardSet[] = [
+  {
+    id: "food-basics",
+    title: "Food Basics",
+    description: "High-frequency food words (Resources page set).",
+    cards: [
+      { term: "밥", def: "rice / meal" },
+      { term: "물", def: "water" },
+      { term: "김치", def: "kimchi" },
+      { term: "빵", def: "bread" },
+      { term: "우유", def: "milk" },
+      { term: "사과", def: "apple" },
+      { term: "바나나", def: "banana" },
+      { term: "커피", def: "coffee" },
+      { term: "차", def: "tea" },
+      { term: "과일", def: "fruit" },
+      { term: "채소", def: "vegetable" },
+      { term: "고기", def: "meat" },
+      { term: "생선", def: "fish" },
+      { term: "달걀", def: "egg" },
+      { term: "국", def: "soup" },
+      { term: "면", def: "noodles" },
+    ],
+  },
+  {
+    id: "greetings",
+    title: "Greetings",
+    description: "Common greetings & polite basics.",
+    cards: [
+      { term: "안녕하세요", def: "hello (polite)" },
+      { term: "감사합니다", def: "thank you (polite)" },
+      { term: "죄송합니다", def: "sorry (polite)" },
+      { term: "네", def: "yes" },
+      { term: "아니요", def: "no" },
+      { term: "좋아요", def: "good / I like it" },
+      { term: "괜찮아요", def: "it's okay / I'm okay" },
+      { term: "잘 지내요?", def: "How are you?" },
+      { term: "잘 지내요", def: "I'm doing well" },
+      { term: "처음 뵙겠습니다", def: "Nice to meet you (formal)" },
+      { term: "안녕히 가세요", def: "Goodbye (to someone leaving)" },
+      { term: "안녕히 계세요", def: "Goodbye (to someone staying)" },
+      { term: "잘 가요", def: "Goodbye (casual)" },
+    ],
+  },
+];
