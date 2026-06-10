@@ -90,6 +90,43 @@
   line-height: 1.5;
 }
 
+/* Metrics */
+.about-metrics {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 14px;
+}
+
+.about-metric-card {
+  border: 1px solid rgba(91, 114, 159, 0.14);
+  border-radius: 16px;
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff, #f5f9fd);
+}
+
+.about-metric-card h3 {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.about-metric-card ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.about-metric-card li {
+  font-size: 0.93rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
 @media (max-width: 760px) {
   .about-hero {
     flex-direction: column;

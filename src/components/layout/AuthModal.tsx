@@ -26,7 +26,7 @@ export function AuthModal() {
       }}
     >
       <div className="kq-auth-modal" role="dialog" aria-modal="true" aria-labelledby="kqAuthTitle">
-        <h3 id="kqAuthTitle">Login / Sign Up</h3>
+        <h3 id="kqAuthTitle">Log In / Sign Up</h3>
 
         <div className="kq-auth-field">
           <label htmlFor="kqFakeName">Name</label>

@@ -121,7 +121,7 @@ export default function ScheduleView() {
           />
         </div>
 
-        <p className="muted schedule-subtitle">Pick a date, then choose a time. Booked slots are greyed out.</p>
+        <p className="muted schedule-subtitle">Pick a date, then choose a time. Booked slots are grayed out.</p>
 
         <div className="appt-layout">
           <div className="cal card cal-card">

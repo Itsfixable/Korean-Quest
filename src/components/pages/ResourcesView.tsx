@@ -33,17 +33,44 @@ const DOWNLOADABLES = [
   {
     title: "Korean Words List",
     filename: "/resources/KoreanWordsList.pdf",
-    note: "Ready to download from your current repo file.",
+    note: "Student-compiled vocabulary reference covering the words used across Korean Quest lessons.",
   },
   {
-    title: "Hangul Trace Pack",
-    filename: "/resources/HangulTracePack.pdf",
-    note: "Add this file manually to /resources when ready.",
+    title: "Hangul Practice Worksheet",
+    filename: "/resources/Korean_hangul_practice_worksheet.pdf",
+    note: "Printable worksheet for practicing Hangul letters by hand.",
   },
   {
-    title: "Food Basics Study Pack",
-    filename: "/resources/FoodBasicsStudyPack.pdf",
-    note: "Add this file manually to /resources when ready.",
+    title: "Hangul Stroke Order Guide",
+    filename: "/resources/Linguajunkie-Korean-Hangul-Stroke-Order.pdf",
+    note: "Stroke order reference for every Hangul consonant and vowel. Source: Linguajunkie.com.",
+  },
+];
+
+const CREDITS = [
+  {
+    label: "Video lessons",
+    detail:
+      "Billy Go's Beginner Korean Course — Learn Korean with GO! Billy Korean (YouTube). Embedded with credit; all video content belongs to its creator.",
+    href: "https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k",
+  },
+  {
+    label: "Stroke order guide",
+    detail:
+      "\"Korean Hangul Stroke Order\" PDF by Linguajunkie.com, shared as a free learning resource.",
+    href: "https://www.linguajunkie.com",
+  },
+  {
+    label: "Typography",
+    detail:
+      "Nunito typeface by Vernon Adams, served via Google Fonts under the SIL Open Font License.",
+    href: "https://fonts.google.com/specimen/Nunito",
+  },
+  {
+    label: "Lessons & artwork",
+    detail:
+      "All lessons, vocabulary sets, quizzes, and page illustrations are original, student-written content created by the Korean Quest team.",
+    href: null,
   },
 ];
 
@@ -157,7 +184,10 @@ export default function ResourcesView() {
 
       <section className="card">
         <h2>Videos</h2>
-        <p className="muted">Short explainers and pronunciation tips (embedded safely; credit sources).</p>
+        <p className="muted">
+          Short explainers and pronunciation tips from Billy Go&apos;s Beginner Korean
+          Course, embedded with credit to the creator.
+        </p>
 
         <div className="video-wrap">
           <iframe
@@ -193,13 +223,32 @@ export default function ResourcesView() {
               </div>
               <h3>{pdf.title}</h3>
               <p>{pdf.note}</p>
-              <div className="kq-pdf-file">{pdf.filename}</div>
               <a className="kq-pdf-link" href={pdf.filename} download>
                 Download PDF
               </a>
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="card">
+        <h2>Credits &amp; Sources</h2>
+        <p className="muted">
+          Korean Quest is built on student-written content. Third-party materials used on
+          this site are credited below.
+        </p>
+        <ul className="kq-credits-list">
+          {CREDITS.map((credit) => (
+            <li key={credit.label} className="kq-credit-item">
+              <strong>{credit.label}:</strong> {credit.detail}{" "}
+              {credit.href ? (
+                <a href={credit.href} target="_blank" rel="noopener noreferrer">
+                  View source
+                </a>
+              ) : null}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <div id="kqResourcesToast" className={`kq-resources-toast${toastVisible ? " show" : ""}`}>

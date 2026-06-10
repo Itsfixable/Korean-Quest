@@ -145,7 +145,7 @@ export function Sidebar() {
                 </button>
               ) : (
                 <button type="button" className="kq-sidebar-action" onClick={openAuthModal}>
-                  Login / Sign Up
+                  Log In / Sign Up
                 </button>
               )}
             </div>
@@ -178,7 +178,7 @@ export function Sidebar() {
               <div className="kq-sidebar-avatar">KQ</div>
               <div className="kq-sidebar-user-copy">
                 <strong>Guest Learner</strong>
-                <span>Login to save your style</span>
+                <span>Log in to save your progress</span>
               </div>
             </div>
           )}
@@ -202,7 +202,7 @@ export function Sidebar() {
             </button>
           ) : (
             <button type="button" className="kq-sidebar-action" onClick={openAuthModal}>
-              Login / Sign Up
+              Log In / Sign Up
             </button>
           )}
         </div>

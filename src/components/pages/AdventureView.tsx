@@ -546,7 +546,7 @@ export default function AdventureView() {
             <option value="hard">Hard</option>
           </select>
         </div>
-        <p>Pick a node to start a battle. Correct answers power up your attacks - miss and the monster strikes back!</p>
+        <p>Pick a node to start a battle. Correct answers power up your attacks — miss and the monster strikes back!</p>
 
         <div id="mapGrid" className="kq-treasure-map">
           <section className="kq-treasure-adventure">

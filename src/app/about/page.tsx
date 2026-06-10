@@ -6,6 +6,41 @@ export const metadata: Metadata = {
   title: "Korean Quest — About",
 };
 
+const METRICS = [
+  {
+    title: "Engagement",
+    items: [
+      "Daily and weekly active users (DAU / WAU ratio)",
+      "Average session duration per study visit",
+      "Streak retention — how many learners keep a 7-day streak",
+    ],
+  },
+  {
+    title: "Learning Outcomes",
+    items: [
+      "Lesson completion rate across the Hangul-to-phrases sequence",
+      "Flashcard mastery rate (cards moved to the Known stack)",
+      "Test score improvement between first and latest attempts",
+    ],
+  },
+  {
+    title: "Technical Performance",
+    items: [
+      "Lighthouse performance and accessibility scores (target: 90+)",
+      "Core Web Vitals — LCP, CLS, and INP within \u201cgood\u201d thresholds",
+      "Error-free interactivity verified across desktop, tablet, and mobile",
+    ],
+  },
+  {
+    title: "Growth & Satisfaction",
+    items: [
+      "30-day learner retention rate",
+      "Net Promoter Score (NPS) from student feedback surveys",
+      "Tutoring session bookings made through the Schedule page",
+    ],
+  },
+];
+
 const TEAM = [
   {
     name: "Jiah Lee",
@@ -65,10 +100,30 @@ export default function AboutPage() {
       </section>
 
       <section className="card">
+        <h2 className="about-section-title">How We Measure Success</h2>
+        <p className="muted">
+          Korean Quest tracks measurable indicators across four areas to evaluate
+          whether the site keeps students engaged, learning, and coming back.
+        </p>
+        <div className="about-metrics">
+          {METRICS.map((group) => (
+            <article key={group.title} className="about-metric-card">
+              <h3>{group.title}</h3>
+              <ul>
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="card">
         <h2 className="about-section-title">Attribution</h2>
         <p className="muted">
-          Any third-party videos or assets are cited on the Resources page. This demo
-          uses student-written content.
+          Third-party videos and assets are cited in the Credits &amp; Sources section of
+          the Learn page. All other content is student-written.
         </p>
       </section>
     </main>

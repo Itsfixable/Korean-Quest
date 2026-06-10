@@ -1,17 +1,17 @@
 /* ---------------- Chatbot Toggle (IMAGE ONLY) ---------------- */
 :root {
-  --chatbot-hitbox: 200px;
-  --chatbot-icon-size: 200px;
+  --chatbot-hitbox: 300px;
+  --chatbot-icon-size: 300px;
 }
-/* ---------------- Chatbot Toggle (BIG IMAGE, SMALL HITBOX) ---------------- */
+/* ---------------- Chatbot Toggle (BIG IMAGE, BOTTOM-RIGHT) ---------------- */
 
 .chatbot-toggle-btn {
   position: fixed;
-  bottom: 22px;
-  right: 24px;
+  bottom: 0;
+  right: 0;
 
   width: var(--chatbot-hitbox);
-  height: var(--chatbot-hitbox);
+  height: auto;
 
   background: none;
   border: none;
@@ -35,7 +35,7 @@
 
 .chatbot-toggle-icon {
   width: var(--chatbot-icon-size) !important;
-  height: var(--chatbot-icon-size) !important;
+  height: auto !important;
   max-width: none !important;
   object-fit: contain;
   display: block;
@@ -50,7 +50,7 @@
 .chatbot-container {
   position: fixed;
   bottom: 30px;
-  right: -450px;
+  right: -100vw;
   width: 420px;
   height: 450px;
   background: var(--panel);
@@ -181,8 +181,8 @@
   transform: scale(0.98);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive — matches the sidebar collapse breakpoint (640px) */
+@media (max-width: 640px) {
   .chatbot-container {
     width: calc(100vw - 60px);
     max-width: 420px;
@@ -196,15 +196,15 @@
   }
 
   .chatbot-toggle-btn {
-    bottom: 14px;
-    right: 14px;
-    width: 88px;
-    height: 88px;
+    bottom: 0;
+    right: 0;
+    width: 132px;
+    height: auto;
   }
 
   .chatbot-toggle-icon {
-    width: 88px !important;
-    height: 88px !important;
+    width: 132px !important;
+    height: auto !important;
   }
 }
 /* Force chatbot to always use Korea Quest dark blue */
