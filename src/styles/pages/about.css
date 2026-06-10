@@ -1,106 +1,102 @@
-/* ==== ABOUT THEME TOKENS (page-scoped) ==== */
-:root {
-  --bg: #0b0c10;
-  --panel: #111318;
-  --text: #e6e7eb;
-  --muted: #9aa1ad;
-  --brand: #4f8cff;
-  --brand-2: #7aa3ff;
-  --accent: #7bd389;
-  --danger: #ff6b6b;
-  --ring: rgba(79, 140, 255, 0.45);
-  --surface-1: #0f1420;
-  --surface-2: #1a2130;
-  --surface-3: #20304a;
-  --border-weak: rgba(255, 255, 255, 0.06);
-  --border-mid: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  --border-solid: #2a3242;
-  --overlay: rgba(0, 0, 0, 0.35);
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  --radius: 14px;
-  --container: 1100px;
-} /* Optional light variant */
-:root[data-theme="light"] {
-  --bg: #f7f9fc;
-  --panel: #ffffff;
-  --text: #111318;
-  --muted: #586071;
-  --ring: rgba(79, 140, 255, 0.25);
-  --surface-1: #eef2f7;
-  --surface-2: #f6f8fc;
-  --surface-3: #e6eefb;
-  --border-weak: rgba(0, 0, 0, 0.06);
-  --border-mid: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --border-solid: #d5dbe6;
-  --overlay: rgba(0, 0, 0, 0.25);
-} /* ==== ABOUT PAGE STYLES ==== */
-.about-container {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  background: var(--panel);
-  border: 1px solid var(--border-weak);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  color: var(--text);
+/* ==== ABOUT PAGE ==== */
+/* Theme tokens live in master.css — do not redefine :root here. */
+
+.about-page {
+  gap: 18px;
 }
-.about-header {
-  text-align: center;
-  border-bottom: 1px solid var(--border-mid);
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+
+/* Hero */
+.about-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+  background: linear-gradient(150deg, #ffffff 0%, #f3f8fe 60%, #eaf2fb 100%);
+  border: 1px solid rgba(91, 114, 159, 0.12);
 }
-.about-header h1 {
-  color: var(--brand);
+
+.about-hero-copy {
+  min-width: 0;
+  max-width: 60%;
+}
+
+.about-hero h1 {
+  margin: 0 0 12px;
   font-size: 2rem;
-  margin: 0;
-}
-.about-content p {
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: 12px;
-}
-.about-content a {
+  letter-spacing: -0.02em;
   color: var(--brand);
-  text-decoration: underline;
 }
+
+.about-mission {
+  font-size: 1.06rem;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.about-hero-art {
+  flex-shrink: 0;
+}
+
+.about-hero-art img {
+  width: clamp(160px, 24vw, 260px);
+  height: auto;
+}
+
+/* Section headings */
+.about-section-title {
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+}
+
+/* Team */
 .about-team {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  margin-top: 20px;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
-.team-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border-mid);
-  border-radius: 12px;
-  padding: 12px;
-  text-align: center;
-  color: var(--text);
-  transition:
-    transform 0.15s ease,
-    filter 0.15s ease;
+
+.about-team-card {
+  border: 1px solid rgba(91, 114, 159, 0.14);
+  border-radius: 16px;
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff, #f5f9fd);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
-.team-card:hover {
+
+.about-team-card:hover {
   transform: translateY(-3px);
-  filter: brightness(1.1);
+  box-shadow: 0 12px 26px rgba(42, 59, 112, 0.1);
 }
-.team-card img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 8px;
-}
-.team-card h3 {
-  margin: 6px 0 2px;
+
+.about-team-card h3 {
+  margin: 0 0 6px;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--brand);
-  font-size: 1.1rem;
 }
-.team-card p {
-  font-size: 0.9rem;
-  color: var(--muted);
+
+.about-team-name {
+  font-size: 1.08rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.about-team-card p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .about-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-hero-copy {
+    max-width: 100%;
+  }
 }

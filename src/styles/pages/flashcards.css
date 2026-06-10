@@ -1,55 +1,6 @@
-/* css/pages/flashcards.css */ /* ==== FLASHCARDS THEME TOKENS (page-scoped) ==== */
-:root {
-  /* Light-only palette (FBLA spec) */
-  --bg: #edf4fa;
-  --panel: #ffffff;
-  --text: #000000;
-  --muted: #586071;
-  --brand: #5b729f; /* main buttons */
-  --brand-2: #7490c8; /* gradients / accents */
-  --accent: #b3d1d3;
-  --danger: #cd4a4a;
-  --ring: rgba(91, 114, 159, 0.35);
-  --surface-1: #ffffff;
-  --surface-2: #f6f8fc;
-  --surface-3: #e6eef9;
-  --border-weak: rgba(0, 0, 0, 0.06);
-  --border-mid: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --border-solid: #d5dbe6;
-  --overlay: rgba(0, 0, 0, 0.25);
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  --radius: 14px;
-  --container: 1100px; /* extra (used by some pages) */
-  --btn-on-brand: #ffffff;
-} /* ===== NAVBAR (page scoped) ===== */
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
-.nav .logo {
-  font-weight: 800;
-  white-space: nowrap;
-}
-.nav .pill {
-  white-space: nowrap;
-}
-.kq-switch {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-}
-@media (max-width: 800px) {
-  .kq-switch-label {
-    display: none;
-  }
-  .nav {
-    gap: 8px;
-  }
-} /* ===== LAYOUT ===== */
+/* css/pages/flashcards.css */
+/* Theme tokens live in master.css — do not redefine :root here. */
+/* ===== LAYOUT ===== */
 .flash-layout {
   grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
   gap: 20px;
@@ -112,12 +63,8 @@
   flex-wrap: wrap;
 }
 
-.select {
+.flash-set-select {
   background: var(--surface-1);
-  border: 1px solid var(--border-mid);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 10px 12px;
   font-weight: 700;
 }
 

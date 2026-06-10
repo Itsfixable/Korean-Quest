@@ -4,47 +4,11 @@
    - Keeps your existing layout/controls the same.
 */
 
-/* ========= FORCE LIGHT THEME FOR THIS PAGE ========= */
-/* Override tokens locally + force colors regardless of data-theme */
-:root,
-:root[data-theme="dark"],
-:root[data-theme="light"]{
-  --bg: #EDF4FA;
-  --panel: #FFFFFF;
-  --text: #000000;
-  --muted: #586071;
-
-  /* Spec colors */
-  --brand: #5B729F;     /* main buttons */
-  --brand-2: #7490C8;   /* accents / home pill */
-  --accent: #B3D1D3;
-  --danger: #CD4A4A;
-
-  --ring: rgba(91,114,159,.35);
-
-  --surface-1: #FFFFFF;
-  --surface-2: #F6F8FC;
-  --surface-3: #E6EEF9;
-
-  --border-weak: rgba(0,0,0,.06);
-  --border-mid: rgba(0,0,0,.08);
-  --border-strong: rgba(0,0,0,.12);
-  --border-solid: #D5DBE6;
-
-  --overlay: rgba(0,0,0,.25);
-  --shadow: 0 10px 30px rgba(0,0,0,.10);
-  --radius: 14px;
-  --container: 1100px;
-
-  /* Tracing-specific line colors (visible on light) */
+/* Theme tokens live in master.css — do not redefine :root here. */
+:root {
+  /* Tracing-specific line colors */
   --preview-template: #6b7ea0;
   --preview-draw: #000000;
-}
-
-/* Also force actual element colors in case other CSS sets them */
-html, body{
-  background: var(--bg) !important;
-  color: var(--text) !important;
 }
 
 /* ========= EXISTING TRACING LAYOUT (kept same) ========= */

@@ -3,41 +3,7 @@
    FBLA Design Spec Compliant
    ========================================================= */
 
-/* =========================
-   TOKENS (page scoped)
-   ========================= */
-:root,
-:root[data-theme="light"],
-:root[data-theme="dark"] {
-  --bg: #edf4fa;
-  --panel: #ffffff;
-  --text: #000000;
-  --muted: #586071;
-
-  --brand: #5b729f;
-  --brand-hover: #4f648a;
-  --selected-border: #25c237;
-
-  --disabled: rgba(91, 114, 159, 0.4);
-
-  --light-btn: #efefef;
-  --light-border: #c3c3c3;
-}
-
-/* Force page light regardless of theme toggle */
-html,
-body {
-  background: var(--bg) !important;
-  color: var(--text) !important;
-}
-
-/* Keep cards white */
-.card,
-.cal.card,
-.slots.card {
-  background-color: var(--panel) !important;
-  color: var(--text) !important;
-}
+/* Theme tokens live in master.css - do not redefine :root here. */
 
 /* =========================
    LAYOUT
@@ -518,41 +484,7 @@ html body
    FBLA Design Spec Compliant
    ========================================================= */
 
-/* =========================
-   TOKENS (page scoped)
-   ========================= */
-:root,
-:root[data-theme="light"],
-:root[data-theme="dark"] {
-  --bg: #edf4fa;
-  --panel: #ffffff;
-  --text: #000000;
-  --muted: #586071;
-
-  --brand: #5b729f;
-  --brand-hover: #4f648a;
-  --selected-border: #25c237;
-
-  --disabled: rgba(91, 114, 159, 0.4);
-
-  --light-btn: #efefef;
-  --light-border: #c3c3c3;
-}
-
-/* Force page light regardless of theme toggle */
-html,
-body {
-  background: var(--bg) !important;
-  color: var(--text) !important;
-}
-
-/* Keep cards white */
-.card,
-.cal.card,
-.slots.card {
-  background-color: var(--panel) !important;
-  color: var(--text) !important;
-}
+/* Theme tokens live in master.css - do not redefine :root here. */
 
 /* =========================
    LAYOUT

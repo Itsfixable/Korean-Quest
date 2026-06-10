@@ -1,4 +1,47 @@
-/* ====== Base (no theme tokens here) ====== */
+/* ====== Canonical design tokens (single source of truth) ======
+   Page stylesheets must NOT redefine :root — in Next.js every imported
+   stylesheet is global, so per-page :root blocks leak across routes. */
+:root,
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  --bg: #edf4fa;
+  --panel: #ffffff;
+  --text: #000000;
+  --muted: #586071;
+
+  --brand: #5b729f;
+  --brand-hover: #4f648a;
+  --brand-2: #7490c8;
+  --accent: #b3d1d3;
+  --success: #6a9f71;
+  --danger: #cd4a4a;
+  --warning: #e5a93d;
+
+  --ring: rgba(91, 114, 159, 0.35);
+
+  --surface-1: #ffffff;
+  --surface-2: #f6f8fc;
+  --surface-3: #e6eef9;
+
+  --border-weak: rgba(0, 0, 0, 0.06);
+  --border-mid: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  --border-solid: #d5dbe6;
+
+  --overlay: rgba(0, 0, 0, 0.25);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --radius: 14px;
+  --container: 1100px;
+  --btn-on-brand: #ffffff;
+
+  /* Schedule / misc extras */
+  --selected-border: #25c237;
+  --disabled: rgba(91, 114, 159, 0.4);
+  --light-btn: #efefef;
+  --light-border: #c3c3c3;
+}
+
+/* ====== Base ====== */
 * {
   box-sizing: border-box;
 }
@@ -348,6 +391,38 @@ a.btn:hover {
 button.btn:active,
 a.btn:active {
   filter: brightness(0.9);
+}
+
+/* Canonical form controls (moved from per-page stylesheets) */
+.select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+select,
+option,
+input,
+textarea {
+  color: var(--text);
+}
+
+select,
+input,
+textarea {
+  background: var(--surface-2);
+  border-color: var(--border-mid);
+}
+
+option {
+  background: var(--panel);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
 }
 
 .btn.secondary,

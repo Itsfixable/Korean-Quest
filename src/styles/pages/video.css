@@ -1,35 +1,4 @@
-:root,
-:root[data-theme="light"],
-:root[data-theme="dark"] {
-  --bg: #edf4fa;
-  --panel: #ffffff;
-  --text: #000000;
-  --muted: #586071;
-
-  --brand: #5b729f;
-  --brand-hover: #4f648a;
-  --brand-2: #7490c8;
-  --accent: #b3d1d3;
-  --success: #6a9f71;
-  --danger: #cd4a4a;
-
-  --surface-1: #ffffff;
-  --surface-2: #f6f8fc;
-  --surface-3: #e6eef9;
-
-  --border-weak: rgba(0, 0, 0, 0.06);
-  --border-mid: rgba(0, 0, 0, 0.08);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --border-solid: #d5dbe6;
-
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-html,
-body {
-  background: var(--bg);
-  color: var(--text);
-}
+/* Theme tokens live in master.css — do not redefine :root here. */
 
 .sr-only {
   position: absolute;
