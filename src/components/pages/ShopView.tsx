@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import type { ShopItem } from "@/lib/types";
+import { asset } from "@/lib/asset";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/pages/shop.css";
@@ -281,7 +282,7 @@ function ShopImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={currentSrc}
+      src={asset(currentSrc)}
       alt={alt}
       className={className}
       style={style}
@@ -600,7 +601,7 @@ export default function ShopView() {
         <div className="kq-shop-section-head">
           <div className="kq-shop-section-title">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img id="kqSectionIcon" src={categoryIcon} alt="" />
+            <img id="kqSectionIcon" src={asset(categoryIcon)} alt="" />
             <div>
               <h2 id="kqSectionTitle">{categoryLabel}</h2>
               <p id="kqSectionDesc">

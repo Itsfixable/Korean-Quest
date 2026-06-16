@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
+import { asset } from "@/lib/asset";
 import "@/styles/pages/dashboard.css";
 import "@/styles/pages/dashboard-enhancements.css";
 
@@ -130,7 +131,7 @@ export default function DashboardView() {
               <div className="kq-scene-card">
                 {profile.background?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.background.image} alt="" className="kq-scene-bg" />
+                  <img src={asset(profile.background.image)} alt="" className="kq-scene-bg" />
                 ) : (
                   <div className="kq-scene-bg kq-scene-bg--emoji">{profile.background?.emoji || "🏯"}</div>
                 )}
@@ -138,13 +139,14 @@ export default function DashboardView() {
                 {profile.avatar?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={rawAvatarSrc(profile.avatar.image)}
+                    src={asset(rawAvatarSrc(profile.avatar.image))}
                     alt={profile.avatar.name}
                     className="kq-scene-avatar-img"
                     onError={(e) => {
                       const img = e.currentTarget;
-                      if (profile.avatar?.image && img.src !== profile.avatar.image) {
-                        img.src = profile.avatar.image;
+                      const fallback = asset(profile.avatar?.image);
+                      if (fallback && img.src !== fallback) {
+                        img.src = fallback;
                       }
                     }}
                   />
@@ -184,7 +186,7 @@ export default function DashboardView() {
                   {profile.avatar?.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={profile.avatar.image}
+                      src={asset(profile.avatar.image)}
                       alt={profile.avatar.name}
                     />
                   ) : (

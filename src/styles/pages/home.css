@@ -57,7 +57,7 @@
 
 .kq-hero-right {
   min-height: 340px;
-  background-image: url("/favicon/index/welcome.png");
+  background-image: url("/Korean-Quest/favicon/index/welcome.png");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
@@ -96,7 +96,7 @@
   position: relative;
   z-index: 1; /* Let height grow naturally */
   min-height: 340px; /* bigger so coins never clip */
-  background-image: url("/favicon/index/welcome.png");
+  background-image: url("/Korean-Quest/favicon/index/welcome.png");
   background-repeat: no-repeat; /* Slightly smaller so full art fits */
   background-size: 80% auto; /* Center horizontally, slight down offset */
   background-position: center 20px;
@@ -185,7 +185,7 @@
 .kq-quests {
   position: relative;
   overflow: hidden;
-  background-image: url("/favicon/index/todaysQuestBanner.png");
+  background-image: url("/Korean-Quest/favicon/index/todaysQuestBanner.png");
   background-repeat: no-repeat; /* Stretch banner edge-to-edge */
   background-size: cover;
   background-position: left center;
@@ -231,7 +231,7 @@
     420px
   ); /* Two-layer background: 1) art image, clipped to left column 2) subtle overlay (kept transparent here) */
   background-image:
-    url("/favicon/index/learningPath.png"),
+    url("/Korean-Quest/favicon/index/learningPath.png"),
     linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0));
   background-repeat:
     no-repeat, no-repeat; /* Key: first layer only uses the art column width */
@@ -300,7 +300,7 @@
     right: 0;
     bottom: 0;
     height: 280px;
-    background-image: url("/favicon/index/learningPath.png");
+    background-image: url("/Korean-Quest/favicon/index/learningPath.png");
     background-repeat: no-repeat;
     background-size: contain; /* Put it at the bottom and keep whole image visible */
     background-position: center bottom;
@@ -356,7 +356,7 @@
     right: 0;
     bottom: 0;
     height: 260px;
-    background-image: url("/favicon/index/learningPath.png");
+    background-image: url("/Korean-Quest/favicon/index/learningPath.png");
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center bottom;
