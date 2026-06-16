@@ -1,0 +1,204 @@
+/* =========================================================
+   Korean Quest — Resources
+   ========================================================= */
+
+:root {
+  --lesson-glow: #f0e2e9;
+}
+
+.resources-page {
+  display: grid;
+  gap: 16px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 6px 0;
+}
+
+.section-title__icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.study-tools-actions {
+  margin-top: 10px;
+}
+
+/* Lessons — wide 2-column cards like live site */
+.lesson-list {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.lesson,
+.lesson-list .lesson {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel, #fff);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--lesson-glow) 65%, #ffffff 35%);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--lesson-glow) 80%, transparent),
+    0 0 18px color-mix(in srgb, var(--lesson-glow) 90%, transparent);
+  padding: 18px 20px;
+  min-height: 210px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lesson:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--lesson-glow) 90%, transparent),
+    0 8px 24px color-mix(in srgb, var(--lesson-glow) 55%, transparent);
+}
+
+.lesson header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lesson h2 {
+  margin: 0 0 8px;
+  font-size: 1.12rem;
+  line-height: 1.35;
+  max-width: 52%;
+  font-weight: 800;
+}
+
+.lesson > p {
+  margin: 0 0 12px;
+  color: var(--muted, #586071);
+  line-height: 1.5;
+  font-size: 0.95rem;
+  max-width: 52%;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.lesson-actions .btn {
+  min-width: 112px;
+  padding: 10px 16px;
+  font-weight: 800;
+}
+
+.lesson[data-lesson-id="L1_hangul"] {
+  background-image: url("/favicon/resources/hangulTrace.png");
+  background-repeat: no-repeat;
+  background-position: right 7px bottom 10px;
+  background-size: 320px auto;
+  padding-right: 250px;
+}
+
+.lesson[data-lesson-id="L2_vocab_food"] {
+  background-image: url("/favicon/index/food.png");
+  background-repeat: no-repeat;
+  background-position: right 7px bottom 10px;
+  background-size: 270px auto;
+  padding-right: 260px;
+}
+
+.kq-credits-list {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.kq-credit-item {
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.kq-credit-item a {
+  font-weight: 700;
+}
+
+.video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong, rgba(0, 0, 0, 0.12));
+  background: #000;
+}
+
+.video-wrap iframe,
+.video-wrap video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-help-text {
+  margin-top: 12px;
+}
+
+.study-tools-card {
+  padding-top: 5px;
+  padding-bottom: 28px;
+}
+
+.study-tools-banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.study-tools-banner img {
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+}
+
+a.btn,
+button.btn {
+  background: #5b729f;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .lesson-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .lesson h2,
+  .lesson > p {
+    max-width: 100%;
+  }
+
+  .lesson[data-lesson-id="L1_hangul"],
+  .lesson[data-lesson-id="L2_vocab_food"] {
+    background-position: center bottom;
+    background-size: 200px auto;
+    padding-right: 20px;
+    padding-bottom: 210px;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .section-title__icon {
+    width: 36px;
+    height: 36px;
+  }
+}

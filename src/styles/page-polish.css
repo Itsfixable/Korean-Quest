@@ -1,0 +1,74 @@
+/* Shared polish for page cards across the app */
+
+main.container.grid {
+  gap: 18px;
+}
+
+main.container.grid > .card,
+main.container.grid > section.card,
+main.container > .card,
+.dashboard-card,
+.kq-profile-card,
+.kq-learning-card,
+.recent-card,
+.quests-card,
+.lb-page-card,
+.kq-shop-page .kq-shop-panel {
+  border: 1px solid rgba(91, 114, 159, 0.1);
+  box-shadow: 0 12px 32px rgba(42, 59, 112, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.section-title,
+.section-head h2,
+.student-dashboard-header h1 {
+  letter-spacing: -0.02em;
+}
+
+.muted {
+  line-height: 1.55;
+}
+
+.btn,
+a.btn,
+button.btn {
+  border-radius: 12px;
+  font-weight: 800;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn:hover,
+a.btn:hover,
+button.btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+/* Shared empty-state pattern */
+.kq-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+  padding: 22px 16px;
+  border: 1px dashed rgba(91, 114, 159, 0.3);
+  border-radius: 14px;
+  background: rgba(246, 248, 252, 0.7);
+  list-style: none;
+}
+
+.kq-empty-title {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.kq-empty-hint {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.kq-empty-cta {
+  margin-top: 6px;
+}

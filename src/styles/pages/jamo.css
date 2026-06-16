@@ -1,0 +1,34 @@
+/* Theme tokens live in master.css — do not redefine :root here. */
+.jamo-builder {
+  display: block;
+}
+.jamo-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.jamo-output {
+  font-size: 2rem;
+  margin-top: 8px;
+}
+.jamo-row select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  color: var(--text);
+}
+.jamo-builder {
+  display: block;
+}
+.jamo-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.jamo-output {
+  font-size: 2rem;
+  margin-top: 8px;
+}

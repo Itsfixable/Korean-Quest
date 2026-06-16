@@ -1,0 +1,871 @@
+
+    :root {
+      --kq-shop-blue: #687dca;
+      --kq-shop-blue-dark: #5466b5;
+      --kq-shop-ink: #202b45;
+      --kq-shop-muted: #66718d;
+      --kq-shop-line: rgba(32, 43, 69, 0.09);
+      --kq-shop-card: rgba(255, 255, 255, 0.94);
+      --kq-shop-soft: #f8fbff;
+      --kq-shop-green: #62b879;
+      --kq-shop-purple: #8865d8;
+      --kq-shop-orange: #f0a43c;
+      --kq-shop-shadow: 0 18px 45px rgba(42, 59, 112, 0.08);
+      --kq-shop-small-shadow: 0 10px 26px rgba(42, 59, 112, 0.07);
+    }
+
+    #kqNavUser,
+    #kqUserCard,
+    #kqSidebarUser,
+    .kq-nav-user,
+    .kq-sidebar-user,
+    .kq-user-card {
+      cursor: pointer;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255, 214, 226, 0.45), transparent 26%),
+        radial-gradient(circle at 80% 0%, rgba(205, 230, 255, 0.45), transparent 32%),
+        linear-gradient(180deg, #f7fbff 0%, #eef7ff 42%, #f8fbf0 100%);
+    }
+
+    .kq-shop-page {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+      padding: 12px;
+      color: var(--kq-shop-ink);
+    }
+
+    .kq-shop-panel,
+    .kq-shop-bottom-card {
+      background: var(--kq-shop-card);
+      border: 1px solid var(--kq-shop-line);
+      border-radius: 28px;
+      box-shadow: var(--kq-shop-shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .kq-shop-banner {
+      width: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #ffffff;
+    }
+
+    .kq-shop-banner img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .kq-shop-panel {
+      padding: 16px;
+    }
+
+    .kq-shop-profile-strip {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .kq-shop-user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .kq-shop-user-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex: 0 0 62px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #6d84d4 0%, #5265b5 100%);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 950;
+      box-shadow: 0 8px 20px rgba(91, 114, 159, 0.18);
+      position: relative;
+    }
+
+    .kq-shop-user-copy {
+      min-width: 0;
+    }
+
+    .kq-shop-user-copy h2 {
+      margin: 0 0 5px;
+      font-size: 1.18rem;
+      line-height: 1.2;
+      font-weight: 950;
+    }
+
+    .kq-shop-user-copy p {
+      margin: 0;
+      color: var(--kq-shop-muted);
+      font-weight: 850;
+      font-size: 0.85rem;
+    }
+
+    .kq-stat-box {
+      min-width: 122px;
+      min-height: 64px;
+      border-radius: 22px;
+      padding: 10px 13px;
+      background: #ffffff;
+      border: 1px solid rgba(32, 43, 69, 0.07);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(42, 59, 112, 0.045);
+    }
+
+    .kq-stat-icon {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .kq-stat-box span {
+      display: block;
+      color: var(--kq-shop-muted);
+      font-size: 0.76rem;
+      font-weight: 850;
+    }
+
+    .kq-stat-box strong {
+      display: block;
+      color: var(--kq-shop-ink);
+      font-size: 1.1rem;
+      font-weight: 950;
+    }
+
+    .kq-shop-progress-shell {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr) auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(234,241,255,0.95), rgba(244,247,255,0.98));
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .kq-lvl-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%);
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 950;
+      box-shadow: 0 8px 18px rgba(91,114,159,0.18);
+    }
+
+    .kq-xp-bar {
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(91,114,159,0.15);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .kq-xp-bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #7f95c4, #5c73a5);
+      transition: width 700ms ease;
+    }
+
+    .kq-xp-text {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-weight: 950;
+      color: #233554;
+    }
+
+    .kq-shop-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.45rem;
+      font-weight: 950;
+      color: #243552;
+    }
+
+    .kq-shop-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .kq-shop-tab {
+      border: none;
+      border-radius: 24px;
+      padding: 16px 22px;
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 950;
+      cursor: pointer;
+      background: rgba(255,255,255,0.78);
+      color: #50607d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition:
+        transform 240ms cubic-bezier(0.2, 1.2, 0.25, 1),
+        box-shadow 240ms ease,
+        background 240ms ease,
+        color 240ms ease;
+    }
+
+    .kq-shop-tab img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .kq-shop-tab:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--kq-shop-small-shadow);
+    }
+
+    .kq-shop-tab.is-active {
+      background: linear-gradient(180deg, #7185d5 0%, #5869bd 100%);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(88, 105, 189, 0.22);
+      transform: scale(1.04);
+    }
+
+    .kq-shop-list-panel {
+      padding: 22px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .kq-shop-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(32, 43, 69, 0.07);
+    }
+
+    .kq-shop-section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .kq-shop-section-title img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .kq-shop-section-title h2 {
+      margin: 0;
+      font-size: 1.42rem;
+      line-height: 1.1;
+      font-weight: 950;
+      color: var(--kq-shop-ink);
+    }
+
+    .kq-shop-section-title p {
+      margin: 5px 0 0;
+      color: var(--kq-shop-muted);
+      font-size: 0.9rem;
+      font-weight: 850;
+    }
+
+    .kq-collected-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #a15e67;
+      font-weight: 950;
+      font-size: 0.9rem;
+    }
+
+    .kq-shop-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .kq-shop-item {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,244,0.98));
+      border: 1px solid rgba(32, 43, 69, 0.08);
+      border-radius: 26px;
+      min-height: 330px;
+      padding: 12px 12px 14px;
+      margin: 0px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 10px;
+      box-shadow: 0 12px 26px rgba(42, 59, 112, 0.07);
+      position: relative;
+      overflow: hidden;
+      transition:
+        transform 260ms cubic-bezier(0.2, 1.2, 0.25, 1),
+        box-shadow 260ms ease,
+        border-color 260ms ease,
+        background 260ms ease;
+    }
+
+    .kq-shop-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 34px rgba(42, 59, 112, 0.11);
+    }
+
+    .kq-shop-item.is-selected {
+      transform: scale(1.025);
+      border-color: rgba(98, 184, 121, 0.78);
+      box-shadow:
+        0 18px 36px rgba(98, 184, 121, 0.18),
+        0 0 0 4px rgba(98, 184, 121, 0.12);
+      z-index: 2;
+    }
+
+    .kq-shop-item.is-selected:hover {
+      transform: scale(1.035) translateY(-3px);
+    }
+
+    .kq-shop-item.is-selected::before {
+      content: "Selected";
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #6d84b7, #5971a1);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 950;
+      box-shadow: 0 6px 14px rgba(91,114,159,0.22);
+    }
+
+    .kq-shop-image-zone {
+      position: relative;
+      min-height: 220px;
+      height: 220px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 24%, rgba(255, 210, 219, 0.48), transparent 13%),
+        radial-gradient(circle at 85% 15%, rgba(255, 226, 177, 0.35), transparent 12%),
+        linear-gradient(180deg, #fbfdff 0%, #fff6ee 100%);
+      border: 1px solid rgba(104, 125, 202, 0.11);
+    }
+
+    .kq-shop-image-zone::before,
+    .kq-shop-image-zone::after {
+      content: "✿";
+      position: absolute;
+      color: rgba(238, 157, 170, 0.4);
+      font-size: 1.05rem;
+      animation: kqShopFloat 3.8s ease-in-out infinite;
+    }
+
+    .kq-shop-image-zone::before {
+      top: 18px;
+      left: 18px;
+    }
+
+    .kq-shop-image-zone::after {
+      top: 32px;
+      right: 22px;
+      animation-delay: -1.4s;
+    }
+
+    .kq-shop-float {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .kq-shop-float.is-floating {
+      animation:
+        kqShopItemFloat var(--kq-item-float-duration)
+        ease-in-out
+        var(--kq-item-float-delay)
+        infinite;
+    }
+
+    .kq-shop-art {
+      max-width: none;
+      max-height: none;
+      display: block;
+      align-self: center;
+      justify-self: center;
+      filter: drop-shadow(0 12px 12px rgba(41, 55, 95, 0.12));
+      transition: filter 260ms ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .kq-profile-stack {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      max-height: 100%;
+      margin: auto;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    /* The inner picture (background + avatar) clipped to a circle that sits
+       just inside the frame's cloud ring. */
+    .kq-profile-clip {
+      width: 84%;
+      height: 84%;
+      aspect-ratio: 1 / 1;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .kq-profile-layer {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+    }
+
+    .kq-profile-bg {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .kq-profile-avatar-layer {
+      z-index: 2;
+      filter: drop-shadow(0 10px 12px rgba(41, 55, 95, 0.12));
+    }
+
+    /* The frame sits on top, wrapping around the clipped picture. */
+    .kq-profile-frame-layer {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+    }
+
+    .kq-shop-user-avatar .kq-profile-stack {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+
+    .kq-shop-placeholder {
+      width: 78%;
+      height: 78%;
+      min-height: 145px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      background: repeating-linear-gradient(
+        45deg,
+        #e9edf6,
+        #e9edf6 10px,
+        #d9dfed 10px,
+        #d9dfed 20px
+      );
+      color: #5b729f;
+      font-weight: 950;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      border: 2px dashed rgba(91,114,159,0.32);
+      text-align: center;
+      padding: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .kq-shop-info {
+      display: grid;
+      gap: 8px;
+      padding: 0px 2px;
+    }
+
+    .kq-shop-item h3 {
+      margin: 0;
+      color: var(--kq-shop-ink);
+      font-size: 0.98rem;
+      line-height: 1.15;
+      text-align: center;
+      font-weight: 950;
+    }
+
+    .kq-shop-rarity {
+      text-align: center;
+      font-size: 0.77rem;
+      font-weight: 950;
+      margin-top: -2px;
+    }
+
+    .kq-rarity-common { color: #627095; }
+    .kq-rarity-rare { color: #4866d8; }
+    .kq-rarity-epic { color: #8656d6; }
+    .kq-rarity-starter { color: #4d9a61; }
+    .kq-rarity-legendary { color: #dd8a28; }
+
+    .kq-shop-buy-row {
+      display: grid;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .kq-shop-price-btn,
+    .kq-shop-equip-btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      min-height: 43px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 950;
+      cursor: pointer;
+      transition:
+        transform 220ms cubic-bezier(0.2, 1.2, 0.25, 1),
+        box-shadow 220ms ease,
+        background 220ms ease,
+        color 220ms ease;
+    }
+
+    .kq-shop-price-btn:hover,
+    .kq-shop-equip-btn:hover {
+      transform: translateY(-1px) scale(1.015);
+    }
+
+    .kq-shop-price-btn {
+      background: linear-gradient(180deg, #6f82d4 0%, #5869bd 100%);
+      color: #fff;
+      box-shadow: 0 9px 18px rgba(88, 105, 189, 0.2);
+    }
+
+    .kq-shop-price-btn.is-rare {
+      background: linear-gradient(180deg, #6f82d4 0%, #5869bd 100%);
+    }
+
+    .kq-shop-price-btn.is-epic {
+      background: linear-gradient(180deg, #9b70e8 0%, #7e55d4 100%);
+    }
+
+    .kq-shop-price-btn.is-legendary {
+      background: linear-gradient(180deg, #f6b24e 0%, #e48f2e 100%);
+    }
+
+    .kq-shop-price-btn.is-owned {
+      background: rgba(104, 125, 202, 0.1);
+      color: #5b6fbf;
+      box-shadow: none;
+    }
+
+    .kq-shop-equip-btn {
+      background: rgba(247, 249, 255, 0.96);
+      color: #334466;
+      border: 1px solid rgba(104, 125, 202, 0.16);
+    }
+
+    .kq-shop-equip-btn.is-equipped {
+      background: #62b879;
+      color: #ffffff;
+      border-color: rgba(77, 154, 97, 0.25);
+      box-shadow: 0 9px 18px rgba(98, 184, 121, 0.22);
+    }
+
+    .kq-shop-lock-card {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.62), rgba(238,244,250,0.92));
+      filter: grayscale(0.15);
+    }
+
+    .kq-shop-lock-card .kq-shop-image-zone {
+      background: rgba(255,255,255,0.4);
+      border-color: rgba(32, 43, 69, 0.05);
+    }
+
+    .kq-coming-soon-lock {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.84);
+      color: #99a1b5;
+      font-size: 2rem;
+      box-shadow: 0 12px 24px rgba(42, 59, 112, 0.08);
+      z-index: 2;
+      position: relative;
+    }
+
+    .kq-shop-bottom-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 22px;
+      background:
+        radial-gradient(circle at 5% 30%, rgba(255, 204, 214, 0.33), transparent 18%),
+        rgba(255, 255, 255, 0.92);
+    }
+
+    .kq-shop-bottom-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .kq-shop-bottom-left img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+    }
+
+    .kq-shop-bottom-card h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      font-weight: 950;
+    }
+
+    .kq-shop-bottom-card p {
+      margin: 0;
+      color: var(--kq-shop-muted);
+      font-size: 0.86rem;
+      font-weight: 850;
+    }
+
+    .kq-shop-dashboard-link {
+      border: none;
+      border-radius: 18px;
+      padding: 13px 18px;
+      background: #fff8ec;
+      color: #536080;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 950;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(42, 59, 112, 0.06);
+    }
+
+    .kq-equip-chip {
+      display: none;
+    }
+
+    .kq-avatar-card {
+      padding: 0px;
+      margin: 0px;
+      border-radius: 26px;
+      min-height: 430px;
+      grid-template-rows: 315px auto;
+      gap: 0;
+    }
+
+    .kq-avatar-card .kq-shop-image-zone {
+      min-height: 315px;
+      height: 315px;
+      border: none;
+      border-radius: 26px 26px 0 0;
+      overflow: hidden;
+      place-items: center;
+    }
+
+    .kq-avatar-card .kq-shop-info {
+      padding: 20px 14px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,250,244,0.98));
+      border-top: 1px solid rgba(32, 43, 69, 0.06);
+    }
+
+    .kq-frame-card {
+      padding: 12px 12px 14px;
+      margin: 0px;
+      border-radius: 26px;
+      min-height: 360px;
+      grid-template-rows: 1fr auto;
+    }
+
+    .kq-frame-card .kq-shop-image-zone {
+      min-height: 230px;
+      height: 230px;
+      border-radius: 22px;
+    }
+
+    .kq-frame-card .kq-shop-info {
+      padding: 0px 2px;
+    }
+
+    .kq-background-card {
+      padding: 12px 12px 14px;
+      margin: 0px;
+      border-radius: 26px;
+      min-height: 360px;
+      grid-template-rows: 1fr auto;
+    }
+
+    .kq-background-card .kq-shop-image-zone {
+      min-height: 230px;
+      height: 230px;
+      border-radius: 22px;
+      background: #ffffff;
+    }
+
+    .kq-background-card .kq-shop-info {
+      padding: 0px 2px;
+    }
+
+    .kq-pet-card {
+      padding: 12px 12px 14px;
+      margin: 0px;
+      border-radius: 26px;
+      min-height: 410px;
+      grid-template-rows: 1fr auto;
+    }
+
+    .kq-pet-card .kq-shop-image-zone {
+      min-height: 350px;
+      height: 350px;
+      border-radius: 22px;
+    }
+
+    .kq-pet-card .kq-shop-info {
+      padding: 0px 2px;
+    }
+
+    .kq-avatar-card:hover .kq-shop-art,
+    .kq-frame-card:hover .kq-shop-art,
+    .kq-background-card:hover .kq-shop-art,
+    .kq-pet-card:hover .kq-shop-art {
+      filter: drop-shadow(0 14px 14px rgba(41, 55, 95, 0.16));
+    }
+
+    @keyframes kqShopFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes kqShopItemFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(calc(-1 * var(--kq-item-float-distance)));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .kq-shop-image-zone::before,
+      .kq-shop-image-zone::after,
+      .kq-shop-float.is-floating {
+        animation: none;
+      }
+
+      .kq-shop-art,
+      .kq-shop-item,
+      .kq-shop-tab,
+      .kq-shop-price-btn,
+      .kq-shop-equip-btn {
+        transition: none;
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .kq-shop-progress-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .kq-shop-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .kq-shop-profile-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .kq-shop-user {
+        grid-column: 1 / -1;
+      }
+
+      .kq-shop-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kq-shop-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .kq-shop-page {
+        padding: 6px;
+      }
+
+      .kq-shop-profile-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .kq-stat-box {
+        min-width: 0;
+      }
+
+      .kq-shop-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kq-shop-list-panel {
+        padding: 16px;
+      }
+
+      .kq-shop-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+
+      .kq-shop-bottom-card {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .kq-shop-dashboard-link {
+        width: 100%;
+      }
+    }
+  

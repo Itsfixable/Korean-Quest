@@ -1,0 +1,236 @@
+/* ==== ADVENTURE THEME TOKENS (page-scoped) ==== */
+/* Theme tokens live in master.css — do not redefine :root here. */
+.map {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.map-node {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+.map-node.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.hp-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.bar {
+  height: 10px;
+  background: var(--border-solid);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+#questionMount .btn {
+  margin-top: 8px;
+}
+.map {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.map-node {
+  background: #1a2130;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+.map-node.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.hp-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.bar {
+  height: 10px;
+  background: #2a3242;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+#questionMount .btn {
+  margin-top: 8px;
+} /* Fun battle polish (keeps your page tokens) */
+.battle .sprite {
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+}
+.bar {
+  height: 10px;
+  background: var(--border-solid);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  transition: width 0.25s ease;
+}
+#qChoices .btn {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-mid);
+}
+#qChoices .btn.correct {
+  outline: 2px solid var(--accent);
+}
+#qChoices .btn.wrong {
+  outline: 2px solid var(--danger);
+} /* Make the Keys counter match other buttons but stay compact */
+.id-badge {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+.id-badge:hover {
+  filter: none;
+} /* ========================= FBLA Color Overrides — Adventure ========================= */ /* Keys badge/button (if present) */
+#keysBtn,
+.id-badge,
+.btn.keys,
+.keysBtn {
+  background: #d5dff1 !important;
+  color: #000000 !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+} /* Level buttons / nodes */
+.map-node {
+  background: #5b729f !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+.map-node.locked {
+  background: #b8bec6 !important;
+  color: #ffffff !important;
+  opacity: 0.8 !important;
+}
+.map-node .subtext,
+.map-node .status,
+.map-node .hp,
+.map-node small {
+  color: #bac1cf !important;
+} /* Answer choices */
+#qChoices .btn {
+  background: #d5dff1 !important;
+  color: #000000 !important;
+  border: 1px solid #8faecf !important;
+} /* Run button */
+#exitBattleBtn {
+  background: #cd4a4a !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+/* Light background behind each jamo preview */
+.aw-level-card canvas {
+  background: #f4f6fb;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+/* ===== Jamo select unified tile cards ===== */
+
+.aw-grid {
+  align-items: stretch;
+}
+
+.aw-level-card {
+  background: #f4f6fb;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.aw-level-card:hover,
+.aw-level-card:focus-visible {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
+  border-color: rgba(91, 114, 159, 0.22);
+  background: #eef3fb;
+  outline: none;
+}
+
+.aw-level-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.aw-level-head h3,
+.aw-level-char {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #111111;
+  font-weight: 800;
+}
+
+.aw-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #d5dff1;
+  color: #111111;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+
+.aw-preview-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2f8;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.aw-level-card canvas {
+  width: 120px;
+  height: 120px;
+  display: block;
+  margin-inline: auto;
+  background: transparent;
+  border-radius: 12px;
+}

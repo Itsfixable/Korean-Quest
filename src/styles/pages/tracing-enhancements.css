@@ -1,0 +1,99 @@
+.kq-trace-stage-panel {
+  margin: 0 0 16px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(91, 114, 159, 0.15);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme="dark"] .kq-trace-stage-panel {
+  background: rgba(22, 29, 42, 0.92);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.kq-trace-stage-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.kq-trace-stage-top strong {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 1000;
+}
+
+.kq-trace-stage-top p {
+  margin: 4px 0 0;
+  font-weight: 800;
+  color: var(--muted, #5e6678);
+}
+
+.kq-trace-stars {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.kq-trace-stage-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.kq-trace-stage-tabs button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 900;
+  color: #304263;
+  background: rgba(91, 114, 159, 0.12);
+  cursor: pointer;
+}
+
+.kq-trace-stage-tabs button.is-active {
+  background: linear-gradient(180deg, #6d84b7, #5971a1);
+  color: #ffffff;
+}
+
+.kq-trace-stage-tabs button.is-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.kq-award-star-fly {
+  position: fixed;
+  left: 50vw;
+  top: 50vh;
+  z-index: 9999;
+  font-size: 1rem;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(255, 226, 95, 0.9)) drop-shadow(0 0 24px rgba(255, 196, 0, 0.65));
+  animation: kqStarAwardFly 1.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes kqStarAwardFly {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.1) rotate(0deg);
+  }
+  28% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(4.2) rotate(180deg);
+  }
+  55% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(3.2) rotate(420deg);
+  }
+  100% {
+    opacity: 0.95;
+    left: var(--end-x);
+    top: var(--end-y);
+    transform: translate(-50%, -50%) scale(1) rotate(720deg);
+  }
+}

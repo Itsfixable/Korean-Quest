@@ -1,0 +1,128 @@
+.kq-resources-summary {
+  margin: 0 0 20px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 255, 0.95));
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.kq-resources-summary strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.kq-resources-summary p {
+  margin: 0;
+  color: var(--muted, #5e6678);
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.kq-unlock-pill,
+.kq-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  background: rgba(91, 114, 159, 0.1);
+  color: var(--brand, #5b729f);
+}
+
+.kq-status-pill.done {
+  background: rgba(106, 159, 113, 0.12);
+  color: #4f7c56;
+}
+
+.kq-lesson-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 1;
+}
+
+.kq-unlock-pill,
+.kq-status-pill {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.kq-download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.kq-pdf-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface-2, #f7f9fd);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 8px;
+}
+
+.kq-pdf-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.kq-pdf-card p {
+  margin: 0;
+  color: var(--muted, #5e6678);
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+
+.kq-pdf-file {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  color: var(--brand, #5b729f);
+  word-break: break-word;
+}
+
+.kq-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: 140px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 900;
+  color: #fff;
+  background: var(--brand, #5b729f);
+}
+
+.kq-resources-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 1200;
+  max-width: 340px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(21, 28, 40, 0.96);
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  pointer-events: none;
+}
+
+.kq-resources-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
