@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV_LINKS } from "@/lib/constants/nav-links";
+import { asset } from "@/lib/asset";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/nav.css";
@@ -32,7 +33,7 @@ function NavLink({
     >
       <Image
         className={className.includes("mobile") ? "kq-mobile-link-icon" : "kq-side-link-icon"}
-        src={`/favicon/nav/${icon}`}
+        src={asset(`/favicon/nav/${icon}`)}
         alt=""
         width={44}
         height={44}
@@ -49,7 +50,7 @@ function ProfileAvatar({ initials, image }: { initials: string; image?: string }
   if (image) {
     return (
       <div className="kq-sidebar-avatar">
-        <Image src={image} alt="Profile" width={52} height={52} />
+        <Image src={asset(image)} alt="Profile" width={52} height={52} />
       </div>
     );
   }
@@ -79,7 +80,7 @@ export function Sidebar() {
     <Link className="brand" href="/" aria-label="Korean Quest Home">
       <Image
         className="brand-logo"
-        src="/favicon/logoImage.png"
+        src={asset("/favicon/logoImage.png")}
         alt="Korean Quest logo"
         width={42}
         height={42}

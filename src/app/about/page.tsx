@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { asset } from "@/lib/asset";
 import "@/styles/pages/about.css";
 
 export const metadata: Metadata = {
@@ -77,7 +78,7 @@ export default function AboutPage() {
         </div>
         <div className="about-hero-art">
           <Image
-            src="/favicon/dashboard/archery.png"
+            src={asset("/favicon/dashboard/archery.png")}
             alt="Korean Quest mascot"
             width={260}
             height={260}

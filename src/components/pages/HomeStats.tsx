@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect } from "react";
 import { useGameStore } from "@/stores/useGameStore";
+import { asset } from "@/lib/asset";
 
 export function HomeStats() {
   const ensureDaily = useGameStore((s) => s.ensureDaily);
@@ -25,7 +26,7 @@ export function HomeStats() {
       <div className="metric">
         <div className="kpi-value streak-value">
           <Image
-            src="/favicon/index/streakEmoji.png"
+            src={asset("/favicon/index/streakEmoji.png")}
             alt="Streak fire icon"
             className="streak-icon"
             width={24}

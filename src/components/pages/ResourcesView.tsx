@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
+import { asset } from "@/lib/asset";
 import "@/styles/pages/resources.css";
 import "@/styles/pages/resources-enhancements.css";
 
@@ -109,7 +110,7 @@ export default function ResourcesView() {
       <section className="card study-tools-card">
         <div className="study-tools-banner">
           <Image
-            src="/favicon/resources/resourcesBanner.png"
+            src={asset("/favicon/resources/resourcesBanner.png")}
             alt="Resources banner"
             width={900}
             height={200}
@@ -119,7 +120,7 @@ export default function ResourcesView() {
 
         <h1 className="section-title">
           <Image
-            src="/favicon/resources/brainEmoji.png"
+            src={asset("/favicon/resources/brainEmoji.png")}
             alt=""
             width={32}
             height={32}
@@ -143,7 +144,7 @@ export default function ResourcesView() {
       <section className="card">
         <h1 className="section-title">
           <Image
-            src="/favicon/resources/bookEmoji.png"
+            src={asset("/favicon/resources/bookEmoji.png")}
             alt=""
             width={32}
             height={32}

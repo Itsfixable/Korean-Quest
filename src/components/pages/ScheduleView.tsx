@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBookingStore } from "@/stores/useBookingStore";
 import type { Booking } from "@/lib/types";
+import { asset } from "@/lib/asset";
 import "@/styles/pages/schedule.css";
 
 const MAX_PER_DAY = 2;
@@ -113,7 +114,7 @@ export default function ScheduleView() {
 
         <div className="schedule-hero">
           <Image
-            src="/favicon/index/ScheduleAStudyQuestImage.png"
+            src={asset("/favicon/index/ScheduleAStudyQuestImage.png")}
             alt="Schedule a Study Quest"
             width={900}
             height={240}

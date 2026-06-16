@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { asset } from "@/lib/asset";
 import {
   createColumnHelper,
   flexRender,
@@ -112,7 +113,7 @@ export default function LeaderboardView() {
         </div>
         <div className="lb-podium-wrap" aria-hidden="true">
           <Image
-            src="/favicon/leaderboard/podium.png"
+            src={asset("/favicon/leaderboard/podium.png")}
             alt=""
             width={300}
             height={130}
