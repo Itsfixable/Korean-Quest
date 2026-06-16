@@ -39,6 +39,14 @@ function starsText(n: number) {
 }
 
 export default function TracingView({ char }: TracingViewProps) {
+  const [queryChar, setQueryChar] = useState<string | undefined>(char);
+
+  useEffect(() => {
+    if (char) return;
+    const c = new URLSearchParams(window.location.search).get("char");
+    if (c) setQueryChar(c);
+  }, [char]);
+
   const getJamoStars = useGameStore((s) => s.getJamoStars);
   const setJamoStars = useGameStore((s) => s.setJamoStars);
   const addXP = useGameStore((s) => s.addXP);
@@ -47,9 +55,9 @@ export default function TracingView({ char }: TracingViewProps) {
   const addRecentWork = useGameStore((s) => s.addRecentWork);
 
   const target = useMemo(() => {
-    const decoded = decodeURIComponent(char || "ㄱ");
+    const decoded = decodeURIComponent(queryChar || "ㄱ");
     return STROKE_DB[decoded] ? decoded : "ㄱ";
-  }, [char]);
+  }, [queryChar]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inkRef = useRef<HTMLCanvasElement | null>(null);

@@ -5,15 +5,10 @@ export const metadata: Metadata = {
   title: "Korean Quest — Tracing",
 };
 
-export default async function TracingPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ char?: string }>;
-}) {
-  const params = await searchParams;
+export default function TracingPage() {
   return (
     <main className="container grid">
-      <TracingView char={params.char} />
+      <TracingView />
     </main>
   );
 }

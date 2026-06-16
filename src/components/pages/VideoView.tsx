@@ -67,7 +67,15 @@ function generateRoomCode(length = 6) {
   return code;
 }
 
-export default function VideoView({ room: initialRoom }: VideoViewProps) {
+export default function VideoView({ room }: VideoViewProps) {
+  const [initialRoom, setInitialRoom] = useState<string | undefined>(room);
+
+  useEffect(() => {
+    if (room) return;
+    const r = new URLSearchParams(window.location.search).get("room");
+    if (r) setInitialRoom(r);
+  }, [room]);
+
   const meetMountRef = useRef<HTMLDivElement>(null);
   const jitsiRef = useRef<InstanceType<NonNullable<typeof window.JitsiMeetExternalAPI>> | null>(null);
   const timerRef = useRef<number | null>(null);

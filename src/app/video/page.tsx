@@ -5,15 +5,10 @@ export const metadata: Metadata = {
   title: "Korean Quest — Video Practice",
 };
 
-export default async function VideoPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ room?: string }>;
-}) {
-  const params = await searchParams;
+export default function VideoPage() {
   return (
     <main className="container video-page">
-      <VideoView room={params.room} />
+      <VideoView />
     </main>
   );
 }

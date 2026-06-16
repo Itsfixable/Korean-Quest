@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
+import { asset } from "@/lib/asset";
 import "@/styles/pages/adventure.css";
 import "@/styles/pages/adventure-enhancements.css";
 
@@ -506,7 +507,7 @@ export default function AdventureView() {
                 isWorldUnlocked(activeWorld.id) ? "" : "locked"
               }`}
             >
-              <img className="kq-stage-bg" src={bgSrc} alt="" aria-hidden="true" />
+              <img className="kq-stage-bg" src={asset(bgSrc)} alt="" aria-hidden="true" />
 
               <div className="kq-stage-title">
                 <p className="kq-stage-eyebrow">✨ Adventure 🌸</p>
@@ -545,7 +546,7 @@ export default function AdventureView() {
                     >
                       <img
                         className="kq-island-img"
-                        src={`/favicon/adventure/island/map${activeWorld.id}-${index + 1}.png`}
+                        src={asset(`/favicon/adventure/island/map${activeWorld.id}-${index + 1}.png`)}
                         alt=""
                       />
                       {locked && <span className="kq-island-lock">🔒</span>}

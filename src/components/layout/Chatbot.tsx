@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { asset } from "@/lib/asset";
 
 const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
 const MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference";
@@ -67,7 +68,7 @@ export function Chatbot() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="chatbot-toggle-icon"
-          src="/favicon/chatbot.png"
+          src={asset("/favicon/chatbot.png")}
           alt="Chatbot"
           width={200}
           height={200}

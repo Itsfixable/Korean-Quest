@@ -279,8 +279,8 @@
   position: relative;
   overflow: visible;
   background-image:
-    url("/favicon/index/scheduleCalendarDesignLeft.png"),
-    url("/favicon/index/scheduleCalendarDesign.png");
+    url("/Korean-Quest/favicon/index/scheduleCalendarDesignLeft.png"),
+    url("/Korean-Quest/favicon/index/scheduleCalendarDesign.png");
   background-repeat: no-repeat, no-repeat;
   background-position: left bottom, right bottom;
   background-size: 150px auto, 400px auto;
@@ -327,7 +327,7 @@
   transform: translateY(-50%);
   width: 38px;
   height: 38px;
-  background: url("/favicon/index/yourBookingIcon.png") no-repeat center /
+  background: url("/Korean-Quest/favicon/index/yourBookingIcon.png") no-repeat center /
     contain;
   pointer-events: none;
   user-select: none;
@@ -340,7 +340,7 @@
   bottom: 10px;
   width: 220px;
   height: 120px;
-  background: url("/favicon/index/yourBookingIcon2.png") no-repeat right
+  background: url("/Korean-Quest/favicon/index/yourBookingIcon2.png") no-repeat right
     bottom / contain;
   pointer-events: none;
   user-select: none;

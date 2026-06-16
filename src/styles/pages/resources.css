@@ -96,7 +96,7 @@
 }
 
 .lesson[data-lesson-id="L1_hangul"] {
-  background-image: url("/favicon/resources/hangulTrace.png");
+  background-image: url("/Korean-Quest/favicon/resources/hangulTrace.png");
   background-repeat: no-repeat;
   background-position: right 7px bottom 10px;
   background-size: 320px auto;
@@ -104,7 +104,7 @@
 }
 
 .lesson[data-lesson-id="L2_vocab_food"] {
-  background-image: url("/favicon/index/food.png");
+  background-image: url("/Korean-Quest/favicon/index/food.png");
   background-repeat: no-repeat;
   background-position: right 7px bottom 10px;
   background-size: 270px auto;
