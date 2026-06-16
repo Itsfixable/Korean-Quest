@@ -6,7 +6,6 @@ import "@/styles/pages/adventure.css";
 import "@/styles/pages/adventure-enhancements.css";
 
 const STORE_KEY = "kq_node_adv_progress_v1";
-const TREASURE_KEY = "kq_adventure_treasure_claimed_v1";
 const BOSS_LEVELS = new Set([4, 8, 12]);
 
 const HANGUL = [
@@ -62,63 +61,35 @@ const WORLDS = [
   { id: 3, title: "Greeting Kingdom", levels: [9, 10, 11, 12] },
 ] as const;
 
-const TREASURE_REWARDS: Record<number, { coins: number; xp: number }> = {
-  1: { coins: 500, xp: 80 },
-  2: { coins: 750, xp: 120 },
-  3: { coins: 1000, xp: 160 },
+// Shared zigzag layout (percent of the stage) used for every world's 4 islands.
+// Island 1 sits below the title block so it never overlaps the heading text.
+const ISLAND_LAYOUT: { x: number; y: number }[] = [
+  { x: 62, y: 34 },
+  { x: 37, y: 51 },
+  { x: 61, y: 66 },
+  { x: 38, y: 81 },
+];
+
+// Maps 1 & 2 share the day scroll; map 3 uses the night scroll.
+const WORLD_BG: Record<number, string> = {
+  1: "/favicon/adventure/bg/adventureBg1.png",
+  2: "/favicon/adventure/bg/adventureBg1.png",
+  3: "/favicon/adventure/bg/adventureBg2.png",
 };
 
-const TREASURE_LAYOUTS: Record<number, { x: number; y: number }[]> = {
-  1: [
-    { x: 55, y: 31 },
-    { x: 38, y: 48 },
-    { x: 63, y: 61 },
-    { x: 42, y: 78 },
-  ],
-  2: [
-    { x: 38, y: 31 },
-    { x: 66, y: 45 },
-    { x: 46, y: 63 },
-    { x: 39, y: 79 },
-  ],
-  3: [
-    { x: 62, y: 31 },
-    { x: 40, y: 47 },
-    { x: 67, y: 59 },
-    { x: 43, y: 75 },
-  ],
-};
+function buildIslandPath(points: { x: number; y: number }[]) {
+  if (points.length === 0) return "";
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i += 1) {
+    const prev = points[i - 1];
+    const cur = points[i];
+    const midY = (prev.y + cur.y) / 2;
+    d += ` C ${prev.x} ${midY}, ${cur.x} ${midY}, ${cur.x} ${cur.y}`;
+  }
+  return d;
+}
 
-const TREASURE_PATHS: Record<number, string> = {
-  1: "M55 31 C44 32 39 37 43 42 C48 48 31 48 38 54 C45 60 62 52 63 61 C64 68 48 67 47 72 C46 76 43 76 42 78",
-  2: "M38 31 C48 34 58 34 66 45 C73 55 52 53 48 59 C43 66 32 67 39 74 C45 80 39 78 39 79",
-  3: "M62 31 C54 38 43 37 40 47 C37 57 65 49 67 59 C70 70 49 65 45 70 C41 74 43 75 43 75",
-};
-
-const MAP_DECORATIONS: Record<number, { src: string; x: number; y: number; size: number; delay: string }[]> = {
-  1: [
-    { src: "/favicon/adventure/tree1.png", x: 28, y: 26, size: 42, delay: "0s" },
-    { src: "/favicon/adventure/skull1.png", x: 33, y: 36, size: 46, delay: ".4s" },
-    { src: "/favicon/adventure/rock1.png", x: 67, y: 43, size: 34, delay: ".8s" },
-    { src: "/favicon/adventure/tree2.png", x: 27, y: 63, size: 48, delay: "1.1s" },
-    { src: "/favicon/adventure/wood1.png", x: 32, y: 84, size: 58, delay: ".6s" },
-    { src: "/favicon/adventure/stone1.png", x: 70, y: 72, size: 34, delay: "1.4s" },
-  ],
-  2: [
-    { src: "/favicon/adventure/tree1.png", x: 30, y: 28, size: 44, delay: ".2s" },
-    { src: "/favicon/adventure/rock1.png", x: 68, y: 34, size: 36, delay: ".9s" },
-    { src: "/favicon/adventure/skull2.png", x: 30, y: 68, size: 44, delay: ".5s" },
-    { src: "/favicon/adventure/tree2.png", x: 70, y: 70, size: 50, delay: "1.2s" },
-    { src: "/favicon/adventure/wood1.png", x: 36, y: 84, size: 56, delay: ".7s" },
-  ],
-  3: [
-    { src: "/favicon/adventure/skull1.png", x: 30, y: 30, size: 48, delay: ".1s" },
-    { src: "/favicon/adventure/tree1.png", x: 70, y: 34, size: 48, delay: ".5s" },
-    { src: "/favicon/adventure/rock1.png", x: 38, y: 57, size: 34, delay: ".9s" },
-    { src: "/favicon/adventure/skull2.png", x: 72, y: 70, size: 44, delay: "1.2s" },
-    { src: "/favicon/adventure/tree2.png", x: 32, y: 82, size: 52, delay: ".4s" },
-  ],
-};
+const ISLAND_PATH = buildIslandPath(ISLAND_LAYOUT);
 
 type Topic = "hangul" | "vocab" | "mixed";
 type Difficulty = "easy" | "normal" | "hard";
@@ -180,14 +151,6 @@ function loadProgress(): ProgressState {
     };
   } catch {
     return { unlocked: 1, cleared: {} };
-  }
-}
-
-function loadTreasureClaims(): Record<number, boolean> {
-  try {
-    return JSON.parse(localStorage.getItem(TREASURE_KEY) || "{}");
-  } catch {
-    return {};
   }
 }
 
@@ -271,7 +234,6 @@ export default function AdventureView() {
   const markBattleWin = useGameStore((s) => s.markBattleWin);
   const [hydrated, setHydrated] = useState(false);
   const [progress, setProgress] = useState<ProgressState>({ unlocked: 1, cleared: {} });
-  const [treasureClaims, setTreasureClaims] = useState<Record<number, boolean>>({});
   const [activeWorldId, setActiveWorldId] = useState(1);
   const [topic, setTopic] = useState<Topic>("mixed");
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
@@ -279,21 +241,34 @@ export default function AdventureView() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [feedback, setFeedback] = useState("");
   const [turnHint, setTurnHint] = useState("Answer to attack!");
-  const [speedPercent, setSpeedPercent] = useState(100);
+  const [timerKey, setTimerKey] = useState(0);
+  const [timerDuration, setTimerDuration] = useState(3800);
+  const [timerPaused, setTimerPaused] = useState(false);
   const [lockedChoices, setLockedChoices] = useState(false);
   const [choiceClass, setChoiceClass] = useState<Record<string, "correct" | "wrong" | undefined>>({});
   const [toast, setToast] = useState("");
+  const [strike, setStrike] = useState<{ target: "enemy" | "player"; amount: number; crit: boolean; key: number } | null>(
+    null,
+  );
 
-  const speedFrameRef = useRef<number | null>(null);
+  const timerTimeoutRef = useRef<number | null>(null);
+  const questionStartRef = useRef<number>(0);
+  const questionDurationRef = useRef<number>(3800);
   const answerTimeoutRef = useRef<number | null>(null);
+  const strikeTimeoutRef = useRef<number | null>(null);
   const battleRef = useRef<BattleState | null>(null);
   const questionRef = useRef<Question | null>(null);
+
+  const triggerStrike = (target: "enemy" | "player", amount: number, crit: boolean) => {
+    if (strikeTimeoutRef.current) window.clearTimeout(strikeTimeoutRef.current);
+    setStrike({ target, amount, crit, key: Date.now() });
+    strikeTimeoutRef.current = window.setTimeout(() => setStrike(null), 850);
+  };
 
   useEffect(() => {
     setHydrated(true);
     const loadedProgress = loadProgress();
     setProgress(loadedProgress);
-    setTreasureClaims(loadTreasureClaims());
     setActiveWorldId(getWorldForLevel(loadedProgress.unlocked));
   }, []);
 
@@ -310,15 +285,11 @@ export default function AdventureView() {
     localStorage.setItem(STORE_KEY, JSON.stringify(progress));
   }, [hydrated, progress]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(TREASURE_KEY, JSON.stringify(treasureClaims));
-  }, [hydrated, treasureClaims]);
-
   useEffect(
     () => () => {
-      if (speedFrameRef.current) cancelAnimationFrame(speedFrameRef.current);
+      if (timerTimeoutRef.current) window.clearTimeout(timerTimeoutRef.current);
       if (answerTimeoutRef.current) window.clearTimeout(answerTimeoutRef.current);
+      if (strikeTimeoutRef.current) window.clearTimeout(strikeTimeoutRef.current);
     },
     [],
   );
@@ -343,10 +314,11 @@ export default function AdventureView() {
     return WORLDS[0];
   }, [activeWorldId, progress]);
 
-  const completedThisWorld = activeWorld.levels.filter((level) => progress.cleared[level]).length;
-  const worldComplete = isWorldComplete(activeWorld.id);
-  const treasureClaimed = Boolean(treasureClaims[activeWorld.id]);
-  const rewards = TREASURE_REWARDS[activeWorld.id];
+  const nextPlayableLevel = activeWorld.levels.find(
+    (level) => level <= progress.unlocked && !progress.cleared[level],
+  );
+  const bgSrc = WORLD_BG[activeWorld.id] ?? WORLD_BG[1];
+  const isNight = activeWorld.id === 3;
 
   const showAdventureToast = (message: string) => {
     setToast(message);
@@ -354,8 +326,9 @@ export default function AdventureView() {
   };
 
   const stopSpeedBar = () => {
-    if (speedFrameRef.current) cancelAnimationFrame(speedFrameRef.current);
-    speedFrameRef.current = null;
+    if (timerTimeoutRef.current) window.clearTimeout(timerTimeoutRef.current);
+    timerTimeoutRef.current = null;
+    setTimerPaused(true);
   };
 
   const nextQuestion = (battleState: BattleState) => {
@@ -365,24 +338,22 @@ export default function AdventureView() {
     setQuestion(q);
     setFeedback("");
     setTurnHint("Answer quickly for bonus damage.");
-    setSpeedPercent(100);
     questionRef.current = q;
 
-    stopSpeedBar();
+    if (timerTimeoutRef.current) window.clearTimeout(timerTimeoutRef.current);
     const total = difficultyDurations(battleState.difficulty);
-    const start = performance.now();
+    questionDurationRef.current = total;
+    questionStartRef.current = performance.now();
 
-    const tick = (now: number) => {
-      const pct = clamp(100 - ((now - start) / total) * 100, 0, 100);
-      setSpeedPercent(pct);
-      if (pct <= 0) {
-        handleAnswer(false, null, true);
-        return;
-      }
-      speedFrameRef.current = requestAnimationFrame(tick);
-    };
+    // restart the countdown bar: bump the key to remount the fill so the
+    // CSS drain animation replays from full, and unpause it.
+    setTimerDuration(total);
+    setTimerPaused(false);
+    setTimerKey((k) => k + 1);
 
-    speedFrameRef.current = requestAnimationFrame(tick);
+    timerTimeoutRef.current = window.setTimeout(() => {
+      handleAnswer(false, null, true);
+    }, total);
   };
 
   const finalizeBattle = (win: boolean, battleState: BattleState) => {
@@ -433,7 +404,9 @@ export default function AdventureView() {
 
     if (correct) {
       const streak = battleState.streak + 1;
-      const crit = speedPercent >= 68 ? 3 : 0;
+      const elapsed = performance.now() - questionStartRef.current;
+      const remainingPct = clamp(100 - (elapsed / questionDurationRef.current) * 100, 0, 100);
+      const crit = remainingPct >= 68 ? 3 : 0;
       const combo = Math.min(Math.max(0, streak - 1), 4);
       const damage = dmgFor(battleState.difficulty) + combo + crit;
       const nextState = {
@@ -443,6 +416,7 @@ export default function AdventureView() {
       };
       setBattle(nextState);
       battleRef.current = nextState;
+      triggerStrike("enemy", damage, crit > 0);
       setFeedback(`⚔️ Correct! You dealt ${damage} damage${crit ? " with a speed bonus" : ""}.`);
       setTurnHint("Keep the streak alive for bigger hits.");
       if (nextState.enemyHP <= 0) {
@@ -458,6 +432,7 @@ export default function AdventureView() {
       };
       setBattle(nextState);
       battleRef.current = nextState;
+      triggerStrike("player", damage, false);
       setFeedback(timedOut ? `⏳ Too slow. The enemy hit you for ${damage}.` : `❌ Not quite. The enemy hit you for ${damage}.`);
       setTurnHint(`Correct answer: ${currentQuestion.answer}`);
       if (nextState.playerHP <= 0) {
@@ -502,30 +477,6 @@ export default function AdventureView() {
     nextQuestion(nextBattle);
   };
 
-  const startNextPlayableLevel = () => {
-    const nextLevel = activeWorld.levels.find((level) => level <= progress.unlocked && !progress.cleared[level]);
-    if (!nextLevel) {
-      showAdventureToast("All nodes cleared! Claim the treasure chest.");
-      return;
-    }
-    startBattle(nextLevel);
-  };
-
-  const claimWorldTreasure = () => {
-    if (!isWorldComplete(activeWorld.id)) {
-      showAdventureToast("Complete every node first to unlock the treasure!");
-      return;
-    }
-    if (treasureClaims[activeWorld.id]) {
-      showAdventureToast("You already claimed this treasure.");
-      return;
-    }
-    setTreasureClaims((prev) => ({ ...prev, [activeWorld.id]: true }));
-    addCoins(rewards.coins);
-    addXP(rewards.xp);
-    showAdventureToast(`🎁 Treasure claimed! +${rewards.coins} coins · +${rewards.xp} XP`);
-  };
-
   if (!hydrated) return null;
 
   return (
@@ -550,154 +501,174 @@ export default function AdventureView() {
 
         <div id="mapGrid" className="kq-treasure-map">
           <section className="kq-treasure-adventure">
-            <div className="kq-map-tabs">
-              {WORLDS.map((world) => (
-                <button
-                  key={world.id}
-                  type="button"
-                  className={`kq-map-tab ${activeWorld.id === world.id ? "active" : ""}`}
-                  disabled={!isWorldUnlocked(world.id)}
-                  onClick={() => {
-                    if (!isWorldUnlocked(world.id)) return;
-                    setActiveWorldId(world.id);
-                  }}
-                >
-                  {isWorldUnlocked(world.id) ? "🗺️" : "🔒"} Level {world.id}
-                </button>
-              ))}
-            </div>
+            <div
+              className={`kq-island-stage ${isNight ? "is-night" : ""} ${
+                isWorldUnlocked(activeWorld.id) ? "" : "locked"
+              }`}
+            >
+              <img className="kq-stage-bg" src={bgSrc} alt="" aria-hidden="true" />
 
-            <div className="kq-map-board">
-              <div className="kq-map-topbar">
-                <button className="kq-map-back" type="button">
-                  Encounter
-                </button>
-                <div className="kq-map-currency">
-                  <span>🪙 {rewards.coins}</span>
-                  <span>⭐ {completedThisWorld}</span>
-                </div>
+              <div className="kq-stage-title">
+                <p className="kq-stage-eyebrow">✨ Adventure 🌸</p>
+                <h2>Level {activeWorld.id}</h2>
+                <p className="kq-stage-world">{activeWorld.title}</p>
+                <p className="kq-stage-desc">
+                  Answer questions and collect stars as you journey through Korean!
+                </p>
               </div>
 
-              <div className={`kq-scroll-stage ${isWorldUnlocked(activeWorld.id) ? "" : "locked"}`}>
-                <img className="kq-scroll-bg" src="/favicon/adventure/treasure-scroll.png" alt="" aria-hidden="true" />
-                {(MAP_DECORATIONS[activeWorld.id] || []).map((obj, idx) => (
-                  <img
-                    key={`${obj.src}-${idx}`}
-                    className="kq-map-decoration"
-                    src={obj.src}
-                    alt=""
-                    aria-hidden="true"
-                    style={{ left: `${obj.x}%`, top: `${obj.y}%`, width: obj.size, animationDelay: obj.delay }}
-                  />
-                ))}
-                <div className="kq-map-title">
-                  <div>Level {activeWorld.id}</div>
-                  <small>{activeWorld.title}</small>
-                </div>
-                <svg className="kq-dashed-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                  <path d={TREASURE_PATHS[activeWorld.id]} />
-                </svg>
-                <button className="kq-start-node" type="button" data-start onClick={startNextPlayableLevel}>
-                  <span className="kq-start-label">START!</span>
-                  <span className="kq-start-circle">▶</span>
-                </button>
-                {activeWorld.levels.map((level, index) => {
-                  const enemy = ENEMIES[(level - 1) % ENEMIES.length];
-                  const boss = BOSS_LEVELS.has(level);
-                  const cleared = Boolean(progress.cleared[level]);
-                  const locked = level > progress.unlocked;
-                  const pos = TREASURE_LAYOUTS[activeWorld.id][index];
-                  return (
+              <svg className="kq-island-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <path d={ISLAND_PATH} />
+              </svg>
+
+              {activeWorld.levels.map((level, index) => {
+                const boss = BOSS_LEVELS.has(level);
+                const cleared = Boolean(progress.cleared[level]);
+                const locked = level > progress.unlocked;
+                const pos = ISLAND_LAYOUT[index];
+                const isStart = level === nextPlayableLevel;
+                const label = boss ? `Boss ${level}` : `Level ${level}`;
+                return (
+                  <div
+                    key={level}
+                    className={`kq-island-node ${cleared ? "done" : ""} ${locked ? "locked" : ""} ${
+                      boss ? "boss" : ""
+                    }`}
+                    style={{ left: `${pos.x}%`, top: `${pos.y}%`, animationDelay: `${index * 0.35}s` }}
+                  >
                     <button
-                      key={level}
                       type="button"
-                      className={`kq-map-node ${cleared ? "done" : ""} ${locked ? "locked" : ""} ${boss ? "boss" : ""}`}
-                      style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                      className="kq-island-btn"
                       disabled={locked}
                       onClick={() => startBattle(level)}
+                      aria-label={label}
                     >
-                      <span className="kq-node-circle">{cleared ? "✓" : boss ? "👑" : enemy.sprite}</span>
-                      <span className="kq-node-label">{boss ? `Boss ${level}` : `Level ${level}`}</span>
-                      <div className="kq-map-stars" aria-hidden="true">
+                      <img
+                        className="kq-island-img"
+                        src={`/favicon/adventure/island/map${activeWorld.id}-${index + 1}.png`}
+                        alt=""
+                      />
+                      {locked && <span className="kq-island-lock">🔒</span>}
+                      {cleared && <span className="kq-island-check">✓</span>}
+                      {isStart && <span className="kq-island-start">START!</span>}
+                    </button>
+                    <div className="kq-island-info">
+                      <span className="kq-island-label">{label}</span>
+                      <div className="kq-island-stars" aria-hidden="true">
                         <span>{cleared ? "⭐" : "☆"}</span>
                         <span>{cleared ? "⭐" : "☆"}</span>
                         <span>{cleared ? "⭐" : "☆"}</span>
                       </div>
-                    </button>
-                  );
-                })}
-                <button
-                  className={`kq-treasure-chest ${worldComplete ? "ready" : ""} ${treasureClaimed ? "claimed" : ""}`}
-                  type="button"
-                  onClick={claimWorldTreasure}
-                >
-                  <span className="kq-x-mark">✕</span>
-                  <span className="kq-chest-bubble">
-                    <span className="kq-chest-icon">{treasureClaimed ? "✅" : "🧰"}</span>
-                    <span className="kq-chest-label">{treasureClaimed ? "CLAIMED!" : "TREASURE!"}</span>
-                    <small>
-                      +{rewards.coins} coins · +{rewards.xp} XP
-                    </small>
-                  </span>
-                </button>
-              </div>
-
-              <div className="kq-map-tip">
-                <strong>Adventure Tip</strong>
-                <span>Complete every node on the map to unlock the treasure chest bonus.</span>
-              </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         </div>
       </section>
 
-      <section id="battleCard" className="card battle-card" hidden={!battle}>
+      <section id="battleCard" className="kq-battle" hidden={!battle}>
         {battle && (
-          <>
-            <h2 id="encounterTitle">
-              {battle.boss ? "Boss" : `Level ${battle.level}`} • {battle.enemy.name}
-            </h2>
-            <button id="exitBattleBtn" className="btn secondary" type="button" onClick={() => setBattle(null)}>
-              Run
-            </button>
+          <div className={`kq-battle-shell ${battle.boss ? "is-boss" : ""}`}>
+            <header className="kq-battle-head">
+              <div className="kq-battle-title">
+                <span className="kq-battle-kicker">
+                  {battle.boss ? "⚔️ Boss Battle" : `Level ${battle.level}`}
+                </span>
+                <h2>{battle.enemy.name}</h2>
+              </div>
+              <button className="kq-battle-run" type="button" onClick={() => setBattle(null)}>
+                Run
+              </button>
+            </header>
 
-            <div className="battle">
-              <div>
-                <div className="sprite" role="img" aria-label="Player">
+            <div className={`kq-battle-arena ${battle.boss ? "is-boss" : ""}`}>
+              <div className="kq-fighter">
+                <div
+                  className={`kq-fighter-avatar kq-fighter-avatar--player ${
+                    strike?.target === "player" ? "is-hit" : ""
+                  }`}
+                  role="img"
+                  aria-label="You"
+                >
                   🧑‍🎓
+                  {strike?.target === "player" && (
+                    <span key={strike.key} className="kq-dmg-pop">
+                      -{strike.amount}
+                    </span>
+                  )}
                 </div>
-                <div>YOU</div>
-                <div className="bar">
-                  <i id="playerHPBar" style={{ width: `${clamp((battle.playerHP / battle.playerHPMax) * 100, 0, 100)}%` }} />
-                </div>
-                <div id="playerHPText">
-                  {battle.playerHP}/{battle.playerHPMax}
+                <div className="kq-fighter-meta">
+                  <div className="kq-fighter-row">
+                    <span className="kq-fighter-name">You</span>
+                    <span className="kq-fighter-hp">
+                      {battle.playerHP}/{battle.playerHPMax}
+                    </span>
+                  </div>
+                  <div className="kq-hpbar">
+                    <i
+                      className={`kq-hpbar-fill is-player ${
+                        battle.playerHP / battle.playerHPMax <= 0.3 ? "is-low" : ""
+                      }`}
+                      style={{ width: `${clamp((battle.playerHP / battle.playerHPMax) * 100, 0, 100)}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <div id="enemySprite" className="sprite" role="img" aria-label="Enemy">
+              <div className="kq-battle-vs">
+                <span>VS</span>
+              </div>
+
+              <div className="kq-fighter kq-fighter--enemy">
+                <div
+                  className={`kq-fighter-avatar kq-fighter-avatar--enemy ${battle.boss ? "is-boss" : ""} ${
+                    strike?.target === "enemy" ? "is-hit" : ""
+                  }`}
+                  role="img"
+                  aria-label={battle.enemy.name}
+                >
+                  {battle.boss && <span className="kq-fighter-crown">👑</span>}
                   {battle.enemy.sprite}
+                  {strike?.target === "enemy" && (
+                    <span key={strike.key} className={`kq-dmg-pop ${strike.crit ? "is-crit" : ""}`}>
+                      -{strike.amount}
+                      {strike.crit ? "!" : ""}
+                    </span>
+                  )}
                 </div>
-                <div id="enemyName">{battle.enemy.name}</div>
-                <div className="bar">
-                  <i id="enemyHPBar" style={{ width: `${clamp((battle.enemyHP / battle.enemyHPMax) * 100, 0, 100)}%` }} />
-                </div>
-                <div id="enemyHPText">
-                  {battle.enemyHP}/{battle.enemyHPMax}
+                <div className="kq-fighter-meta">
+                  <div className="kq-fighter-row">
+                    <span className="kq-fighter-name">{battle.enemy.name}</span>
+                    <span className="kq-fighter-hp">
+                      {battle.enemyHP}/{battle.enemyHPMax}
+                    </span>
+                  </div>
+                  <div className="kq-hpbar">
+                    <i
+                      className={`kq-hpbar-fill is-enemy ${
+                        battle.enemyHP / battle.enemyHPMax <= 0.3 ? "is-low" : ""
+                      }`}
+                      style={{ width: `${clamp((battle.enemyHP / battle.enemyHPMax) * 100, 0, 100)}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="qwrap">
-              <h3 id="qTitle">{question?.title || "Question"}</h3>
-              <p id="qPrompt">{question?.prompt || "-"}</p>
-              <div id="qChoices">
+            <div className="kq-battle-q">
+              <div className="kq-q-tagrow">
+                <span className="kq-q-tag">{question?.title || "Question"}</span>
+                {battle.streak > 1 && <span className="kq-q-streak">🔥 {battle.streak} streak</span>}
+              </div>
+              <p className="kq-q-prompt">{question?.prompt || "-"}</p>
+              <div className="kq-q-choices">
                 {(question?.choices || []).map((choice) => (
                   <button
                     key={choice}
                     type="button"
-                    className={`btn kq-answer-btn ${choiceClass[choice] || ""}`}
+                    className={`kq-q-choice ${choiceClass[choice] || ""}`}
                     disabled={lockedChoices}
                     onClick={() => handleAnswer(choice === question?.answer, choice)}
                   >
@@ -705,17 +676,17 @@ export default function AdventureView() {
                   </button>
                 ))}
               </div>
-              <div className="progress">
-                <i id="speedFill" style={{ width: `${speedPercent}%` }} />
+              <div className="kq-q-timer" aria-hidden="true">
+                <i
+                  key={timerKey}
+                  className={timerPaused ? "is-paused" : ""}
+                  style={{ animationDuration: `${timerDuration}ms` }}
+                />
               </div>
-              <p id="qFeedback" className="muted">
-                {feedback}
-              </p>
-              <p id="turnHint" className="muted">
-                {turnHint}
-              </p>
+              <p className="kq-q-feedback">{feedback}</p>
+              <p className="kq-q-hint">{turnHint}</p>
             </div>
-          </>
+          </div>
         )}
       </section>
 

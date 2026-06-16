@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
@@ -9,6 +8,13 @@ import "@/styles/pages/dashboard-enhancements.css";
 
 function clamp(num: number, min: number, max: number) {
   return Math.max(min, Math.min(max, num));
+}
+
+// Map a framed shop avatar (…/avatars/avatarN.png) to its raw full-body
+// cutout (…/avatars/raw/rawAvatarN.png) for the dashboard scene.
+function rawAvatarSrc(image?: string) {
+  if (!image) return "";
+  return image.replace("/avatars/avatar", "/avatars/raw/rawAvatar");
 }
 
 function computeJourneyPercent(
@@ -121,61 +127,30 @@ export default function DashboardView() {
 
           <div className="student-dashboard-right">
             <div className="kq-scene-stage">
-              <div className="kq-scene-background">
+              <div className="kq-scene-card">
                 {profile.background?.image ? (
-                  <Image
-                    src={profile.background.image}
-                    alt={profile.background.name}
-                    width={400}
-                    height={320}
-                    className="kq-bg-image"
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profile.background.image} alt="" className="kq-scene-bg" />
+                ) : (
+                  <div className="kq-scene-bg kq-scene-bg--emoji">{profile.background?.emoji || "🏯"}</div>
+                )}
+
+                {profile.avatar?.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={rawAvatarSrc(profile.avatar.image)}
+                    alt={profile.avatar.name}
+                    className="kq-scene-avatar-img"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (profile.avatar?.image && img.src !== profile.avatar.image) {
+                        img.src = profile.avatar.image;
+                      }
+                    }}
                   />
                 ) : (
-                  <div className="kq-bg-emoji">{profile.background?.emoji || "🏯"}</div>
+                  <span className="kq-scene-avatar-emoji">{profile.avatar?.emoji || "👑"}</span>
                 )}
-                <div className="kq-scene-overlay" />
-              </div>
-
-              {profile.pet ? (
-                <div className="kq-scene-pet">
-                  {profile.pet.image ? (
-                    <Image src={profile.pet.image} alt={profile.pet.name} width={70} height={70} />
-                  ) : (
-                    <span>{profile.pet.emoji}</span>
-                  )}
-                  <div className="kq-pet-label">{profile.pet.name}</div>
-                </div>
-              ) : null}
-
-              <div className="kq-scene-avatar-container">
-                <div className="kq-scene-frame">{profile.frame?.emoji || "☁️"}</div>
-                <div className="kq-scene-avatar">
-                  {profile.avatar?.image ? (
-                    <Image src={profile.avatar.image} alt={profile.avatar.name} width={140} height={240} />
-                  ) : (
-                    <span>{profile.avatar?.emoji || "👑"}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="kq-scene-nameplate">
-                <div className="kq-scene-items">
-                  {profile.avatar ? (
-                    <span>
-                      {profile.avatar.emoji} {profile.avatar.name}
-                    </span>
-                  ) : null}
-                  {profile.pet ? (
-                    <span>
-                      {profile.pet.emoji} {profile.pet.name}
-                    </span>
-                  ) : null}
-                  {profile.background ? (
-                    <span>
-                      {profile.background.emoji} {profile.background.name}
-                    </span>
-                  ) : null}
-                </div>
               </div>
             </div>
           </div>

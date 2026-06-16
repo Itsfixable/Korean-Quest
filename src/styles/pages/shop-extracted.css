@@ -84,7 +84,7 @@
     .kq-shop-user-avatar {
       width: 62px;
       height: 62px;
-      border-radius: 23px;
+      border-radius: 50%;
       overflow: hidden;
       flex: 0 0 62px;
       display: grid;
@@ -431,12 +431,27 @@
 
     .kq-profile-stack {
       width: 100%;
-      height: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      max-height: 100%;
+      margin: auto;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    /* The inner picture (background + avatar) clipped to a circle that sits
+       just inside the frame's cloud ring. */
+    .kq-profile-clip {
+      width: 84%;
+      height: 84%;
+      aspect-ratio: 1 / 1;
       position: relative;
       display: grid;
       place-items: center;
       overflow: hidden;
-      border-radius: inherit;
+      border-radius: 50%;
+      z-index: 1;
     }
 
     .kq-profile-layer {
@@ -458,19 +473,20 @@
       filter: drop-shadow(0 10px 12px rgba(41, 55, 95, 0.12));
     }
 
-    .kq-profile-pet-layer {
-      z-index: 3;
-      filter: drop-shadow(0 8px 9px rgba(41, 55, 95, 0.14));
-    }
-
+    /* The frame sits on top, wrapping around the clipped picture. */
     .kq-profile-frame-layer {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
       z-index: 4;
     }
 
     .kq-shop-user-avatar .kq-profile-stack {
       width: 100%;
       height: 100%;
-      border-radius: 23px;
+      aspect-ratio: auto;
     }
 
     .kq-shop-placeholder {

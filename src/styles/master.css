@@ -995,19 +995,6 @@ body.kq-transition-out main {
     transform: translate(-50%, -28px);
   }
 }
-/* Adventure map nodes: prevent global hover motion from moving buttons away */
-.kq-start-node:hover,
-.kq-map-node:hover,
-.kq-treasure-chest:hover {
-  transform: translate(-50%, -50%) !important;
-}
-
-.kq-start-node:active,
-.kq-map-node:active,
-.kq-treasure-chest:active {
-  transform: translate(-50%, -50%) scale(0.98) !important;
-}
-
 /* =========================
    Animated Jamo Star Upgrades
 ========================= */

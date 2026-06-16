@@ -18,6 +18,7 @@ interface ImageSettings {
   scale?: number;
   objectFit?: string;
   objectPosition?: string;
+  transformOrigin?: string;
 }
 
 interface VisualShopItem extends ShopItem {
@@ -47,14 +48,13 @@ const SHOP_ASSETS = {
     "/favicon/shop/avatars/avatar8.png",
   ],
   rawAvatars: [
-    "/favicon/shop/raw-images/avatar/avatar1.png",
-    "/favicon/shop/raw-images/avatar/avatar2.png",
-    "/favicon/shop/raw-images/avatar/avatar3.png",
-    "/favicon/shop/raw-images/avatar/avatar4.png",
-    "/favicon/shop/raw-images/avatar/avatar5.png",
-    "/favicon/shop/raw-images/avatar/avatar6.png",
-    "/favicon/shop/raw-images/avatar/avatar7.png",
-    "/favicon/shop/raw-images/avatar/avatar8.png",
+    "/favicon/shop/avatars/raw/rawAvatar1.png",
+    "/favicon/shop/avatars/raw/rawAvatar2.png",
+    "/favicon/shop/avatars/raw/rawAvatar3.png",
+    "/favicon/shop/avatars/raw/rawAvatar4.png",
+    "/favicon/shop/avatars/raw/rawAvatar5.png",
+    "/favicon/shop/avatars/raw/rawAvatar6.png",
+    "/favicon/shop/avatars/raw/rawAvatar7.png",
   ],
   frames: [
     "/favicon/shop/frames/cloud-frame.png",
@@ -94,31 +94,28 @@ const SHOP_ITEM_FLOAT_CONSTRAINTS = {
 };
 
 const PROFILE_LAYER_CONSTRAINTS = {
+  // Zoom hard into the top of the avatar so only the head/face shows,
+  // anchored to the top so scaling keeps the head in view (the rest of the
+  // body overflows and is clipped by the stack's overflow: hidden).
   avatar: {
-    width: "82%",
-    height: "82%",
+    width: "100%",
+    height: "100%",
     x: "0px",
-    y: "8px",
-    scale: 1,
+    y: "-16%",
+    scale: 2.7,
     objectFit: "contain",
-    objectPosition: "center bottom",
+    objectPosition: "center top",
+    transformOrigin: "center top",
   },
-  pet: {
-    width: "46%",
-    height: "46%",
-    x: "20px",
-    y: "18px",
-    scale: 1,
-    objectFit: "contain",
-    objectPosition: "center bottom",
-  },
+  // The frame uses cover (not fill) so its circular ring keeps its shape and
+  // wraps around the inner picture like a real picture frame.
   frame: {
     width: "100%",
     height: "100%",
     x: "0px",
     y: "0px",
     scale: 1,
-    objectFit: "contain",
+    objectFit: "cover",
     objectPosition: "center center",
   },
 };
@@ -188,6 +185,7 @@ function imageSettingsToStyle(settings: ImageSettings | null): CSSProperties {
     height: settings.height || "100%",
     objectFit: (settings.objectFit || "contain") as CSSProperties["objectFit"],
     objectPosition: settings.objectPosition || "center center",
+    transformOrigin: settings.transformOrigin || "center center",
     transform: `translate(${settings.x || "0px"}, ${settings.y || "0px"}) scale(${settings.scale || 1})`,
   };
 }
@@ -318,46 +316,36 @@ function ProfileStack({
   avatar,
   frame,
   background,
-  pet,
 }: {
   avatar?: VisualShopItem | null;
   frame?: VisualShopItem | null;
   background?: VisualShopItem | null;
-  pet?: VisualShopItem | null;
 }) {
   const avatarSrc = avatar?.rawImage || avatar?.image || "";
   const frameSrc = frame?.image || "";
   const backgroundSrc = background?.image || "";
-  const petSrc = pet?.rawImage || pet?.image || "";
 
   return (
     <div className="kq-profile-stack">
-      {backgroundSrc ? (
-        <ShopImage src={backgroundSrc} alt="" className="kq-profile-layer kq-profile-bg" />
-      ) : null}
-      {avatarSrc ? (
-        <ShopImage
-          src={avatarSrc}
-          fallbackSrc={avatar?.image || avatarSrc}
-          alt=""
-          className="kq-profile-layer kq-profile-avatar-layer"
-          style={imageSettingsToStyle(PROFILE_LAYER_CONSTRAINTS.avatar)}
-        />
-      ) : null}
-      {petSrc ? (
-        <ShopImage
-          src={petSrc}
-          fallbackSrc={pet?.image || petSrc}
-          alt=""
-          className="kq-profile-layer kq-profile-pet-layer"
-          style={imageSettingsToStyle(PROFILE_LAYER_CONSTRAINTS.pet)}
-        />
-      ) : null}
+      <div className="kq-profile-clip">
+        {backgroundSrc ? (
+          <ShopImage src={backgroundSrc} alt="" className="kq-profile-layer kq-profile-bg" />
+        ) : null}
+        {avatarSrc ? (
+          <ShopImage
+            src={avatarSrc}
+            fallbackSrc={avatar?.image || avatarSrc}
+            alt=""
+            className="kq-profile-layer kq-profile-avatar-layer"
+            style={imageSettingsToStyle(PROFILE_LAYER_CONSTRAINTS.avatar)}
+          />
+        ) : null}
+      </div>
       {frameSrc ? (
         <ShopImage
           src={frameSrc}
           alt=""
-          className="kq-profile-layer kq-profile-frame-layer"
+          className="kq-profile-frame-layer"
           style={imageSettingsToStyle(PROFILE_LAYER_CONSTRAINTS.frame)}
         />
       ) : null}
@@ -379,8 +367,8 @@ function PlainItemImage({ item, index, extraClass = "" }: { item: VisualShopItem
   return (
     <FloatShell index={index}>
       <ShopImage
-        src={item.rawImage || item.image}
-        fallbackSrc={item.image}
+        src={item.image || item.rawImage}
+        fallbackSrc={item.rawImage || item.image}
         alt={item.name}
         className={`kq-shop-art ${extraClass}`}
         style={imageSettingsToStyle(item.imageSettings)}
@@ -519,7 +507,6 @@ export default function ShopView() {
           avatar={profileVisuals.avatar}
           frame={profileVisuals.frame}
           background={profileVisuals.background}
-          pet={profileVisuals.pet}
         />
       );
     }
