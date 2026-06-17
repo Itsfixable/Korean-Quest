@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { asset } from "@/lib/asset";
 import "@/styles/pages/dashboard.css";
@@ -17,6 +17,26 @@ function rawAvatarSrc(image?: string) {
   if (!image) return "";
   return image.replace("/avatars/avatar", "/avatars/raw/rawAvatar");
 }
+
+// Frame artwork is assigned by catalog order in the shop, so we mirror that
+// ordering here to render the equipped frame on the profile picture.
+const FRAME_IMAGES = [
+  "/favicon/shop/frames/cloud-frame.png",
+  "/favicon/shop/frames/night-frame.png",
+  "/favicon/shop/frames/traditional-frame.png",
+  "/favicon/shop/frames/frame4.png",
+];
+
+// Zoom into the head of the full-body avatar cutout so the circular profile
+// picture frames the face (matching the shop's profile preview).
+const PFP_AVATAR_STYLE: CSSProperties = {
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  objectPosition: "center top",
+  transformOrigin: "center top",
+  transform: "translate(0px, -16%) scale(2.7)",
+};
 
 function computeJourneyPercent(
   completedLessonIds: string[],
@@ -38,6 +58,7 @@ export default function DashboardView() {
   const getAdventureProgress = useGameStore((s) => s.getAdventureProgress);
   const getEquippedProfile = useGameStore((s) => s.getEquippedProfile);
   const getCurrentDisplayTitle = useGameStore((s) => s.getCurrentDisplayTitle);
+  const getShopCatalog = useGameStore((s) => s.getShopCatalog);
   const ensureDaily = useGameStore((s) => s.ensureDaily);
 
   const [xpPct, setXpPct] = useState(0);
@@ -48,6 +69,14 @@ export default function DashboardView() {
   const profile = getEquippedProfile();
   const displayTitle = getCurrentDisplayTitle();
   const nextXp = needXP(player.level);
+
+  const frameImage = useMemo(() => {
+    const frames = getShopCatalog("frames");
+    const idx = frames.findIndex((f) => f.id === profile.frame?.id);
+    return FRAME_IMAGES[idx >= 0 ? idx : 0] || "";
+  }, [getShopCatalog, profile.frame?.id]);
+
+  const avatarRawSrc = rawAvatarSrc(profile.avatar?.image);
 
   const journeyPercent = useMemo(
     () => computeJourneyPercent(progress.completedLessonIds, progress.battlesWon, achievements.length),
@@ -80,7 +109,18 @@ export default function DashboardView() {
 
   return (
     <>
-      <section className="card dashboard-card student-dashboard-card">
+      <section className="card dashboard-card student-dashboard-card kq-dashboard-hero">
+        {profile.background?.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={asset(profile.background.image)} alt="" className="kq-dashboard-hero-bg" />
+        ) : (
+          <div className="kq-dashboard-hero-bg kq-dashboard-hero-bg--emoji" aria-hidden="true">
+            {profile.background?.emoji || "🏯"}
+          </div>
+        )}
+        <div className="kq-dashboard-hero-veil" aria-hidden="true" />
+
+        <div className="kq-dashboard-hero-content">
         <div className="student-dashboard-header">
           <span className="student-dashboard-icon" aria-hidden="true">
             🎯
@@ -127,35 +167,25 @@ export default function DashboardView() {
           </div>
 
           <div className="student-dashboard-right">
-            <div className="kq-scene-stage">
-              <div className="kq-scene-card">
-                {profile.background?.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={asset(profile.background.image)} alt="" className="kq-scene-bg" />
-                ) : (
-                  <div className="kq-scene-bg kq-scene-bg--emoji">{profile.background?.emoji || "🏯"}</div>
-                )}
-
-                {profile.avatar?.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={asset(rawAvatarSrc(profile.avatar.image))}
-                    alt={profile.avatar.name}
-                    className="kq-scene-avatar-img"
-                    onError={(e) => {
-                      const img = e.currentTarget;
-                      const fallback = asset(profile.avatar?.image);
-                      if (fallback && img.src !== fallback) {
-                        img.src = fallback;
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="kq-scene-avatar-emoji">{profile.avatar?.emoji || "👑"}</span>
-                )}
-              </div>
-            </div>
+            {avatarRawSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={asset(avatarRawSrc)}
+                alt={profile.avatar?.name || "Your avatar"}
+                className="kq-hero-avatar-img"
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  const fallback = asset(profile.avatar?.image);
+                  if (fallback && img.src !== fallback) {
+                    img.src = fallback;
+                  }
+                }}
+              />
+            ) : (
+              <span className="kq-hero-avatar-emoji">{profile.avatar?.emoji || "👑"}</span>
+            )}
           </div>
+        </div>
         </div>
       </section>
 
@@ -181,19 +211,43 @@ export default function DashboardView() {
           <div className="kq-profile-top">
             <div className="kq-profile-head">
               <div className="kq-profile-avatar-wrap">
-                <div className="kq-profile-bg">{profile.background?.emoji || "🏯"}</div>
-                <div className="kq-profile-avatar">
-                  {profile.avatar?.image ? (
+                <div className="kq-dash-pfp">
+                  <div className="kq-dash-pfp-clip">
+                    {profile.background?.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className="kq-dash-pfp-bg" src={asset(profile.background.image)} alt="" />
+                    ) : null}
+                    {avatarRawSrc ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        className="kq-dash-pfp-avatar"
+                        src={asset(avatarRawSrc)}
+                        alt={profile.avatar?.name || "Your avatar"}
+                        style={PFP_AVATAR_STYLE}
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          const fallback = asset(profile.avatar?.image);
+                          if (fallback && img.src !== fallback) {
+                            img.src = fallback;
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span className="kq-dash-pfp-emoji">{profile.avatar?.emoji || "👑"}</span>
+                    )}
+                  </div>
+                  {frameImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={asset(profile.avatar.image)}
-                      alt={profile.avatar.name}
+                      className="kq-dash-pfp-frame"
+                      src={asset(frameImage)}
+                      alt=""
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
                     />
-                  ) : (
-                    profile.avatar?.emoji || "👑"
-                  )}
+                  ) : null}
                 </div>
-                <div className="kq-profile-frame">{profile.frame?.emoji || "☁️"}</div>
               </div>
               <div>
                 <h3 className="kq-profile-title">{displayTitle}</h3>
