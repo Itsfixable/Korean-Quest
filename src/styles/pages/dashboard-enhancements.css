@@ -411,13 +411,22 @@
 
 /* ---------------------------------------------------------------------------
    DASHBOARD HERO BANNER
-   The equipped background image bleeds across the entire top banner instead
-   of being confined to a small card, with the avatar standing in the scene.
+   The equipped background image bleeds across the entire top banner with the
+   avatar standing inside the same scene layer, so the background and avatar
+   share the exact same lighting/opacity. A dark scrim on the left keeps the
+   stats and title readable while the right side stays fully vivid.
 --------------------------------------------------------------------------- */
 .kq-dashboard-hero {
   position: relative;
   overflow: hidden;
   min-height: 320px;
+}
+
+/* Scene layer: background + avatar live together below the text + scrim. */
+.kq-dashboard-hero-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
 .kq-dashboard-hero-bg {
@@ -427,69 +436,80 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  z-index: 0;
 }
 
 .kq-dashboard-hero-bg--emoji {
   display: grid;
   place-items: center;
   font-size: 8rem;
-  background: linear-gradient(180deg, #e7eefb, #dfe8f6);
-  color: rgba(91, 114, 159, 0.22);
+  background: linear-gradient(180deg, #1f2942, #283a63);
+  color: rgba(255, 255, 255, 0.32);
 }
 
+.kq-hero-avatar-img {
+  position: absolute;
+  right: clamp(8px, 5%, 64px);
+  bottom: 0;
+  width: auto;
+  max-width: 48%;
+  height: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.32));
+  pointer-events: none;
+  user-select: none;
+}
+
+.kq-hero-avatar-emoji {
+  position: absolute;
+  right: 8%;
+  bottom: 12%;
+  font-size: 6rem;
+}
+
+/* Dark scrim: strong on the left (behind text), clear before the avatar. */
 .kq-dashboard-hero-veil {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: linear-gradient(
-    100deg,
-    rgba(255, 255, 255, 0.97) 0%,
-    rgba(255, 255, 255, 0.93) 32%,
-    rgba(255, 255, 255, 0.66) 52%,
-    rgba(255, 255, 255, 0.2) 76%,
-    rgba(255, 255, 255, 0) 100%
+    105deg,
+    rgba(11, 16, 31, 0.72) 0%,
+    rgba(11, 16, 31, 0.55) 28%,
+    rgba(11, 16, 31, 0.24) 46%,
+    rgba(11, 16, 31, 0) 62%
   );
 }
 
 .kq-dashboard-hero-content {
   position: relative;
   z-index: 2;
+  max-width: 480px;
 }
 
-.kq-dashboard-hero .student-dashboard-body {
-  align-items: stretch;
-  margin-bottom: 0;
+.kq-dashboard-hero .student-dashboard-header h1 {
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
-.kq-dashboard-hero .student-dashboard-left {
-  align-self: center;
+.kq-dashboard-hero .dashboard-stats {
+  max-width: 420px;
 }
 
-.kq-dashboard-hero .student-dashboard-right {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  min-height: 260px;
-  overflow: visible;
+.kq-dashboard-hero .stat-box {
+  background: rgba(15, 21, 38, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
 }
 
-.kq-hero-avatar-img {
-  width: auto;
-  max-width: 100%;
-  height: 100%;
-  max-height: 340px;
-  object-fit: contain;
-  object-position: center bottom;
-  margin-bottom: -18px;
-  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.3));
-  pointer-events: none;
-  user-select: none;
+.kq-dashboard-hero .stat-label {
+  color: rgba(255, 255, 255, 0.82);
 }
 
-.kq-hero-avatar-emoji {
-  align-self: center;
-  font-size: 6rem;
+.kq-dashboard-hero .stat-value {
+  color: #fff;
 }
 
 /* ---------------------------------------------------------------------------
@@ -549,18 +569,26 @@
   z-index: 3;
 }
 
-@media (max-width: 860px) {
-  .kq-dashboard-hero .student-dashboard-right {
-    order: 1;
-    min-height: 220px;
+@media (max-width: 640px) {
+  .kq-dashboard-hero {
+    min-height: 280px;
   }
 
+  .kq-hero-avatar-img {
+    max-width: 44%;
+    max-height: 230px;
+    opacity: 0.92;
+  }
+
+  /* Narrow screens: the stats sit over the scene, so deepen the scrim a touch
+     and let it wrap further right for legibility. */
   .kq-dashboard-hero-veil {
     background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.94) 0%,
-      rgba(255, 255, 255, 0.82) 45%,
-      rgba(255, 255, 255, 0.4) 100%
+      120deg,
+      rgba(11, 16, 31, 0.78) 0%,
+      rgba(11, 16, 31, 0.6) 40%,
+      rgba(11, 16, 31, 0.28) 70%,
+      rgba(11, 16, 31, 0.08) 100%
     );
   }
 }

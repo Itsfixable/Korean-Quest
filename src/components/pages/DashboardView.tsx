@@ -110,82 +110,77 @@ export default function DashboardView() {
   return (
     <>
       <section className="card dashboard-card student-dashboard-card kq-dashboard-hero">
-        {profile.background?.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={asset(profile.background.image)} alt="" className="kq-dashboard-hero-bg" />
-        ) : (
-          <div className="kq-dashboard-hero-bg kq-dashboard-hero-bg--emoji" aria-hidden="true">
-            {profile.background?.emoji || "🏯"}
-          </div>
-        )}
+        <div className="kq-dashboard-hero-scene" aria-hidden="true">
+          {profile.background?.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={asset(profile.background.image)} alt="" className="kq-dashboard-hero-bg" />
+          ) : (
+            <div className="kq-dashboard-hero-bg kq-dashboard-hero-bg--emoji">
+              {profile.background?.emoji || "🏯"}
+            </div>
+          )}
+          {avatarRawSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={asset(avatarRawSrc)}
+              alt=""
+              className="kq-hero-avatar-img"
+              onError={(e) => {
+                const img = e.currentTarget;
+                const fallback = asset(profile.avatar?.image);
+                if (fallback && img.src !== fallback) {
+                  img.src = fallback;
+                }
+              }}
+            />
+          ) : (
+            <span className="kq-hero-avatar-emoji">{profile.avatar?.emoji || "👑"}</span>
+          )}
+        </div>
         <div className="kq-dashboard-hero-veil" aria-hidden="true" />
 
         <div className="kq-dashboard-hero-content">
-        <div className="student-dashboard-header">
-          <span className="student-dashboard-icon" aria-hidden="true">
-            🎯
-          </span>
-          <h1>Student Dashboard</h1>
-        </div>
+          <div className="student-dashboard-header">
+            <span className="student-dashboard-icon" aria-hidden="true">
+              🎯
+            </span>
+            <h1>Student Dashboard</h1>
+          </div>
 
-        <div className="student-dashboard-body">
-          <div className="student-dashboard-left">
-            <div className="dashboard-stats kq-stagger">
-              <div className="stat-box">
-                <span className="stat-label">Level</span>
-                <strong className="stat-value">{player.level}</strong>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">XP</span>
-                <strong className="stat-value">
-                  {player.xp} / {nextXp}
-                </strong>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">Streak</span>
-                <strong className="stat-value">
-                  {player.streak} day{player.streak === 1 ? "" : "s"}
-                </strong>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">Coins</span>
-                <strong className="stat-value">{player.coins}</strong>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">Badges</span>
-                <strong id="dBadges" className="stat-value">
-                  {achievements.length === 0
-                    ? "—"
-                    : achievements.slice(0, 3).map((badge) => (
-                        <span key={badge.name} className="kq-inline-badge" title={badge.name}>
-                          {badge.icon}
-                        </span>
-                      ))}
-                </strong>
-              </div>
+          <div className="dashboard-stats kq-stagger">
+            <div className="stat-box">
+              <span className="stat-label">Level</span>
+              <strong className="stat-value">{player.level}</strong>
+            </div>
+            <div className="stat-box">
+              <span className="stat-label">XP</span>
+              <strong className="stat-value">
+                {player.xp} / {nextXp}
+              </strong>
+            </div>
+            <div className="stat-box">
+              <span className="stat-label">Streak</span>
+              <strong className="stat-value">
+                {player.streak} day{player.streak === 1 ? "" : "s"}
+              </strong>
+            </div>
+            <div className="stat-box">
+              <span className="stat-label">Coins</span>
+              <strong className="stat-value">{player.coins}</strong>
+            </div>
+            <div className="stat-box">
+              <span className="stat-label">Badges</span>
+              <strong id="dBadges" className="stat-value">
+                {achievements.length === 0
+                  ? "—"
+                  : achievements.slice(0, 3).map((badge) => (
+                      <span key={badge.name} className="kq-inline-badge" title={badge.name}>
+                        {badge.icon}
+                      </span>
+                    ))}
+              </strong>
             </div>
           </div>
-
-          <div className="student-dashboard-right">
-            {avatarRawSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={asset(avatarRawSrc)}
-                alt={profile.avatar?.name || "Your avatar"}
-                className="kq-hero-avatar-img"
-                onError={(e) => {
-                  const img = e.currentTarget;
-                  const fallback = asset(profile.avatar?.image);
-                  if (fallback && img.src !== fallback) {
-                    img.src = fallback;
-                  }
-                }}
-              />
-            ) : (
-              <span className="kq-hero-avatar-emoji">{profile.avatar?.emoji || "👑"}</span>
-            )}
-          </div>
-        </div>
         </div>
       </section>
 
