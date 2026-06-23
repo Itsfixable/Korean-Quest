@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { asset } from "@/lib/asset";
 
 const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
-const MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference";
+const MODEL = "Qwen/Qwen2.5-7B-Instruct:fastest";
 const MAX_HISTORY = 14;
 
 interface ChatMessage {

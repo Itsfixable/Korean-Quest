@@ -1,0 +1,10 @@
+{
+  // Name must match the existing deployed worker so the chatbot URL
+  // (crimson-truth-507c.<subdomain>.workers.dev) stays the same.
+  "name": "crimson-truth-507c",
+  "main": "src/index.js",
+  "compatibility_date": "2026-03-07",
+  "observability": {
+    "enabled": true
+  }
+}
