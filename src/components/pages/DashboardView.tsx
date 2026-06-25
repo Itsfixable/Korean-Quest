@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
+import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
 import { asset } from "@/lib/asset";
 import "@/styles/pages/dashboard.css";
 import "@/styles/pages/dashboard-enhancements.css";
@@ -17,26 +18,6 @@ function rawAvatarSrc(image?: string) {
   if (!image) return "";
   return image.replace("/avatars/avatar", "/avatars/raw/rawAvatar");
 }
-
-// Frame artwork is assigned by catalog order in the shop, so we mirror that
-// ordering here to render the equipped frame on the profile picture.
-const FRAME_IMAGES = [
-  "/favicon/shop/frames/cloud-frame.png",
-  "/favicon/shop/frames/night-frame.png",
-  "/favicon/shop/frames/traditional-frame.png",
-  "/favicon/shop/frames/frame4.png",
-];
-
-// Zoom into the head of the full-body avatar cutout so the circular profile
-// picture frames the face (matching the shop's profile preview).
-const PFP_AVATAR_STYLE: CSSProperties = {
-  width: "100%",
-  height: "100%",
-  objectFit: "contain",
-  objectPosition: "center top",
-  transformOrigin: "center top",
-  transform: "translate(0px, -16%) scale(2.7)",
-};
 
 function computeJourneyPercent(
   completedLessonIds: string[],
@@ -58,8 +39,9 @@ export default function DashboardView() {
   const getAdventureProgress = useGameStore((s) => s.getAdventureProgress);
   const getEquippedProfile = useGameStore((s) => s.getEquippedProfile);
   const getCurrentDisplayTitle = useGameStore((s) => s.getCurrentDisplayTitle);
-  const getShopCatalog = useGameStore((s) => s.getShopCatalog);
   const ensureDaily = useGameStore((s) => s.ensureDaily);
+  const claimQuest = useGameStore((s) => s.claimQuest);
+  const profileVisuals = useEquippedProfileVisuals();
 
   const [xpPct, setXpPct] = useState(0);
   const [journeyPct, setJourneyPct] = useState(0);
@@ -69,12 +51,6 @@ export default function DashboardView() {
   const profile = getEquippedProfile();
   const displayTitle = getCurrentDisplayTitle();
   const nextXp = needXP(player.level);
-
-  const frameImage = useMemo(() => {
-    const frames = getShopCatalog("frames");
-    const idx = frames.findIndex((f) => f.id === profile.frame?.id);
-    return FRAME_IMAGES[idx >= 0 ? idx : 0] || "";
-  }, [getShopCatalog, profile.frame?.id]);
 
   const avatarRawSrc = rawAvatarSrc(profile.avatar?.image);
 
@@ -174,8 +150,19 @@ export default function DashboardView() {
                 {achievements.length === 0
                   ? "—"
                   : achievements.slice(0, 3).map((badge) => (
-                      <span key={badge.name} className="kq-inline-badge" title={badge.name}>
-                        {badge.icon}
+                      <span
+                        key={badge.name}
+                        className="kq-badge-tip"
+                        tabIndex={0}
+                        aria-label={`${badge.name}: ${badge.desc}`}
+                      >
+                        <span className="kq-inline-badge" aria-hidden="true">
+                          {badge.icon}
+                        </span>
+                        <span className="kq-badge-tip__bubble" role="tooltip" aria-hidden="true">
+                          <span className="kq-badge-tip__name">{badge.name}</span>
+                          <span className="kq-badge-tip__desc">{badge.desc}</span>
+                        </span>
                       </span>
                     ))}
               </strong>
@@ -203,75 +190,45 @@ export default function DashboardView() {
           <h2>Quest Profile</h2>
         </div>
         <div id="kqProfileBody">
-          <div className="kq-profile-top">
-            <div className="kq-profile-head">
-              <div className="kq-profile-avatar-wrap">
-                <div className="kq-dash-pfp">
-                  <div className="kq-dash-pfp-clip">
-                    {profile.background?.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img className="kq-dash-pfp-bg" src={asset(profile.background.image)} alt="" />
-                    ) : null}
-                    {avatarRawSrc ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        className="kq-dash-pfp-avatar"
-                        src={asset(avatarRawSrc)}
-                        alt={profile.avatar?.name || "Your avatar"}
-                        style={PFP_AVATAR_STYLE}
-                        onError={(e) => {
-                          const img = e.currentTarget;
-                          const fallback = asset(profile.avatar?.image);
-                          if (fallback && img.src !== fallback) {
-                            img.src = fallback;
-                          }
-                        }}
-                      />
-                    ) : (
-                      <span className="kq-dash-pfp-emoji">{profile.avatar?.emoji || "👑"}</span>
-                    )}
-                  </div>
-                  {frameImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      className="kq-dash-pfp-frame"
-                      src={asset(frameImage)}
-                      alt=""
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
-                  ) : null}
+          <div className="kq-profile-main">
+            <div className="kq-profile-top">
+              <div className="kq-profile-head">
+                <div className="kq-profile-avatar-wrap">
+                  <ProfileStack
+                    avatar={profileVisuals.avatar}
+                    frame={profileVisuals.frame}
+                    background={profileVisuals.background}
+                  />
+                </div>
+                <div>
+                  <h3 className="kq-profile-title">{displayTitle}</h3>
+                  <p className="kq-profile-sub">
+                    {profile.background?.name || "Hanok Courtyard"} · {player.coins} coins · Level {player.level}
+                  </p>
                 </div>
               </div>
-              <div>
-                <h3 className="kq-profile-title">{displayTitle}</h3>
-                <p className="kq-profile-sub">
-                  {profile.background?.name || "Hanok Courtyard"} · {player.coins} coins · Level {player.level}
-                </p>
-              </div>
             </div>
-            <div className="kq-profile-actions">
-              <Link className="kq-profile-shop-link" href="/shop">
-                Open Shop
-              </Link>
+            <div className="kq-profile-tags">
+              <span className="kq-profile-tag">
+                {profile.avatar?.emoji || "👑"} {profile.avatar?.name || "Starter Avatar"}
+              </span>
+              <span className="kq-profile-tag">
+                {profile.frame?.emoji || "☁️"} {profile.frame?.name || "Cloud Frame"}
+              </span>
+              <span className="kq-profile-tag">
+                {profile.background?.emoji || "🏯"} {profile.background?.name || "Hanok Courtyard"}
+              </span>
+              {profile.pet ? (
+                <span className="kq-profile-tag">
+                  {profile.pet.emoji} {profile.pet.name}
+                </span>
+              ) : null}
             </div>
           </div>
-          <div className="kq-profile-tags">
-            <span className="kq-profile-tag">
-              {profile.avatar?.emoji || "👑"} {profile.avatar?.name || "Starter Avatar"}
-            </span>
-            <span className="kq-profile-tag">
-              {profile.frame?.emoji || "☁️"} {profile.frame?.name || "Cloud Frame"}
-            </span>
-            <span className="kq-profile-tag">
-              {profile.background?.emoji || "🏯"} {profile.background?.name || "Hanok Courtyard"}
-            </span>
-            {profile.pet ? (
-              <span className="kq-profile-tag">
-                {profile.pet.emoji} {profile.pet.name}
-              </span>
-            ) : null}
+          <div className="kq-profile-actions">
+            <Link className="kq-profile-shop-link" href="/shop">
+              Open Shop
+            </Link>
           </div>
         </div>
       </section>
@@ -393,15 +350,26 @@ export default function DashboardView() {
               dailyQuests.map((q) => {
                 const prog = Math.min(q.progress, q.target);
                 const pct = clamp(Math.round((prog / q.target) * 100), 0, 100);
+                const ready = !q.done && prog >= q.target;
                 return (
-                  <li key={q.id} className="kq-quest-item">
+                  <li key={q.id} className={`kq-quest-item ${ready ? "is-ready" : ""}`}>
                     <div className="kq-quest-top">
                       <span>
-                        {q.done ? "✅" : "⬜"} {q.desc}
+                        {q.done ? "✅" : ready ? "🎁" : "⬜"} {q.desc}
                       </span>
-                      <span className="kq-quest-status">
-                        {prog}/{q.target}
-                      </span>
+                      {ready ? (
+                        <button
+                          type="button"
+                          className="kq-quest-claim"
+                          onClick={() => claimQuest(q.id)}
+                        >
+                          Claim
+                        </button>
+                      ) : (
+                        <span className="kq-quest-status">
+                          {q.done ? "Claimed" : `${prog}/${q.target}`}
+                        </span>
+                      )}
                     </div>
                     <div className="kq-quest-mini-bar" aria-hidden="true">
                       <span style={{ width: `${pct}%` }} />

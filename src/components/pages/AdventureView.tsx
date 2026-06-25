@@ -90,7 +90,15 @@ function buildIslandPath(points: { x: number; y: number }[]) {
   return d;
 }
 
-const ISLAND_PATH = buildIslandPath(ISLAND_LAYOUT);
+// The island art sits in the lower-center of a tall, mostly-transparent PNG
+// frame (props like gate posts reach up into the empty top). Connecting the
+// trail to each island's box center would route it through that airy top and
+// show it "over" the island. Dropping the trail anchors down onto the grass
+// makes the line meet the solid island body, so it tucks behind it.
+const PATH_ANCHOR_Y_OFFSET = 6;
+const ISLAND_PATH = buildIslandPath(
+  ISLAND_LAYOUT.map((point) => ({ x: point.x, y: point.y + PATH_ANCHOR_Y_OFFSET })),
+);
 
 type Topic = "hangul" | "vocab" | "mixed";
 type Difficulty = "easy" | "normal" | "hard";
@@ -251,6 +259,13 @@ export default function AdventureView() {
   const [strike, setStrike] = useState<{ target: "enemy" | "player"; amount: number; crit: boolean; key: number } | null>(
     null,
   );
+  // The level the bunny marker is currently standing on, plus whether it's
+  // mid-walk to the next node (drives the walking bob animation).
+  const [bunnyLevel, setBunnyLevel] = useState<number | null>(null);
+  const [bunnyWalking, setBunnyWalking] = useState(false);
+  // The level node currently hovered, so the bunny standing on it can lift in
+  // sync with the island's hover animation.
+  const [hoverLevel, setHoverLevel] = useState<number | null>(null);
 
   const timerTimeoutRef = useRef<number | null>(null);
   const questionStartRef = useRef<number>(0);
@@ -320,6 +335,32 @@ export default function AdventureView() {
   );
   const bgSrc = WORLD_BG[activeWorld.id] ?? WORLD_BG[1];
   const isNight = activeWorld.id === 3;
+
+  // Keep the bunny marker on the current node. When the next playable level
+  // advances (after clearing one) and we're back on the map, walk it over.
+  // Start the bob the moment it begins sliding so it wiggles *as* it walks.
+  useEffect(() => {
+    if (!hydrated || battle) return;
+    const levels: readonly number[] = activeWorld.levels;
+    const target = nextPlayableLevel ?? levels[levels.length - 1];
+    if (bunnyLevel === target) return;
+    if (bunnyLevel == null || !levels.includes(bunnyLevel)) {
+      setBunnyLevel(target);
+      return;
+    }
+    setBunnyWalking(true);
+    const moveT = window.setTimeout(() => setBunnyLevel(target), 60);
+    return () => window.clearTimeout(moveT);
+  }, [hydrated, battle, nextPlayableLevel, activeWorld, bunnyLevel]);
+
+  // Stop the walking bob once the slide finishes. Kept in its own effect (keyed
+  // only on `bunnyWalking`) so the bunnyLevel change mid-walk can't cancel the
+  // timer and leave the bunny wiggling forever after it arrives.
+  useEffect(() => {
+    if (!bunnyWalking) return;
+    const stopT = window.setTimeout(() => setBunnyWalking(false), 1250);
+    return () => window.clearTimeout(stopT);
+  }, [bunnyWalking]);
 
   const showAdventureToast = (message: string) => {
     setToast(message);
@@ -510,11 +551,34 @@ export default function AdventureView() {
               <img className="kq-stage-bg" src={asset(bgSrc)} alt="" aria-hidden="true" />
 
               <div className="kq-stage-title">
+                <nav className="kq-world-nav" aria-label="Select a map">
+                  {WORLDS.map((world) => {
+                    const unlocked = isWorldUnlocked(world.id);
+                    const complete = isWorldComplete(world.id);
+                    const active = world.id === activeWorld.id;
+                    const badge = !unlocked ? "🔒" : complete ? "✓" : world.id;
+                    return (
+                      <button
+                        key={world.id}
+                        type="button"
+                        className={`kq-world-tab ${active ? "is-active" : ""} ${unlocked ? "" : "is-locked"} ${
+                          complete ? "is-complete" : ""
+                        }`}
+                        disabled={!unlocked}
+                        aria-current={active ? "true" : undefined}
+                        onClick={() => unlocked && setActiveWorldId(world.id)}
+                      >
+                        <span className="kq-world-tab-badge">{badge}</span>
+                        <span className="kq-world-tab-name">{world.title}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
                 <p className="kq-stage-eyebrow">✨ Adventure 🌸</p>
                 <h2>Level {activeWorld.id}</h2>
                 <p className="kq-stage-world">{activeWorld.title}</p>
                 <p className="kq-stage-desc">
-                  Answer questions and collect stars as you journey through Korean!
+                  Answer questions and battle your way through Korean!
                 </p>
               </div>
 
@@ -531,7 +595,7 @@ export default function AdventureView() {
                 const label = boss ? `Boss ${level}` : `Level ${level}`;
                 return (
                   <div
-                    key={level}
+                    key={index}
                     className={`kq-island-node ${cleared ? "done" : ""} ${locked ? "locked" : ""} ${
                       boss ? "boss" : ""
                     }`}
@@ -542,6 +606,8 @@ export default function AdventureView() {
                       className="kq-island-btn"
                       disabled={locked}
                       onClick={() => startBattle(level)}
+                      onMouseEnter={() => !locked && setHoverLevel(level)}
+                      onMouseLeave={() => setHoverLevel((cur) => (cur === level ? null : cur))}
                       aria-label={label}
                     >
                       <img
@@ -550,20 +616,34 @@ export default function AdventureView() {
                         alt=""
                       />
                       {locked && <span className="kq-island-lock">🔒</span>}
-                      {cleared && <span className="kq-island-check">✓</span>}
                       {isStart && <span className="kq-island-start">START!</span>}
                     </button>
                     <div className="kq-island-info">
                       <span className="kq-island-label">{label}</span>
-                      <div className="kq-island-stars" aria-hidden="true">
-                        <span>{cleared ? "⭐" : "☆"}</span>
-                        <span>{cleared ? "⭐" : "☆"}</span>
-                        <span>{cleared ? "⭐" : "☆"}</span>
-                      </div>
                     </div>
                   </div>
                 );
               })}
+
+              {(() => {
+                const bunnyIdx =
+                  bunnyLevel != null
+                    ? (activeWorld.levels as readonly number[]).indexOf(bunnyLevel)
+                    : -1;
+                if (bunnyIdx < 0) return null;
+                const bunnyPos = ISLAND_LAYOUT[bunnyIdx];
+                return (
+                  <img
+                    className={`kq-adventure-bunny ${bunnyWalking ? "is-walking" : ""} ${
+                      !bunnyWalking && hoverLevel === bunnyLevel ? "is-hover" : ""
+                    }`}
+                    src={asset("/favicon/adventure/bunnyAvatarAdventure.png")}
+                    alt=""
+                    aria-hidden="true"
+                    style={{ left: `${bunnyPos.x}%`, top: `${bunnyPos.y}%` }}
+                  />
+                );
+              })()}
             </div>
           </section>
         </div>

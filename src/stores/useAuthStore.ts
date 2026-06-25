@@ -2,7 +2,9 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { User } from "@supabase/supabase-js";
 import type { FakeUser } from "@/lib/types";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 
 function getInitials(name: string) {
   const cleaned = String(name || "").trim();
@@ -11,38 +13,169 @@ function getInitials(name: string) {
   return parts.map((p) => p.charAt(0).toUpperCase()).join("") || "KQ";
 }
 
+function mapSupabaseUser(user: User): FakeUser {
+  const meta = user.user_metadata ?? {};
+  const name =
+    (meta.display_name as string) ||
+    (meta.full_name as string) ||
+    (user.email ? user.email.split("@")[0] : "Learner");
+  return {
+    name,
+    email: user.email ?? "",
+    loggedIn: true,
+    avatarInitials: getInitials(name),
+    avatarImage: (meta.avatar_url as string) || undefined,
+  };
+}
+
+interface AuthResult {
+  ok: boolean;
+  error?: string;
+  needsConfirmation?: boolean;
+}
+
 interface AuthStore {
   user: FakeUser | null;
+  userId: string | null;
   authModalOpen: boolean;
+  authLoading: boolean;
+  authError: string | null;
+  initialized: boolean;
+  init: () => void;
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  clearError: () => void;
+  signUp: (name: string, email: string, password: string) => Promise<AuthResult>;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
+  signInWithGoogle: () => Promise<AuthResult>;
+  /** Legacy local-only login used when Supabase isn't configured. */
   login: (name: string, email: string, password: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
+
+let authSubscribed = false;
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
+      userId: null,
       authModalOpen: false,
-      openAuthModal: () => set({ authModalOpen: true }),
-      closeAuthModal: () => set({ authModalOpen: false }),
+      authLoading: false,
+      authError: null,
+      initialized: false,
+
+      init: () => {
+        const supabase = getSupabase();
+        if (!supabase || authSubscribed) {
+          set({ initialized: true });
+          return;
+        }
+        authSubscribed = true;
+
+        supabase.auth.getSession().then(({ data }) => {
+          const sessionUser = data.session?.user ?? null;
+          set({
+            user: sessionUser ? mapSupabaseUser(sessionUser) : null,
+            userId: sessionUser?.id ?? null,
+            initialized: true,
+          });
+        });
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          const sessionUser = session?.user ?? null;
+          set({
+            user: sessionUser ? mapSupabaseUser(sessionUser) : null,
+            userId: sessionUser?.id ?? null,
+          });
+        });
+      },
+
+      openAuthModal: () => set({ authModalOpen: true, authError: null }),
+      closeAuthModal: () => set({ authModalOpen: false, authError: null }),
+      clearError: () => set({ authError: null }),
+
+      signUp: async (name, email, password) => {
+        const supabase = getSupabase();
+        if (!supabase) {
+          get().login(name, email, password);
+          return { ok: true };
+        }
+        set({ authLoading: true, authError: null });
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { data: { display_name: name.trim() } },
+        });
+        if (error) {
+          set({ authLoading: false, authError: error.message });
+          return { ok: false, error: error.message };
+        }
+        const needsConfirmation = !data.session;
+        set({ authLoading: false, authModalOpen: needsConfirmation ? true : false });
+        return { ok: true, needsConfirmation };
+      },
+
+      signIn: async (email, password) => {
+        const supabase = getSupabase();
+        if (!supabase) {
+          get().login(email.split("@")[0], email, password);
+          return { ok: true };
+        }
+        set({ authLoading: true, authError: null });
+        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) {
+          set({ authLoading: false, authError: error.message });
+          return { ok: false, error: error.message };
+        }
+        set({ authLoading: false, authModalOpen: false });
+        return { ok: true };
+      },
+
+      signInWithGoogle: async () => {
+        const supabase = getSupabase();
+        if (!supabase) return { ok: false, error: "Supabase is not configured." };
+        const redirectTo = typeof window !== "undefined" ? window.location.href : undefined;
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo },
+        });
+        if (error) {
+          set({ authError: error.message });
+          return { ok: false, error: error.message };
+        }
+        return { ok: true };
+      },
+
       login: (name, email, password) => {
         const trimmed = String(name || "").trim();
         if (!trimmed) return;
+        void password;
         set({
           user: {
             name: trimmed,
             email: String(email || "").trim(),
-            password: String(password || "").trim(),
             loggedIn: true,
             avatarInitials: getInitials(trimmed),
           },
+          userId: `local:${String(email || trimmed).trim()}`,
           authModalOpen: false,
         });
       },
-      logout: () => set({ user: null }),
+
+      logout: async () => {
+        const supabase = getSupabase();
+        if (supabase) {
+          await supabase.auth.signOut();
+        }
+        set({ user: null, userId: null });
+      },
     }),
-    { name: "kq_fake_user" },
+    {
+      name: "kq_auth",
+      // Only persist the legacy local user. Supabase manages its own session;
+      // re-persisting it would fight with the SDK on reload.
+      partialize: (state) => (isSupabaseConfigured ? {} : { user: state.user, userId: state.userId }),
+    },
   ),
 );

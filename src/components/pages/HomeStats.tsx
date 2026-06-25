@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { asset } from "@/lib/asset";
+import CountUp from "@/components/reactbits/CountUp";
 
 export function HomeStats() {
   const ensureDaily = useGameStore((s) => s.ensureDaily);
@@ -21,7 +22,9 @@ export function HomeStats() {
     <div className="kq-hero-stats" role="region" aria-label="Key progress">
       <div className="metric">
         <div className="muted">Level</div>
-        <div className="kpi-value">{player.level}</div>
+        <div className="kpi-value">
+          <CountUp to={player.level} duration={1.4} />
+        </div>
       </div>
       <div className="metric">
         <div className="kpi-value streak-value">
@@ -32,7 +35,7 @@ export function HomeStats() {
             width={24}
             height={24}
           />
-          <span>{player.streak}</span>
+          <CountUp to={player.streak} duration={1.4} />
         </div>
         <div className="muted">Day Streak</div>
       </div>

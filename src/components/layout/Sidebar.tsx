@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { NAV_LINKS } from "@/lib/constants/nav-links";
+import { NAV_LINKS, NAV_SUBROUTES } from "@/lib/constants/nav-links";
+import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
 import { asset } from "@/lib/asset";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
@@ -47,6 +48,20 @@ function NavLink({
 }
 
 function ProfileAvatar({ initials, image }: { initials: string; image?: string }) {
+  const visuals = useEquippedProfileVisuals();
+
+  if (visuals.avatar) {
+    return (
+      <div className="kq-sidebar-pfp">
+        <ProfileStack
+          avatar={visuals.avatar}
+          frame={visuals.frame}
+          background={visuals.background}
+        />
+      </div>
+    );
+  }
+
   if (image) {
     return (
       <div className="kq-sidebar-avatar">
@@ -71,9 +86,13 @@ export function Sidebar() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  const matchesPath = (target: string) =>
+    pathname === target || pathname.startsWith(`${target}/`);
+
   const isCurrent = (href: string) => {
     if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
+    if (matchesPath(href)) return true;
+    return (NAV_SUBROUTES[href] ?? []).some((sub) => matchesPath(sub));
   };
 
   const brand = (
@@ -176,7 +195,7 @@ export function Sidebar() {
             </div>
           ) : (
             <div className="kq-sidebar-profile-top">
-              <div className="kq-sidebar-avatar">KQ</div>
+              <ProfileAvatar initials="KQ" />
               <div className="kq-sidebar-user-copy">
                 <strong>Guest Learner</strong>
                 <span>Log in to save your progress</span>

@@ -21,8 +21,14 @@ const ALLOWED_MODELS = new Set([
 const SYSTEM_PROMPT =
   "You are the Korean Quest learning assistant. Help the user with Korean " +
   "language, grammar, vocabulary, and culture. Keep answers clear and " +
-  "encouraging. When you use Korean, add a short English gloss so beginners " +
-  "can follow along.";
+  "encouraging. Respond primarily in English. " +
+  "When you write Korean, use ONLY Hangul (한글). " +
+  "Never use Chinese or Japanese characters, and never use Hanja (Chinese " +
+  "characters) — even for words of Chinese origin, always write them in " +
+  "Hangul. For every Korean phrase, include its romanization and a short " +
+  "English translation so beginners can follow along. " +
+  "Only output valid, complete characters — never emit broken or placeholder " +
+  "symbols.";
 
 const FALLBACK_REPLY =
   "음… 지금 AI가 잠깐 바쁜 것 같아요. 다시 한 번 해볼까요?";
@@ -76,11 +82,13 @@ export default {
           model,
           messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
           max_tokens: 512,
-          temperature: 0.7,
+          temperature: 0.4,
         }),
       });
 
-      const rawText = await hfResponse.text();
+      // Decode explicitly as UTF-8 so a mislabeled upstream charset can't
+      // corrupt multi-byte Hangul.
+      const rawText = new TextDecoder("utf-8").decode(await hfResponse.arrayBuffer());
       let parsed = null;
       try {
         parsed = JSON.parse(rawText);
@@ -100,8 +108,8 @@ export default {
         );
       }
 
-      const reply =
-        parsed?.choices?.[0]?.message?.content?.trim() || FALLBACK_REPLY;
+      const rawReply = parsed?.choices?.[0]?.message?.content || "";
+      const reply = cleanReply(rawReply) || FALLBACK_REPLY;
 
       return replyJson(reply);
     } catch (error) {
@@ -113,6 +121,15 @@ export default {
     }
   },
 };
+
+function cleanReply(text) {
+  return String(text || "")
+    // Drop Unicode replacement characters left by any broken byte sequence.
+    .replace(/\uFFFD/g, "")
+    // Collapse whitespace that stripping may have left dangling.
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
 
 function sanitizeMessages(messages) {
   return messages

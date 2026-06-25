@@ -301,13 +301,125 @@
   justify-content: flex-end;
 }
 
+/* Balanced, equal-width action buttons so both groups read the same and are
+   easier to scan and tap. */
+.flash-action-buttons .btn {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.flash-action-grade .flash-action-buttons {
+  justify-content: stretch;
+}
+
 @media (max-width: 720px) {
   .flash-actions {
     grid-template-columns: 1fr;
   }
 
   .flash-action-grade .flash-action-buttons {
-    justify-content: flex-start;
+    justify-content: stretch;
+  }
+}
+
+/* ===== Shuffle riffle animation ===== */
+.flash-shuffle {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.flash-shuffle-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(70%, 240px);
+  height: 78%;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, #f2f7fd);
+  border: 1px solid rgba(91, 114, 159, 0.18);
+  box-shadow: 0 14px 28px rgba(42, 59, 112, 0.16);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: kqShuffleRiffle 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.flash-shuffle-card.sc-0 {
+  --sx: -72px;
+  --sy: -8px;
+  --sr: -15deg;
+  animation-delay: 0ms;
+}
+.flash-shuffle-card.sc-1 {
+  --sx: 68px;
+  --sy: -3px;
+  --sr: 13deg;
+  animation-delay: 45ms;
+}
+.flash-shuffle-card.sc-2 {
+  --sx: -46px;
+  --sy: 6px;
+  --sr: -8deg;
+  animation-delay: 90ms;
+}
+.flash-shuffle-card.sc-3 {
+  --sx: 78px;
+  --sy: 2px;
+  --sr: 17deg;
+  animation-delay: 70ms;
+}
+.flash-shuffle-card.sc-4 {
+  --sx: 0px;
+  --sy: 0px;
+  --sr: 0deg;
+  animation-delay: 110ms;
+}
+
+@keyframes kqShuffleRiffle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(0.98);
+  }
+  18% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(0.98);
+  }
+}
+
+/* Hide the live card while the riffle plays so the swap isn't visible. */
+.flash-stage.is-shuffling #flash3d,
+.flash-stage.is-shuffling #incoming3d {
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+#shuffleBtn.is-shuffling {
+  animation: kqShuffleBtnPulse 600ms ease;
+}
+
+@keyframes kqShuffleBtnPulse {
+  50% {
+    transform: translateY(-1px) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-shuffle-card,
+  #shuffleBtn.is-shuffling {
+    animation: none;
+  }
+  .flash-stage.is-shuffling #flash3d {
+    opacity: 1;
   }
 }
 

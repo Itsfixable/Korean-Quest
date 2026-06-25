@@ -6,40 +6,10 @@ import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/pages/alphabetWorld.css";
 import "@/styles/pages/jamo.css";
 import "@/styles/pages/jamo-select-enhancements.css";
-import { SIOT_STROKE } from "@/lib/pixel-adventure/strokes";
+import { JAMO_LIST, JAMO_STROKE_DB, type StrokeSeg } from "@/lib/jamo-strokes";
 
-type StrokeSeg = [number, number, number, number];
-type Stroke = StrokeSeg[];
-
-const STROKE_DB: Record<string, Stroke[]> = {
-  "ㄱ": [[[0.2, 0.25, 0.75, 0.25]], [[0.75, 0.25, 0.75, 0.78]]],
-  "ㄴ": [[[0.25, 0.22, 0.25, 0.78]], [[0.25, 0.78, 0.78, 0.78]]],
-  "ㄷ": [[[0.22, 0.22, 0.78, 0.22]], [[0.22, 0.22, 0.22, 0.78]], [[0.22, 0.78, 0.78, 0.78]]],
-  "ㅁ": [[[0.22, 0.22, 0.22, 0.78]], [[0.22, 0.22, 0.78, 0.22]], [[0.78, 0.22, 0.78, 0.78]], [[0.22, 0.78, 0.78, 0.78]]],
-  "ㅂ": [[[0.27, 0.22, 0.27, 0.74]], [[0.73, 0.22, 0.73, 0.74]], [[0.27, 0.52, 0.73, 0.52]], [[0.27, 0.78, 0.73, 0.78]]],
-  "ㅅ": SIOT_STROKE,
-  "ㅏ": [[[0.45, 0.18, 0.45, 0.82]], [[0.45, 0.5, 0.65, 0.5]]],
-  "ㅓ": [[[0.35, 0.5, 0.55, 0.5]], [[0.55, 0.18, 0.55, 0.82]]],
-  "ㅗ": [[[0.5, 0.35, 0.5, 0.55]], [[0.22, 0.55, 0.78, 0.55]]],
-  "ㅣ": [[[0.55, 0.18, 0.55, 0.82]]],
-  "ㅠ": [[[0.22, 0.4, 0.78, 0.4]], [[0.4, 0.4, 0.4, 0.6]], [[0.6, 0.4, 0.6, 0.6]]],
-  "ㅡ": [[[0.22, 0.55, 0.78, 0.55]]],
-};
-
-const JAMO = [
-  { ch: "ㄱ", kind: "Consonant" },
-  { ch: "ㄴ", kind: "Consonant" },
-  { ch: "ㄷ", kind: "Consonant" },
-  { ch: "ㅁ", kind: "Consonant" },
-  { ch: "ㅂ", kind: "Consonant" },
-  { ch: "ㅅ", kind: "Consonant" },
-  { ch: "ㅏ", kind: "Vowel" },
-  { ch: "ㅓ", kind: "Vowel" },
-  { ch: "ㅗ", kind: "Vowel" },
-  { ch: "ㅣ", kind: "Vowel" },
-  { ch: "ㅠ", kind: "Vowel" },
-  { ch: "ㅡ", kind: "Vowel" },
-];
+const STROKE_DB = JAMO_STROKE_DB;
+const JAMO = JAMO_LIST;
 
 function starsHTML(n: number) {
   return `${"⭐".repeat(n)}${"☆".repeat(3 - n)}`;

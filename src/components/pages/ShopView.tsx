@@ -4,154 +4,25 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import type { ShopItem } from "@/lib/types";
 import { asset } from "@/lib/asset";
+import { ShopImage, ProfileStack } from "@/components/shared/ProfileAvatar";
+import {
+  SHOP_ASSETS,
+  addImagesToItems,
+  getEquippedVisualItem,
+  imageSettingsToStyle,
+  type CategoryId,
+  type VisualShopItem,
+} from "@/lib/shop-visuals";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/pages/shop.css";
 import "@/styles/pages/shop-extracted.css";
-
-type CategoryId = "avatars" | "frames" | "backgrounds" | "pets";
-
-interface ImageSettings {
-  width?: string;
-  height?: string;
-  x?: string;
-  y?: string;
-  scale?: number;
-  objectFit?: string;
-  objectPosition?: string;
-  transformOrigin?: string;
-}
-
-interface VisualShopItem extends ShopItem {
-  rawImage: string;
-  imageSettings: ImageSettings | null;
-}
-
-const SHOP_ASSETS = {
-  banner: "/favicon/shop/shopBanner.png",
-  icons: {
-    owned: "/favicon/shop/icons/owned.png",
-    equipped: "/favicon/shop/icons/equipped.png",
-    earnCoins: "/favicon/shop/icons/earnCoins.png",
-    avatars: "/favicon/shop/icons/avatar.png",
-    frames: "/favicon/shop/icons/frames.png",
-    backgrounds: "/favicon/shop/icons/bg.png",
-    pets: "/favicon/shop/icons/pets.png",
-  },
-  avatars: [
-    "/favicon/shop/avatars/avatar1.png",
-    "/favicon/shop/avatars/avatar2.png",
-    "/favicon/shop/avatars/avatar3.png",
-    "/favicon/shop/avatars/avatar4.png",
-    "/favicon/shop/avatars/avatar5.png",
-    "/favicon/shop/avatars/avatar6.png",
-    "/favicon/shop/avatars/avatar7.png",
-    "/favicon/shop/avatars/avatar8.png",
-  ],
-  rawAvatars: [
-    "/favicon/shop/avatars/raw/rawAvatar1.png",
-    "/favicon/shop/avatars/raw/rawAvatar2.png",
-    "/favicon/shop/avatars/raw/rawAvatar3.png",
-    "/favicon/shop/avatars/raw/rawAvatar4.png",
-    "/favicon/shop/avatars/raw/rawAvatar5.png",
-    "/favicon/shop/avatars/raw/rawAvatar6.png",
-    "/favicon/shop/avatars/raw/rawAvatar7.png",
-  ],
-  frames: [
-    "/favicon/shop/frames/cloud-frame.png",
-    "/favicon/shop/frames/night-frame.png",
-    "/favicon/shop/frames/traditional-frame.png",
-    "/favicon/shop/frames/frame4.png",
-  ],
-  backgrounds: [
-    "/favicon/shop/backgrounds/night-bg.png",
-    "/favicon/shop/backgrounds/picnic-bg.png",
-    "/favicon/shop/backgrounds/sakura-bg.png",
-    "/favicon/shop/backgrounds/temple-bg.png",
-  ],
-  pets: [
-    "/favicon/shop/pets/bunny.png",
-    "/favicon/shop/pets/cat.png",
-    "/favicon/shop/pets/dog.png",
-    "/favicon/shop/pets/pet4.png",
-    "/favicon/shop/pets/pet5.png",
-    "/favicon/shop/pets/pet6.png",
-  ],
-  rawPets: [
-    "/favicon/shop/raw-images/pets/bunny.png",
-    "/favicon/shop/raw-images/pets/cat.png",
-    "/favicon/shop/raw-images/pets/dog.png",
-    "/favicon/shop/raw-images/pets/pet4.png",
-    "/favicon/shop/raw-images/pets/pet5.png",
-    "/favicon/shop/raw-images/pets/pet6.png",
-  ],
-};
 
 const SHOP_ITEM_FLOAT_CONSTRAINTS = {
   enabled: true,
   distance: "8px",
   duration: "3.8s",
   stagger: "0.18s",
-};
-
-const PROFILE_LAYER_CONSTRAINTS = {
-  // Zoom hard into the top of the avatar so only the head/face shows,
-  // anchored to the top so scaling keeps the head in view (the rest of the
-  // body overflows and is clipped by the stack's overflow: hidden).
-  avatar: {
-    width: "100%",
-    height: "100%",
-    x: "0px",
-    y: "-16%",
-    scale: 2.7,
-    objectFit: "contain",
-    objectPosition: "center top",
-    transformOrigin: "center top",
-  },
-  // The frame uses cover (not fill) so its circular ring keeps its shape and
-  // wraps around the inner picture like a real picture frame.
-  frame: {
-    width: "100%",
-    height: "100%",
-    x: "0px",
-    y: "0px",
-    scale: 1,
-    objectFit: "cover",
-    objectPosition: "center center",
-  },
-};
-
-const SHOP_IMAGE_CONSTRAINTS: Record<CategoryId, ImageSettings[]> = {
-  avatars: [
-    { width: "100%", height: "100%", x: "0px", y: "-50px", scale: 1.02, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-60px", scale: 1.03, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-50px", scale: 1.02, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-50px", scale: 1.02, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-50px", scale: 1.02, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-30px", scale: 1.03, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-40px", scale: 1.02, objectFit: "contain", objectPosition: "center top" },
-    { width: "100%", height: "100%", x: "0px", y: "-50px", scale: 1.02, objectFit: "contain", objectPosition: "center top" },
-  ],
-  frames: [
-    { width: "150%", height: "150%", x: "0px", y: "0px", scale: 1, objectFit: "contain", objectPosition: "center center" },
-    { width: "150%", height: "150%", x: "0px", y: "0px", scale: 1, objectFit: "contain", objectPosition: "center center" },
-    { width: "150%", height: "150%", x: "0px", y: "0px", scale: 1, objectFit: "contain", objectPosition: "center center" },
-    { width: "150%", height: "150%", x: "0px", y: "0px", scale: 1, objectFit: "contain", objectPosition: "center center" },
-  ],
-  backgrounds: [
-    { width: "150%", height: "100%", x: "30px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
-    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
-    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
-    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
-  ],
-  pets: [
-    { width: "220%", height: "150%", x: "-15px", y: "14px", scale: 1.35, objectFit: "contain", objectPosition: "center center" },
-    { width: "250%", height: "200%", x: "10px", y: "0px", scale: 1.3, objectFit: "contain", objectPosition: "center center" },
-    { width: "232%", height: "150%", x: "25px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-    { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-    { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-    { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-  ],
 };
 
 const CATEGORIES: [CategoryId, string, string][] = [
@@ -177,57 +48,6 @@ function getInitials(name: string) {
 
 function getRarityClass(item: ShopItem) {
   return String(item?.rarity || "Common").trim().toLowerCase().replace(/\s+/g, "-");
-}
-
-function imageSettingsToStyle(settings: ImageSettings | null): CSSProperties {
-  if (!settings) return {};
-  return {
-    width: settings.width || "100%",
-    height: settings.height || "100%",
-    objectFit: (settings.objectFit || "contain") as CSSProperties["objectFit"],
-    objectPosition: settings.objectPosition || "center center",
-    transformOrigin: settings.transformOrigin || "center center",
-    transform: `translate(${settings.x || "0px"}, ${settings.y || "0px"}) scale(${settings.scale || 1})`,
-  };
-}
-
-function getCategoryAssets(category: CategoryId) {
-  if (category === "avatars") return SHOP_ASSETS.avatars;
-  if (category === "frames") return SHOP_ASSETS.frames;
-  if (category === "backgrounds") return SHOP_ASSETS.backgrounds;
-  return SHOP_ASSETS.pets;
-}
-
-function getCategoryRawAssets(category: CategoryId) {
-  if (category === "avatars") return SHOP_ASSETS.rawAvatars;
-  if (category === "pets") return SHOP_ASSETS.rawPets;
-  return [];
-}
-
-function addImagesToItems(items: ShopItem[], category: CategoryId): VisualShopItem[] {
-  const imageList = getCategoryAssets(category);
-  const rawImageList = getCategoryRawAssets(category);
-  const constraintsList = SHOP_IMAGE_CONSTRAINTS[category];
-
-  return items.map((item, index) => ({
-    ...item,
-    image: imageList[index] || item.image || "",
-    rawImage: rawImageList[index] || imageList[index] || item.image || "",
-    imageSettings: constraintsList[index] || null,
-  }));
-}
-
-function getEquippedVisualItem(
-  catalog: ShopItem[],
-  category: CategoryId,
-  itemId?: string | null,
-): VisualShopItem | null {
-  const visualCatalog = addImagesToItems(catalog, category);
-  if (itemId) {
-    const found = visualCatalog.find((item) => item.id === itemId);
-    if (found) return found;
-  }
-  return visualCatalog[0] || null;
 }
 
 function getFloatDelay(index: number) {
@@ -260,41 +80,6 @@ function getBaseTotal(items: ShopItem[], category: CategoryId) {
   return items.length;
 }
 
-function ShopImage({
-  src,
-  fallbackSrc,
-  alt,
-  className,
-  style,
-}: {
-  src: string;
-  fallbackSrc?: string;
-  alt: string;
-  className?: string;
-  style?: CSSProperties;
-}) {
-  const [currentSrc, setCurrentSrc] = useState(src);
-
-  useEffect(() => {
-    setCurrentSrc(src);
-  }, [src]);
-
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={asset(currentSrc)}
-      alt={alt}
-      className={className}
-      style={style}
-      onError={() => {
-        if (fallbackSrc && currentSrc !== fallbackSrc) {
-          setCurrentSrc(fallbackSrc);
-        }
-      }}
-    />
-  );
-}
-
 function FloatShell({ index, children }: { index: number; children: ReactNode }) {
   const floatingClass = SHOP_ITEM_FLOAT_CONSTRAINTS.enabled ? "is-floating" : "";
   return (
@@ -309,47 +94,6 @@ function FloatShell({ index, children }: { index: number; children: ReactNode })
       }
     >
       {children}
-    </div>
-  );
-}
-
-function ProfileStack({
-  avatar,
-  frame,
-  background,
-}: {
-  avatar?: VisualShopItem | null;
-  frame?: VisualShopItem | null;
-  background?: VisualShopItem | null;
-}) {
-  const avatarSrc = avatar?.rawImage || avatar?.image || "";
-  const frameSrc = frame?.image || "";
-  const backgroundSrc = background?.image || "";
-
-  return (
-    <div className="kq-profile-stack">
-      <div className="kq-profile-clip">
-        {backgroundSrc ? (
-          <ShopImage src={backgroundSrc} alt="" className="kq-profile-layer kq-profile-bg" />
-        ) : null}
-        {avatarSrc ? (
-          <ShopImage
-            src={avatarSrc}
-            fallbackSrc={avatar?.image || avatarSrc}
-            alt=""
-            className="kq-profile-layer kq-profile-avatar-layer"
-            style={imageSettingsToStyle(PROFILE_LAYER_CONSTRAINTS.avatar)}
-          />
-        ) : null}
-      </div>
-      {frameSrc ? (
-        <ShopImage
-          src={frameSrc}
-          alt=""
-          className="kq-profile-frame-layer"
-          style={imageSettingsToStyle(PROFILE_LAYER_CONSTRAINTS.frame)}
-        />
-      ) : null}
     </div>
   );
 }
@@ -382,40 +126,19 @@ function ItemVisual({
   item,
   category,
   index,
-  profileVisuals,
 }: {
   item: VisualShopItem;
   category: CategoryId;
   index: number;
-  profileVisuals: {
-    avatar: VisualShopItem | null;
-    frame: VisualShopItem | null;
-    background: VisualShopItem | null;
-    pet: VisualShopItem | null;
-  };
 }) {
-  if (category === "frames") {
-    return (
-      <FloatShell index={index}>
-        <ProfileStack
-          avatar={profileVisuals.avatar}
-          frame={item}
-          background={profileVisuals.background}
-        />
-      </FloatShell>
-    );
+  // Frames and backgrounds each preview only their own artwork (no composited
+  // avatar/background), so the gallery shows just the frame or just the bg.
+  if (category === "backgrounds") {
+    return <PlainItemImage item={item} index={index} extraClass="kq-shop-art--bg" />;
   }
 
-  if (category === "backgrounds") {
-    return (
-      <FloatShell index={index}>
-        <ProfileStack
-          avatar={profileVisuals.avatar}
-          frame={profileVisuals.frame}
-          background={item}
-        />
-      </FloatShell>
-    );
+  if (category === "frames") {
+    return <PlainItemImage item={item} index={index} extraClass="kq-shop-art--frame" />;
   }
 
   return <PlainItemImage item={item} index={index} />;
@@ -495,13 +218,14 @@ export default function ShopView() {
   const categoryIcon = categoryMeta?.[2] || SHOP_ASSETS.icons.avatars;
   const categoryCardClass = getCategoryCardClass(activeCategory);
 
-  const userAvatarContent = (() => {
-    const hasProfileStack =
-      profileVisuals.avatar?.image ||
+  const hasProfileStack = Boolean(
+    profileVisuals.avatar?.image ||
       profileVisuals.frame?.image ||
       profileVisuals.background?.image ||
-      profileVisuals.pet?.image;
+      profileVisuals.pet?.image,
+  );
 
+  const userAvatarContent = (() => {
     if (hasProfileStack) {
       return (
         <ProfileStack
@@ -531,7 +255,9 @@ export default function ShopView() {
       <section className="kq-shop-panel">
         <div className="kq-shop-profile-strip">
           <div className="kq-shop-user" id="kqShopUser">
-            <div className="kq-shop-user-avatar">{userAvatarContent}</div>
+            <div className={`kq-shop-user-avatar${hasProfileStack ? " has-stack" : ""}`}>
+              {userAvatarContent}
+            </div>
             <div className="kq-shop-user-copy">
               <h2>{username}</h2>
               <p>
@@ -649,7 +375,6 @@ export default function ShopView() {
                         item={item}
                         category={activeCategory}
                         index={index}
-                        profileVisuals={profileVisuals}
                       />
                     </div>
 

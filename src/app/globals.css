@@ -5,8 +5,11 @@
 @import "../styles/responsive.css";
 @import "../styles/chatbot.css";
 @import "../styles/nav.css";
+@import "../styles/components/profile-avatar.css";
 @import "../styles/components/theme-toggle.css";
+@import "../styles/components/reactbits.css";
 @import "../styles/page-polish.css";
+@import "../styles/refinement.css";
 
 @theme inline {
   --color-bg: #edf4fa;
@@ -18,7 +21,7 @@
   --color-accent: #b3d1d3;
   --color-danger: #cd4a4a;
   --color-success: #6a9f71;
-  --font-sans: "Nunito", sans-serif;
+  --font-sans: var(--font-app), "Nunito", sans-serif;
   --radius-default: 14px;
 }
 
@@ -33,5 +36,5 @@ body {
 
 body {
   background-color: #edf4fa !important;
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Nunito", sans-serif;
 }

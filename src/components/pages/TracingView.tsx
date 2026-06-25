@@ -5,26 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/pages/tracing.css";
 import "@/styles/pages/tracing-enhancements.css";
-import { SIOT_STROKE } from "@/lib/pixel-adventure/strokes";
+import { JAMO_STROKE_DB, type Stroke } from "@/lib/jamo-strokes";
 
-type StrokeSeg = [number, number, number, number];
-type Stroke = StrokeSeg[];
 type Point = { x: number; y: number };
 type StrokeDraw = { points: Point[] };
 
-const STROKE_DB: Record<string, Stroke[]> = {
-  "ㄱ": [[[0.2, 0.25, 0.75, 0.25]], [[0.75, 0.25, 0.75, 0.78]]],
-  "ㄴ": [[[0.25, 0.22, 0.25, 0.78]], [[0.25, 0.78, 0.78, 0.78]]],
-  "ㄷ": [[[0.22, 0.22, 0.78, 0.22]], [[0.22, 0.22, 0.22, 0.78]], [[0.22, 0.78, 0.78, 0.78]]],
-  "ㅁ": [[[0.22, 0.22, 0.78, 0.22]], [[0.22, 0.22, 0.22, 0.78]], [[0.22, 0.78, 0.78, 0.78]], [[0.78, 0.78, 0.78, 0.22]]],
-  "ㅂ": [[[0.27, 0.22, 0.27, 0.74]], [[0.73, 0.22, 0.73, 0.74]], [[0.27, 0.52, 0.73, 0.52]], [[0.27, 0.78, 0.73, 0.78]]],
-  "ㅅ": SIOT_STROKE,
-  "ㅇ": [[[0.65, 0.5, 0.5, 0.35], [0.5, 0.35, 0.35, 0.5], [0.35, 0.5, 0.5, 0.65], [0.5, 0.65, 0.65, 0.5]]],
-  "ㅏ": [[[0.45, 0.18, 0.45, 0.82]], [[0.45, 0.5, 0.65, 0.5]]],
-  "ㅓ": [[[0.35, 0.5, 0.5, 0.5]], [[0.55, 0.18, 0.55, 0.82]]],
-  "ㅗ": [[[0.22, 0.55, 0.78, 0.55]], [[0.5, 0.55, 0.5, 0.35]]],
-  "ㅣ": [[[0.55, 0.18, 0.55, 0.82]]],
-};
+const STROKE_DB = JAMO_STROKE_DB;
 
 const CSS_SIZE = 320;
 const SIZE = CSS_SIZE;

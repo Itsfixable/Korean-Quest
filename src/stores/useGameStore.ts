@@ -68,6 +68,12 @@ const DEFAULT_STATE: GameState = {
     { name: "Nari Lim", xp: 745, title: "Quiz Champ", badge: "🏆", streak: 6 },
     { name: "Daniel Kwon", xp: 700, title: "Streak Saver", badge: "⏰", streak: 6 },
     { name: "Sujin Oh", xp: 660, title: "Lesson Explorer", badge: "📘", streak: 5 },
+    { name: "Yuna Bae", xp: 620, title: "Vocab Voyager", badge: "🧳", streak: 5 },
+    { name: "Tae Jeong", xp: 585, title: "Combo Crafter", badge: "⚡", streak: 4 },
+    { name: "Bo-ram Seo", xp: 540, title: "Daily Devotee", badge: "🌙", streak: 4 },
+    { name: "Kai Jung", xp: 505, title: "Rookie Reader", badge: "🔰", streak: 3 },
+    { name: "Seoyeon Ahn", xp: 470, title: "Syllable Seeker", badge: "🧩", streak: 3 },
+    { name: "Min-jun Cho", xp: 430, title: "Fresh Challenger", badge: "🎒", streak: 2 },
   ],
 };
 
@@ -132,6 +138,7 @@ interface GameStore extends GameState {
   addBadge: (name: string) => void;
   addRecentWork: (title: string, type: string) => void;
   incQuest: (id: string, amount?: number) => void;
+  claimQuest: (id: string) => void;
   markLessonComplete: (opts?: { id?: string; title?: string; adventureUnlockCap?: number }) => { firstCompletion: boolean };
   markQuizComplete: (title?: string) => void;
   markBattleWin: (title?: string, options?: { boss?: boolean }) => void;
@@ -269,19 +276,33 @@ export const useGameStore = create<GameStore>()(
       incQuest: (id, amount = 1) => {
         get().ensureDaily();
         const state = get();
+        // Only track progress here — rewards are granted when the user clicks
+        // "Claim" (see claimQuest). Progress caps at the target and the quest
+        // stays unclaimed (done stays false) until then.
         const daily = state.quests.daily.map((q) => {
           if (q.id !== id || q.done) return q;
-          const progress = q.progress + (Number(amount) || 0);
-          if (progress < q.target) return { ...q, progress };
-          const updated = { ...q, progress: q.target, done: true };
-          if (updated.reward?.coins) get().addCoins(updated.reward.coins);
-          if (updated.reward?.badge) get().addBadge(updated.reward.badge);
-          get().addXP(DAILY_QUEST_XP_BONUS, { countForQuest: false });
-          get().addRecentWork(`Completed daily quest: ${updated.desc} (+${DAILY_QUEST_XP_BONUS} XP)`, "Quest");
-          return updated;
+          const progress = Math.min(q.target, q.progress + (Number(amount) || 0));
+          return { ...q, progress };
         });
-
         set((s) => ({ quests: { ...s.quests, daily } }));
+      },
+
+      claimQuest: (id) => {
+        get().ensureDaily();
+        const quest = get().quests.daily.find((q) => q.id === id);
+        // Only claimable once progress has reached the target and it isn't
+        // already claimed.
+        if (!quest || quest.done || quest.progress < quest.target) return;
+
+        const daily = get().quests.daily.map((q) =>
+          q.id === id ? { ...q, progress: q.target, done: true } : q,
+        );
+        set((s) => ({ quests: { ...s.quests, daily } }));
+
+        if (quest.reward?.coins) get().addCoins(quest.reward.coins);
+        if (quest.reward?.badge) get().addBadge(quest.reward.badge);
+        get().addXP(DAILY_QUEST_XP_BONUS, { countForQuest: false });
+        get().addRecentWork(`Claimed daily quest: ${quest.desc} (+${DAILY_QUEST_XP_BONUS} XP)`, "Quest");
 
         const allDone = get().quests.daily.every((item) => item.done);
         if (allDone && !get().quests.dailyAllBonusGiven) {

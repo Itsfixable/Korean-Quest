@@ -4,6 +4,8 @@ import type { NextConfig } from "next";
 // so the app lives under the "/Korean-Quest" base path.
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/Korean-Quest";
 
+// Fully static export: all data access goes directly to Supabase from the
+// browser, so the site can be hosted on GitHub Pages with no server.
 const nextConfig: NextConfig = {
   output: "export",
   basePath,

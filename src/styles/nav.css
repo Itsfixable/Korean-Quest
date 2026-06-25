@@ -95,7 +95,7 @@ body {
 .brand-korean,
 .brand-quest {
   font-weight: 900 !important;
-  font-family: "Nunito", sans-serif !important;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif !important;
   font-size: clamp(0.94rem, 1.05vw, 1.1rem) !important;
 }
 
@@ -124,7 +124,7 @@ body {
   place-items: center;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: clamp(0.86rem, 1vw, 1rem);
   flex: 0 0 var(--kq-profile-avatar-size);
@@ -137,6 +137,14 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Composed profile picture (avatar + frame + background) in the navbar, matching
+   the dashboard. No circular crop so the frame can wrap around the picture. */
+.kq-sidebar-pfp {
+  width: var(--kq-profile-avatar-size);
+  height: var(--kq-profile-avatar-size);
+  flex: 0 0 var(--kq-profile-avatar-size);
 }
 
 .kq-sidebar-user-copy {
@@ -181,7 +189,7 @@ body {
   color: #1e2a3f !important;
   background: transparent !important;
   box-shadow: none !important;
-  font-family: "Nunito", sans-serif !important;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif !important;
   font-size: var(--kq-link-font) !important;
   font-weight: 900 !important;
   transition: transform 120ms ease, background 120ms ease, color 120ms ease;
@@ -192,7 +200,8 @@ body {
   transform: translateX(2px);
 }
 
-.kq-side-link[aria-current="page"] {
+.site-nav .kq-side-link[aria-current="page"],
+.site-nav .kq-mobile-link[aria-current="page"] {
   background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%) !important;
   color: #fff !important;
 }
@@ -222,7 +231,7 @@ body {
   border: none;
   border-radius: 999px;
   padding: clamp(10px, 1vw, 12px) clamp(12px, 1vw, 14px);
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
   font-size: var(--kq-bottom-btn-font);
   font-weight: 900;
   text-align: center;
@@ -266,7 +275,7 @@ body {
 .kq-auth-field label {
   font-weight: 800;
   color: #273142;
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 .kq-auth-field input {
@@ -274,7 +283,7 @@ body {
   border-radius: 14px;
   padding: 12px 14px;
   font-size: 0.96rem;
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 .kq-auth-field input:focus {
@@ -298,12 +307,170 @@ body {
   cursor: pointer;
   background: rgba(91, 114, 159, 0.1);
   color: #5b729f;
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 .kq-auth-btn.primary {
   background: linear-gradient(180deg, #7089bc 0%, #5d76aa 100%);
   color: #fff;
+}
+
+.kq-auth-btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.kq-auth-error {
+  margin: 2px 0 0;
+  color: #c0392b;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.kq-auth-notice {
+  margin: 2px 0 0;
+  color: #2f6f4f;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.kq-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 12px;
+  color: #98a2b3;
+  font-size: 0.82rem;
+}
+
+.kq-auth-divider::before,
+.kq-auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.gsi-material-button {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-appearance: none;
+  background-color: WHITE;
+  background-image: none;
+  border: none;
+  box-shadow: 0 1px 2px rgba(41, 55, 95, 0.16), 0 2px 8px rgba(41, 55, 95, 0.1);
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-family: var(--font-app), "Nunito", sans-serif;
+  font-size: 14px;
+  height: 40px;
+  letter-spacing: 0.25px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 400px;
+  min-width: min-content;
+}
+
+.gsi-material-button .gsi-material-button-icon {
+  height: 20px;
+  margin-right: 10px;
+  min-width: 20px;
+  width: 20px;
+}
+
+.gsi-material-button .gsi-material-button-content-wrapper {
+  -webkit-align-items: center;
+  align-items: center;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.gsi-material-button .gsi-material-button-contents {
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  font-family: var(--font-app), "Nunito", sans-serif;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.gsi-material-button .gsi-material-button-state {
+  -webkit-transition: opacity .218s;
+  transition: opacity .218s;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.gsi-material-button:disabled {
+  cursor: default;
+  background-color: #ffffff61;
+  box-shadow: none;
+}
+
+.gsi-material-button:disabled .gsi-material-button-contents {
+  opacity: 38%;
+}
+
+.gsi-material-button:disabled .gsi-material-button-icon {
+  opacity: 38%;
+}
+
+.gsi-material-button:not(:disabled):active .gsi-material-button-state,
+.gsi-material-button:not(:disabled):focus .gsi-material-button-state {
+  background-color: #303030;
+  opacity: 12%;
+}
+
+.gsi-material-button:not(:disabled):hover {
+  -webkit-box-shadow: 0 2px 4px rgba(41, 55, 95, 0.2), 0 6px 16px rgba(41, 55, 95, 0.16);
+  box-shadow: 0 2px 4px rgba(41, 55, 95, 0.2), 0 6px 16px rgba(41, 55, 95, 0.16);
+}
+
+.gsi-material-button:not(:disabled):hover .gsi-material-button-state {
+  background-color: #303030;
+  opacity: 8%;
+}
+
+.kq-auth-switch {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #5a6477;
+}
+
+.kq-auth-switch button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 800;
+  color: #5d76aa;
+  cursor: pointer;
 }
 
 .kq-mobile-top {
@@ -332,7 +499,7 @@ body {
   border-radius: 999px;
   background: rgba(91, 114, 159, 0.1);
   color: #22324d;
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
   font-size: 0.88rem;
   font-weight: 800;
   max-width: 150px;

@@ -153,6 +153,7 @@
 .recent-list li,
 .quest-list li {
   font-size: 1rem;
+  font-family: var(--font-app), "Nunito", sans-serif;
 }
 
 .recent-list li {

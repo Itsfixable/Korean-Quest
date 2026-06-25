@@ -8,3 +8,10 @@ export const NAV_LINKS = [
   { href: "/leaderboard", label: "Leaderboard", icon: "nav-leaderboard.png" },
   { href: "/about", label: "About", icon: "nav-about.png" },
 ] as const;
+
+// Routes that live under a top-level nav tab but have their own path. Visiting
+// any of these keeps the parent tab highlighted (e.g. Flashcards → "Learn").
+export const NAV_SUBROUTES: Record<string, string[]> = {
+  "/resources": ["/flashcards", "/test", "/jamo", "/jamo-select", "/tracing"],
+  "/schedule": ["/video"],
+};

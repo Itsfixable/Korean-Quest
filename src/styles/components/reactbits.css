@@ -1,0 +1,119 @@
+/* =========================================
+   React Bits component styles (https://reactbits.dev)
+========================================= */
+
+/* ---------- SplitText ---------- */
+.kq-split-text {
+  display: block;
+}
+.kq-split-text__inner {
+  display: inline;
+}
+.kq-split-text__piece {
+  display: inline-block;
+  white-space: pre;
+  will-change: transform, opacity;
+}
+
+/* ---------- ShinyText ---------- */
+.kq-shiny-text {
+  color: #b5b5b5cc;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  display: inline-block;
+  animation: kq-shine 5s linear infinite;
+}
+.kq-shiny-text.is-disabled {
+  animation: none;
+}
+@keyframes kq-shine {
+  0% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: -100%;
+  }
+}
+
+/* ---------- GradientText ---------- */
+.kq-gradient-text {
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+}
+.kq-gradient-text__content {
+  display: inline-block;
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: kq-gradient-pan linear infinite;
+}
+.kq-gradient-text__overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-size: 300% 100%;
+  animation: kq-gradient-pan linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+@keyframes kq-gradient-pan {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ---------- SpotlightCard ---------- */
+.kq-spotlight-card {
+  position: relative;
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(91, 114, 159, 0.25);
+}
+.kq-spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  background: radial-gradient(
+    circle at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color),
+    transparent 70%
+  );
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.kq-spotlight-card:hover::before {
+  opacity: 1;
+}
+.kq-spotlight-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .kq-shiny-text,
+  .kq-gradient-text__content,
+  .kq-gradient-text__overlay {
+    animation: none;
+  }
+}

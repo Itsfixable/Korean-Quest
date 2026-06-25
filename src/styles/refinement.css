@@ -1,0 +1,184 @@
+/* =============================================================================
+   REFINEMENT LAYER  —  imported last
+   A single, reversible pass that calms the "templated" feel of the UI:
+   softer text color, restrained depth, unified type, and quieter motion.
+   ============================================================================= */
+
+:root,
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  /* Pure #000 reads harsh on a light UI; a deep ink feels intentional. */
+  --text: #19202e;
+  --muted: #5a6477;
+
+  /* One restrained, neutral elevation scale instead of glowy colored shadows. */
+  --shadow: 0 4px 16px rgba(20, 30, 55, 0.06);
+  --shadow-sm: 0 2px 8px rgba(20, 30, 55, 0.05);
+  --shadow-lg: 0 10px 28px rgba(20, 30, 55, 0.09);
+
+  --border-weak: rgba(22, 32, 56, 0.07);
+  --border-mid: rgba(22, 32, 56, 0.1);
+}
+
+/* ---------------------------------------------------------------- TYPOGRAPHY */
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0.005em;
+}
+
+/* Unify headings: 900 everywhere is what makes it feel "bubbly". 700–800 with
+   tighter tracking and controlled leading reads like considered design. */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  letter-spacing: -0.018em;
+  line-height: 1.18;
+}
+
+h1 {
+  letter-spacing: -0.025em;
+}
+
+p, li {
+  line-height: 1.6;
+}
+
+/* Tiny uppercase eyebrow/label tracking — keep it tasteful, not shouty. */
+.kq-section-tag,
+.lb-eyebrow,
+.kq-hero-tag,
+.kq-recent-pill {
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------- DEPTH / RADIUS */
+/* Dial the oversized "bubble" radii back to a consistent, calmer scale. */
+.dashboard-card,
+.student-dashboard-card,
+.kq-profile-card,
+.kq-learning-card,
+.recent-card,
+.quests-card,
+.lb-page-card,
+.kq-shop-panel,
+.kq-shop-bottom-card,
+.kq-frame-card,
+.kq-background-card,
+.kq-pet-card,
+.kq-avatar-card,
+.card {
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.kq-dashboard-hero {
+  border-radius: 16px;
+}
+
+/* Buttons: less pill-y, more app-like. */
+.btn,
+button.btn,
+a.btn {
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- MOTION */
+/* Remove the perpetual decorative motion — the clearest "vibe-coded" tell. */
+.kq-shop-image-zone::before,
+.kq-shop-image-zone::after,
+.kq-stars-3::after {
+  display: none !important;
+}
+
+.kq-shop-float.is-floating {
+  animation: none !important;
+}
+
+/* Keep entrance motion, just quicker and calmer. */
+body.kq-motion-ready .kq-stagger > * {
+  animation-duration: 360ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------- DECLUTTER */
+/* Decorative emoji glued to section headings/hero title read as filler.
+   Hide the purely-ornamental icon slots; functional emoji (coins, badges,
+   quest states) live in their own elements and are untouched. */
+.section-icon,
+.student-dashboard-icon {
+  display: none !important;
+}
+
+/* Tighten the gap the hidden icon used to occupy. */
+.section-head,
+.student-dashboard-header {
+  gap: 0;
+}
+
+/* ---------------------------------------------------------------- SURFACES
+   Gradient-on-gradient surfaces are the biggest remaining "templated" tell.
+   Flatten the known-neutral card/panel surfaces to a single clean fill with a
+   crisp hairline border. (Generic .card is intentionally excluded so sections
+   that paint their own background art are left alone.) */
+.dashboard-card,
+.student-dashboard-card,
+.kq-profile-card,
+.kq-learning-card,
+.recent-card,
+.quests-card,
+.lb-page-card,
+.kq-shop-panel,
+.kq-shop-bottom-card,
+.kq-shop-item:not(.is-selected),
+.kq-feature-card,
+.metric,
+.kq-mini-stat,
+.kq-achievement-chip,
+.kq-quest-item {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--border-mid) !important;
+}
+
+/* Drop the pastel pink/peach radial "glow" backdrops behind shop art. */
+.kq-shop-image-zone,
+.kq-frame-card .kq-shop-image-zone,
+.kq-background-card .kq-shop-image-zone {
+  background: #f4f6fa !important;
+}
+
+/* ---------------------------------------------------------------- PALETTE
+   A faint blue page wash reads "starter template". A neutral cool gray feels
+   more deliberate and lets the content carry the color. */
+:root,
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  --bg: #f1f3f6;
+}
+
+body {
+  background-color: #f1f3f6 !important;
+}
+
+/* Solid brand fills instead of subtle gradients on interactive chrome. */
+.pill[aria-current="page"],
+.pill.active,
+.nav .pill.active {
+  background: var(--brand) !important;
+}
+
+/* Quieter labels: drop the shouty all-caps eyebrow treatment. */
+.lb-eyebrow {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-weight: 700;
+}

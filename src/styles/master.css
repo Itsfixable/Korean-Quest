@@ -59,7 +59,7 @@ body {
 body {
   margin: 0;
   padding-top: 80px; /* Space for fixed navbar */
-  font-family: "Nunito", sans-serif;
+  font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.55;
   background: var(--bg);

@@ -186,15 +186,20 @@
   position: relative;
   overflow: hidden;
   background-image: url("/Korean-Quest/favicon/index/todaysQuestBanner.png");
-  background-repeat: no-repeat; /* Stretch banner edge-to-edge */
+  background-repeat: no-repeat; /* Fill banner edge-to-edge without distortion */
   background-size: cover;
-  background-position: left center;
-} /* Light overlay for readability */
+  background-position: center;
+} /* Left-weighted overlay so text stays readable over the artwork */
 .kq-quests::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.18);
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.3) 45%,
+    rgba(255, 255, 255, 0) 70%
+  );
   pointer-events: none;
 }
 .kq-quests > * {
@@ -203,7 +208,7 @@
 }
 .kq-quests__content {
   max-width: 560px;
-  margin-left: 150px;
+  margin-left: clamp(200px, 22%, 320px);
   margin-right: auto;
   padding: 6px 0 10px;
 }
@@ -216,7 +221,7 @@
   display: inline-flex;
   width: fit-content;
   padding: 10px 14px;
-  margin-left: 50px;
+  margin-left: 0;
 } /* ========================================= LEARNING PATH (Desktop) — FIXED: no overlap ========================================= */
 .kq-bg {
   position: relative;
@@ -247,6 +252,17 @@
 } /* Optional: if your text still feels close to the image */
 .kq-bg--path h2 {
   margin-top: 0;
+  margin-bottom: 18px;
+}
+.learning-path {
+  margin: 0 0 22px;
+  line-height: 1.65;
+}
+.learning-path li {
+  margin-bottom: 14px;
+}
+.learning-path li:last-child {
+  margin-bottom: 0;
 } /* ========================================= TABLET ========================================= */
 @media (max-width: 900px) {
 

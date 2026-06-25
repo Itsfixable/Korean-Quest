@@ -423,6 +423,50 @@
   width: 100%;
 }
 
+/* ---- Player bunny marker ---- */
+.kq-adventure-bunny {
+  position: absolute;
+  z-index: 6;
+  width: clamp(38px, 11cqw, 132px);
+  height: auto;
+  transform: translate(-50%, -86%);
+  transition:
+    left 1.15s cubic-bezier(0.45, 0.05, 0.25, 1),
+    top 1.15s cubic-bezier(0.45, 0.05, 0.25, 1),
+    transform 220ms ease;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.25));
+  will-change: left, top, transform;
+}
+
+.kq-adventure-bunny.is-walking {
+  animation: kqBunnyWalk 0.42s ease-in-out infinite;
+}
+
+/* Match the island hover lift so the bunny rises with the island it stands on. */
+.kq-adventure-bunny.is-hover {
+  transform: translate(-50%, -86%) translateY(-4px) scale(1.05);
+}
+
+@keyframes kqBunnyWalk {
+  0%,
+  100% {
+    transform: translate(-50%, -86%) rotate(-4deg);
+  }
+  50% {
+    transform: translate(-50%, -92%) rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kq-adventure-bunny {
+    transition: none;
+  }
+  .kq-adventure-bunny.is-walking {
+    animation: none;
+  }
+}
+
 .kq-island-stage {
   position: relative;
   width: 100%;
@@ -461,12 +505,100 @@
 /* ---- Title overlay ---- */
 .kq-stage-title {
   position: absolute;
-  top: 7%;
+  top: 4.5%;
   left: 50%;
   transform: translateX(-50%);
-  width: 64%;
-  z-index: 2;
+  width: 72%;
+  z-index: 3;
   text-align: center;
+}
+
+/* ---- Map / world selector navbar (floats over the scroll, scales w/ stage) ---- */
+.kq-world-nav {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(3px, 0.5cqw, 6px);
+  margin: 0 auto clamp(6px, 1.4cqh, 14px);
+  padding: clamp(3px, 0.5cqw, 5px);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px rgba(40, 50, 74, 0.16);
+  pointer-events: auto;
+}
+
+.kq-world-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(3px, 0.7cqw, 7px);
+  border: none;
+  cursor: pointer;
+  padding: clamp(4px, 0.8cqw, 8px) clamp(8px, 1.5cqw, 15px);
+  border-radius: 999px;
+  background: transparent;
+  color: #5b4a8f;
+  font-weight: 900;
+  font-size: clamp(0.52rem, 1.05cqw, 0.86rem);
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 120ms ease, background 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.kq-world-tab:not(:disabled):hover {
+  background: rgba(91, 114, 159, 0.14);
+  transform: translateY(-1px);
+}
+
+.kq-world-tab.is-active {
+  background: linear-gradient(180deg, #7089bc 0%, #5d76aa 100%);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(55, 76, 119, 0.28);
+}
+
+.kq-world-tab.is-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.kq-world-tab-badge {
+  display: grid;
+  place-items: center;
+  width: clamp(15px, 2.1cqw, 22px);
+  height: clamp(15px, 2.1cqw, 22px);
+  border-radius: 50%;
+  background: rgba(91, 114, 159, 0.16);
+  color: inherit;
+  font-size: clamp(0.5rem, 1cqw, 0.78rem);
+  font-weight: 1000;
+  flex-shrink: 0;
+}
+
+.kq-world-tab.is-active .kq-world-tab-badge {
+  background: rgba(255, 255, 255, 0.26);
+  color: #fff;
+}
+
+.kq-world-tab.is-complete:not(.is-active) .kq-world-tab-badge {
+  background: linear-gradient(180deg, #43d17f, #29ab63);
+  color: #fff;
+}
+
+/* On a narrow map, collapse tabs to just their badge so the bar stays on one row. */
+@container (max-width: 540px) {
+  .kq-world-tab-name {
+    display: none;
+  }
+  .kq-world-tab {
+    padding: clamp(4px, 1.2cqw, 8px);
+  }
+}
+
+/* Night world (map 3): the parchment is dark, so lift the inactive tab text. */
+.kq-island-stage.is-night .kq-world-tab {
+  color: #4b3f6b;
 }
 
 .kq-stage-eyebrow {
@@ -557,6 +689,8 @@
   will-change: transform;
 }
 
+/* Bob in place only — the translate(-50%, -50%) keeps the node anchored to its
+   fixed map coordinate while it floats up and down. */
 @keyframes kqIslandFloat {
   0%, 100% {
     transform: translate(-50%, -50%) translateY(0);

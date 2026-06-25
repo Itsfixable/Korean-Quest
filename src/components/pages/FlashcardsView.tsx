@@ -55,6 +55,7 @@ export default function FlashcardsView() {
   const [flipped, setFlipped] = useState(false);
   const [incomingFlipped, setIncomingFlipped] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [shuffling, setShuffling] = useState(false);
 
   const currentSet = FLASHCARD_SETS.find((s) => s.id === currentSetId) || FLASHCARD_SETS[0];
   const prog = ensureSetProgress(getSetProgress(currentSet.id), currentSet);
@@ -93,7 +94,7 @@ export default function FlashcardsView() {
   };
 
   const flip = () => {
-    if (isAnimating) return;
+    if (isAnimating || shuffling) return;
     setShowingDef((v) => !v);
     setFlipped((v) => !v);
   };
@@ -220,11 +221,16 @@ export default function FlashcardsView() {
   };
 
   const doShuffle = () => {
-    if (isAnimating) return;
-    updateProgress({ ...prog, order: shuffle(prog.order) });
-    setIdx(0);
+    if (isAnimating || shuffling) return;
+    setShuffling(true);
     setShowingDef(false);
     setFlipped(false);
+    // Reorder mid-riffle so the new top card is revealed as the cards settle.
+    window.setTimeout(() => {
+      updateProgress({ ...prog, order: shuffle(prog.order) });
+      setIdx(0);
+    }, 280);
+    window.setTimeout(() => setShuffling(false), 640);
   };
 
   const resetProgress = () => {
@@ -281,8 +287,14 @@ export default function FlashcardsView() {
             </label>
 
             <div className="flash-toolbar-actions">
-              <button className="btn secondary" id="shuffleBtn" type="button" onClick={doShuffle}>
-                Shuffle
+              <button
+                className={`btn secondary${shuffling ? " is-shuffling" : ""}`}
+                id="shuffleBtn"
+                type="button"
+                onClick={doShuffle}
+                disabled={shuffling || isAnimating}
+              >
+                🔀 Shuffle
               </button>
               <button className="btn secondary" id="resetBtn" type="button" onClick={resetProgress}>
                 Reset progress
@@ -315,7 +327,11 @@ export default function FlashcardsView() {
               </span>
             </div>
 
-            <div className={`flash-stage${animClass ? ` ${animClass}` : ""}`} id="flashStage" aria-hidden="true">
+            <div
+              className={`flash-stage${animClass ? ` ${animClass}` : ""}${shuffling ? " is-shuffling" : ""}`}
+              id="flashStage"
+              aria-hidden="true"
+            >
               <div className={`flash-3d${flipped ? " flipped" : ""}`} id="flash3d">
                 <div className="flash-face flash-front">
                   <div className="flash-label muted">Korean</div>
@@ -343,6 +359,14 @@ export default function FlashcardsView() {
                   </div>
                 </div>
               </div>
+
+              {shuffling && (
+                <div className="flash-shuffle" aria-hidden="true">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <span key={i} className={`flash-shuffle-card sc-${i}`} />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flash-progress-strip" aria-hidden="true">

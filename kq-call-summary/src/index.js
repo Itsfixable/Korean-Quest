@@ -1,5 +1,29 @@
+const ROUTER_URL = "https://router.huggingface.co/v1/chat/completions";
+const DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct:fastest";
+
+const SUMMARY_SYSTEM_PROMPT =
+  "You are a Korean-language speaking coach. You will be given the transcript " +
+  "of a Korean practice call between learners. Analyze it and return a concise, " +
+  "encouraging session report. " +
+  "Respond with ONLY a single JSON object — no markdown, no code fences, no " +
+  "extra prose. Use exactly these keys:\n" +
+  '{\n' +
+  '  "xpEarned": <integer 5-50>,\n' +
+  '  "summaryParagraph": <string, 2-4 sentences recapping the call>,\n' +
+  '  "topicsPracticed": [<3-5 short topic strings>],\n' +
+  '  "wordsUsed": [<3-6 notable words actually used; keep Korean words in Hangul>],\n' +
+  '  "strengths": [<3-5 specific strengths>],\n' +
+  '  "weaknesses": [<3-5 specific areas to improve>],\n' +
+  '  "recommendedNextSteps": [<3-5 actionable next steps>],\n' +
+  '  "dailyQuests": [<3-5 concrete practice quests>],\n' +
+  '  "coachNote": <string, one warm encouraging sentence>\n' +
+  "}\n" +
+  "Base every field strictly on what actually happens in the transcript. " +
+  "Write in English, but keep Korean words in Hangul (한글) only — never use " +
+  "Chinese or Japanese characters.";
+
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
     if (request.method === "OPTIONS") {
@@ -13,7 +37,8 @@ export default {
         {
           ok: true,
           service: "kq-call-summary",
-          mode: "local-rule-based-summary",
+          mode: env?.HF_TOKEN ? "ai-summary" : "local-rule-based-summary",
+          model: DEFAULT_MODEL,
         },
         { headers: corsHeaders() }
       );
@@ -31,7 +56,20 @@ export default {
           );
         }
 
-        const summary = buildSummaryFromTranscript(transcript);
+        // Always compute the rule-based summary first; it's the safety net that
+        // backfills any field the AI omits (or the whole thing if AI fails).
+        const fallback = buildSummaryFromTranscript(transcript);
+
+        let summary = fallback;
+        if (env?.HF_TOKEN) {
+          try {
+            const aiSummary = await buildSummaryWithAI(transcript, env);
+            if (aiSummary) summary = mergeSummaries(fallback, aiSummary);
+          } catch {
+            // Keep the rule-based fallback on any AI error.
+            summary = fallback;
+          }
+        }
 
         return json(summary, { headers: corsHeaders() });
       } catch (error) {
@@ -53,6 +91,108 @@ export default {
     );
   },
 };
+
+async function buildSummaryWithAI(transcript, env) {
+  const model = env.HF_MODEL && !/Arch-Router/i.test(env.HF_MODEL)
+    ? env.HF_MODEL
+    : DEFAULT_MODEL;
+
+  const response = await fetch(ROUTER_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.HF_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: SUMMARY_SYSTEM_PROMPT },
+        {
+          role: "user",
+          content: `Transcript of the Korean practice call:\n\n${transcript}`,
+        },
+      ],
+      max_tokens: 700,
+      temperature: 0.4,
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  if (!response.ok) return null;
+
+  const rawText = new TextDecoder("utf-8").decode(await response.arrayBuffer());
+  let parsed = null;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch {
+    return null;
+  }
+
+  const content = parsed?.choices?.[0]?.message?.content;
+  if (!content) return null;
+
+  return extractJsonObject(content);
+}
+
+// Pulls a JSON object out of model output, tolerating stray prose or code fences.
+function extractJsonObject(text) {
+  const cleaned = String(text || "")
+    .replace(/\uFFFD/g, "")
+    .trim();
+
+  const candidates = [cleaned];
+  const fenced = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced) candidates.push(fenced[1].trim());
+  const first = cleaned.indexOf("{");
+  const last = cleaned.lastIndexOf("}");
+  if (first !== -1 && last > first) candidates.push(cleaned.slice(first, last + 1));
+
+  for (const candidate of candidates) {
+    try {
+      const obj = JSON.parse(candidate);
+      if (obj && typeof obj === "object") return obj;
+    } catch {
+      /* try next candidate */
+    }
+  }
+  return null;
+}
+
+// Combines AI output with the rule-based fallback so every field is populated.
+function mergeSummaries(fallback, ai) {
+  const list = (value, fallbackList) => {
+    if (Array.isArray(value)) {
+      const cleaned = value
+        .map((item) => (typeof item === "string" ? item.trim() : String(item)))
+        .filter(Boolean)
+        .slice(0, 5);
+      if (cleaned.length) return cleaned;
+    }
+    return fallbackList;
+  };
+
+  const str = (value, fallbackStr) =>
+    typeof value === "string" && value.trim() ? value.trim() : fallbackStr;
+
+  let xp = Number(ai.xpEarned);
+  if (!Number.isFinite(xp)) xp = fallback.xpEarned;
+  xp = Math.max(5, Math.min(50, Math.round(xp)));
+
+  return {
+    xpEarned: xp,
+    summaryParagraph: str(ai.summaryParagraph, fallback.summaryParagraph),
+    topicsPracticed: list(ai.topicsPracticed, fallback.topicsPracticed),
+    wordsUsed: list(ai.wordsUsed, fallback.wordsUsed),
+    strengths: list(ai.strengths, fallback.strengths),
+    weaknesses: list(ai.weaknesses, fallback.weaknesses),
+    recommendedNextSteps: list(
+      ai.recommendedNextSteps,
+      fallback.recommendedNextSteps
+    ),
+    dailyQuests: list(ai.dailyQuests, fallback.dailyQuests),
+    coachNote: str(ai.coachNote, fallback.coachNote),
+  };
+}
 
 function buildSummaryFromTranscript(rawTranscript) {
   const lines = getTranscriptLines(rawTranscript);

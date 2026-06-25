@@ -66,6 +66,51 @@ html[data-theme="dark"] .kq-trace-stage-panel {
   cursor: not-allowed;
 }
 
+/* ===== Practice area layout: center the canvas + controls as one group ===== */
+.trace-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 4vw, 52px);
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding: clamp(12px, 2vw, 24px);
+}
+
+/* Override the global `.trace-canvas { margin-inline: auto }` so the flexbox
+   gap/justify controls spacing instead of the canvas eating the free space. */
+.trace-wrap .trace-canvas {
+  margin: 0;
+  flex: 0 0 auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.trace-wrap .trace-controls {
+  align-content: center;
+  gap: 12px;
+  min-width: 200px;
+  max-width: 260px;
+}
+
+.trace-wrap .trace-controls .muted {
+  text-align: center;
+}
+
+#traceScore {
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .trace-wrap {
+    flex-direction: column;
+  }
+  .trace-wrap .trace-controls {
+    width: 100%;
+    max-width: min(92vw, 360px);
+  }
+}
+
 .kq-award-star-fly {
   position: fixed;
   left: 50vw;

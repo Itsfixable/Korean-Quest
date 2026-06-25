@@ -29,8 +29,19 @@ const SUMMARY_ENDPOINT = "https://kq-call-summary.mr-koji-tanaka.workers.dev/api
 const TRANSCRIBE_ENDPOINT = "https://kq-live-transcribe-hf.mr-koji-tanaka.workers.dev/api/transcribe";
 const CHUNK_MS = 4000;
 const TARGET_SAMPLE_RATE = 16000;
-const SILENCE_RMS_THRESHOLD = 0.015;
-const MIN_SPEECH_FRAMES_PER_CHUNK = 8;
+// Voice-activity gate. Kept low so normal speaking volume is picked up — a
+// higher value forces the user to talk unnaturally loud.
+const SILENCE_RMS_THRESHOLD = 0.006;
+const MIN_SPEECH_FRAMES_PER_CHUNK = 3;
+
+// Keep transcripts to English + Korean only. Whisper auto-detects per chunk and
+// occasionally drifts into other scripts (Chinese, Japanese, Cyrillic, …); we
+// drop any chunk that is mostly made of those characters.
+function isEnglishOrKorean(text: string) {
+  const allowed = (text.match(/[A-Za-z\uAC00-\uD7A3\u3130-\u318F]/g) || []).length;
+  const foreign = (text.match(/[\u3040-\u30FF\u4E00-\u9FFF\u0400-\u04FF\u0600-\u06FF\u0E00-\u0E7F]/g) || []).length;
+  return allowed >= foreign;
+}
 
 const missions = [
   { title: "Order Food", desc: "One person is the customer and one is the server.", words: ["김치", "물", "주세요", "밥"] },
@@ -252,7 +263,7 @@ export default function VideoView({ room }: VideoViewProps) {
       let isSending = false;
 
       const downsampleBuffer = (buffer: Float32Array, inputSampleRate: number, outputSampleRate: number) => {
-        if (inputSampleRate === outputSampleRate) return buffer;
+        if (inputSampleRate === outputSampleRate) return new Float32Array(buffer);
         const sampleRateRatio = inputSampleRate / outputSampleRate;
         const newLength = Math.round(buffer.length / sampleRateRatio);
         const result = new Float32Array(newLength);
@@ -317,7 +328,8 @@ export default function VideoView({ room }: VideoViewProps) {
           formData.append("language", "ko");
           const response = await fetch(TRANSCRIBE_ENDPOINT, { method: "POST", body: formData });
           const data = await response.json();
-          if (response.ok && data.text?.trim()) appendTranscriptLine(`You: ${data.text.trim()}`);
+          const line = data.text?.trim();
+          if (response.ok && line && isEnglishOrKorean(line)) appendTranscriptLine(`You: ${line}`);
         }
         isSending = false;
         setCaptionStatus("Captions running.");
@@ -325,13 +337,14 @@ export default function VideoView({ room }: VideoViewProps) {
 
       processorNode.onaudioprocess = (event) => {
         const inputData = event.inputBuffer.getChannelData(0);
-        const downsampled = downsampleBuffer(inputData, audioContext.sampleRate, TARGET_SAMPLE_RATE);
+        // Measure loudness on the raw signal — downsampling averages adjacent
+        // samples and lowers the apparent volume, which made the gate too strict.
         let sumSquares = 0;
-        for (let i = 0; i < downsampled.length; i += 1) sumSquares += downsampled[i] ** 2;
-        const rms = Math.sqrt(sumSquares / downsampled.length);
+        for (let i = 0; i < inputData.length; i += 1) sumSquares += inputData[i] ** 2;
+        const rms = Math.sqrt(sumSquares / inputData.length);
         if (rms >= SILENCE_RMS_THRESHOLD) {
           speechFrameCount += 1;
-          pcmChunks.push(new Float32Array(downsampled));
+          pcmChunks.push(downsampleBuffer(inputData, audioContext.sampleRate, TARGET_SAMPLE_RATE));
         }
       };
 

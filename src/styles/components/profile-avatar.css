@@ -1,0 +1,79 @@
+/* =========================================
+   Korean Quest — composited profile avatar
+   Shared by the Shop profile strip and the
+   global sidebar/navbar account avatar.
+   ========================================= */
+
+.kq-profile-stack {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  max-height: 100%;
+  margin: auto;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+/* The inner picture (background + avatar) clipped to a circle that sits
+   just inside the frame's ring. */
+.kq-profile-clip {
+  width: 84%;
+  height: 84%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #ffffff;
+  z-index: 1;
+}
+
+.kq-profile-layer {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+/* Scoped to .kq-profile-clip so it outranks the unrelated .kq-profile-bg
+   decorative rule in dashboard-enhancements.css (which sets opacity: 0.18). */
+.kq-profile-clip .kq-profile-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  z-index: 1;
+  /* Fade the background's outer edge into the white clip so it doesn't form a
+     hard colored ring around the avatar near the frame. */
+  -webkit-mask-image: radial-gradient(circle at center, #000 58%, rgba(0, 0, 0, 0) 80%);
+  mask-image: radial-gradient(circle at center, #000 58%, rgba(0, 0, 0, 0) 80%);
+}
+
+.kq-profile-avatar-layer {
+  z-index: 2;
+  filter: drop-shadow(0 10px 12px rgba(41, 55, 95, 0.12));
+}
+
+/* The frame sits on top, wrapping around the clipped picture. */
+.kq-profile-frame-layer {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+}
+
+/* Sidebar / navbar account avatar: show the equipped avatar's portrait art,
+   filling the round container with the face anchored to the top. This reads
+   far better at ~52px than re-compositing the raw cutout + background. */
+.kq-sidebar-avatar .kq-account-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
