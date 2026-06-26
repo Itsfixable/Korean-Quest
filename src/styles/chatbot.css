@@ -1,17 +1,20 @@
 /* ---------------- Chatbot Toggle (IMAGE ONLY) ---------------- */
 :root {
-  --chatbot-hitbox: 300px;
   --chatbot-icon-size: 300px;
 }
-/* ---------------- Chatbot Toggle (BIG IMAGE, BOTTOM-RIGHT) ---------------- */
+/* ---------------- Chatbot Toggle (BIG IMAGE, BOTTOM-RIGHT) ----------------
+   The PNG has wide transparent margins; the visible speech-bubble only fills
+   roughly x 31%–93% and y 19%–80% of the art. The button (hitbox) is sized to
+   just that bubble, and the oversized art is offset to line back up over it. */
 
 .chatbot-toggle-btn {
   position: fixed;
-  bottom: 0;
-  right: 0;
+  bottom: 14px;
+  right: 14px;
 
-  width: var(--chatbot-hitbox);
-  height: auto;
+  /* Hitbox = the visible bubble, not the full transparent image box. */
+  width: calc(var(--chatbot-icon-size) * 0.62);
+  height: calc(var(--chatbot-icon-size) * 0.41);
 
   background: none;
   border: none;
@@ -19,10 +22,7 @@
   cursor: pointer;
   box-shadow: none;
   z-index: 999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: visible;
 }
 
 .chatbot-toggle-btn:hover .chatbot-toggle-icon {
@@ -34,6 +34,9 @@
 }
 
 .chatbot-toggle-icon {
+  position: absolute;
+  left: calc(var(--chatbot-icon-size) * -0.31);
+  top: calc(var(--chatbot-icon-size) * -0.127);
   width: var(--chatbot-icon-size) !important;
   height: auto !important;
   max-width: none !important;
@@ -181,8 +184,8 @@
   transform: scale(0.98);
 }
 
-/* Responsive — matches the sidebar collapse breakpoint (640px) */
-@media (max-width: 640px) {
+/* Responsive — matches the sidebar collapse breakpoint (900px) */
+@media (max-width: 900px) {
   .chatbot-container {
     width: calc(100vw - 60px);
     max-width: 420px;
@@ -196,15 +199,9 @@
   }
 
   .chatbot-toggle-btn {
-    bottom: 0;
-    right: 0;
-    width: 132px;
-    height: auto;
-  }
-
-  .chatbot-toggle-icon {
-    width: 132px !important;
-    height: auto !important;
+    --chatbot-icon-size: 132px;
+    bottom: 6px;
+    right: 6px;
   }
 }
 /* Force chatbot to always use Korea Quest dark blue */

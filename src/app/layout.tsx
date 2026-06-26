@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { PageTransition } from "@/components/layout/PageTransition";
@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     shortcut: asset("/favicon/logoImage.png"),
     apple: asset("/favicon/logoImage.png"),
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

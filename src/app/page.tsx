@@ -55,14 +55,14 @@ export default function HomePage() {
           <div className="kq-feature-grid">
             <SpotlightCard className="kq-feature-card">
               <div className="kq-feature-icon">
-                <Image src={asset("/favicon/nav/nav-learn.png")} alt="" width={56} height={56} />
+                <Image src={asset("/favicon/nav/newNavIcons/learnIcon1.png")} alt="" width={56} height={56} />
               </div>
               <h3>Quick Lessons</h3>
               <p>Learn the essentials in short, beginner-friendly lessons built for fast progress.</p>
             </SpotlightCard>
             <SpotlightCard className="kq-feature-card">
               <div className="kq-feature-icon">
-                <Image src={asset("/favicon/nav/nav-adventure.png")} alt="" width={56} height={56} />
+                <Image src={asset("/favicon/nav/newNavIcons/adventureIcon1.png")} alt="" width={56} height={56} />
               </div>
               <h3>Game Adventure</h3>
               <p>Turn practice into motivation with battles, unlocks, and world progression.</p>

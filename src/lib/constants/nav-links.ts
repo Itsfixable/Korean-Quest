@@ -1,12 +1,12 @@
 export const NAV_LINKS = [
-  { href: "/", label: "Home", icon: "nav-home.png" },
-  { href: "/schedule", label: "Schedule", icon: "nav-schedule.png" },
-  { href: "/resources", label: "Learn", icon: "nav-learn.png" },
-  { href: "/adventure", label: "Adventure", icon: "nav-adventure.png" },
-  { href: "/dashboard", label: "Dashboard", icon: "nav-dashboard.png" },
-  { href: "/shop", label: "Shop", icon: "nav-shop.png" },
-  { href: "/leaderboard", label: "Leaderboard", icon: "nav-leaderboard.png" },
-  { href: "/about", label: "About", icon: "nav-about.png" },
+  { href: "/", label: "Home", icon: "newNavIcons/homeIcon1.png" },
+  { href: "/schedule", label: "Schedule", icon: "newNavIcons/scheduleIcon1.png" },
+  { href: "/resources", label: "Learn", icon: "newNavIcons/learnIcon1.png" },
+  { href: "/adventure", label: "Adventure", icon: "newNavIcons/adventureIcon1.png" },
+  { href: "/dashboard", label: "Dashboard", icon: "newNavIcons/dashboardIcon1.png" },
+  { href: "/shop", label: "Shop", icon: "newNavIcons/shopIcon1.png" },
+  { href: "/leaderboard", label: "Leaderboard", icon: "newNavIcons/leaderboardIcon1.png" },
+  { href: "/about", label: "About", icon: "newNavIcons/aboutIcon1.png" },
 ] as const;
 
 // Routes that live under a top-level nav tab but have their own path. Visiting

@@ -388,6 +388,7 @@ export default function TestView() {
                   <input
                     id="writtenInput"
                     className="text-input"
+                    aria-label="Your answer"
                     placeholder="Type your answer…"
                     autoComplete="off"
                     value={writtenInput}

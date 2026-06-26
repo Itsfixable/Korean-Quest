@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Korean Quest API — Swagger UI</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css"
+    />
+    <link rel="icon" href="/favicon/favicon.ico" />
+    <style>
+      body {
+        margin: 0;
+        background: #fafafa;
+      }
+      .topbar {
+        background: #0f172a;
+        color: #fff;
+        padding: 14px 20px;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+      }
+      /* Make the operation cards a bit smaller / more compact. */
+      .swagger-ui .opblock {
+        margin: 0 0 8px;
+        border-radius: 6px;
+      }
+      .swagger-ui .opblock .opblock-summary {
+        padding: 5px 10px;
+      }
+      .swagger-ui .opblock .opblock-summary-method {
+        min-width: 64px;
+        padding: 5px 8px;
+        font-size: 12px;
+      }
+      .swagger-ui .opblock .opblock-summary-path {
+        font-size: 13px;
+      }
+      .swagger-ui .opblock-tag {
+        font-size: 18px;
+        margin: 6px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">Korean Quest API</div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js" crossorigin></script>
+    <script>
+      window.onload = function () {
+        window.ui = SwaggerUIBundle({
+          url: "/openapi.yaml",
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset,
+          ],
+          layout: "StandaloneLayout",
+        });
+      };
+    </script>
+  </body>
+</html>

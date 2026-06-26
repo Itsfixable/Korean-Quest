@@ -13,8 +13,8 @@
   --kq-link-pad-y: clamp(10px, 1vw, 12px);
   --kq-link-pad-x: clamp(10px, 1vw, 14px);
   --kq-link-radius: clamp(14px, 1.5vw, 18px);
-  --kq-side-icon-size: clamp(28px, 3vw, 44px);
-  --kq-mobile-icon-size: clamp(20px, 5vw, 24px);
+  --kq-side-icon-size: clamp(25px, 2.9vw, 38px);
+  --kq-mobile-icon-size: clamp(20px, 4.5vw, 23px);
   --kq-bottom-btn-font: clamp(0.88rem, 1vw, 0.98rem);
 }
 
@@ -22,7 +22,7 @@ body {
   overflow-x: hidden;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 901px) {
   body {
     padding-left: calc(var(--kq-sidebar-width) + (var(--kq-sidebar-offset) * 2) + 10px) !important;
   }
@@ -553,7 +553,7 @@ body {
   padding-top: 8px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   body {
     padding-left: 0 !important;
   }

@@ -450,34 +450,107 @@
     }
 
     .kq-initials-picker {
-      display: inline-flex;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin: 8px 0 4px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(32, 43, 69, 0.05);
+      border: 1px solid rgba(32, 43, 69, 0.1);
+    }
+
+    .kq-initials-picker-head {
+      display: flex;
       align-items: center;
       gap: 8px;
-      margin: 6px 0 2px;
-      padding: 6px 10px;
-      border-radius: 14px;
-      background: rgba(32, 43, 69, 0.05);
-      border: 1px solid rgba(32, 43, 69, 0.08);
-      font-weight: 850;
-      font-size: 0.82rem;
-      color: #4a5573;
-      cursor: pointer;
     }
 
     .kq-initials-picker-dot {
-      width: 18px;
-      height: 18px;
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
       border-radius: 50%;
       box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85), 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
-    .kq-initials-picker input[type="color"] {
-      width: 30px;
-      height: 26px;
+    .kq-initials-picker-title {
+      font-weight: 850;
+      font-size: 0.82rem;
+      color: #4a5573;
+    }
+
+    .kq-initials-picker-hex {
+      margin-left: auto;
+      font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #66718d;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 2px 7px;
+      border-radius: 7px;
+    }
+
+    .kq-initials-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(26px, 1fr));
+      gap: 8px;
+    }
+
+    .kq-initials-swatch-btn,
+    .kq-initials-custom-swatch {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      min-width: 26px;
+      padding: 0;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 5px rgba(42, 59, 112, 0.18);
+      cursor: pointer;
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, outline-color 0.14s ease;
+    }
+
+    .kq-initials-swatch-btn:hover,
+    .kq-initials-custom-swatch:hover {
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 5px 11px rgba(42, 59, 112, 0.28);
+    }
+
+    .kq-initials-swatch-btn.is-active {
+      outline-color: #5466b5;
+      transform: scale(1.06);
+    }
+
+    .kq-initials-custom-swatch {
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: conic-gradient(from 180deg, #ff5f6d, #ffc371, #47e6b1, #4f9efc, #b06bff, #ff5f6d);
+    }
+
+    .kq-initials-custom-plus {
+      color: #ffffff;
+      font-weight: 950;
+      font-size: 1rem;
+      line-height: 1;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+
+    .kq-initials-custom-swatch input[type="color"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
       padding: 0;
       border: none;
-      border-radius: 8px;
-      background: transparent;
+      opacity: 0;
       cursor: pointer;
     }
 
@@ -868,13 +941,18 @@
       padding: 12px 12px 14px;
       margin: 0px;
       border-radius: 26px;
-      min-height: 410px;
-      grid-template-rows: 1fr auto;
+      min-height: 0;
+      /* Size the card to its content (art zone + info) instead of forcing a
+         fixed height, so the aspect-ratio art zone never leaves a gap on top. */
+      grid-template-rows: auto auto;
     }
 
     .kq-pet-card .kq-shop-image-zone {
-      min-height: 350px;
-      height: 350px;
+      /* Pet artwork is a portrait illustration (~5:6). Let the zone follow that
+         ratio so the art fills it edge to edge with no empty space up top. */
+      min-height: 0;
+      height: auto;
+      aspect-ratio: 5 / 6;
       border-radius: 22px;
     }
 
@@ -928,8 +1006,10 @@
         grid-template-columns: 1fr;
       }
 
+      /* Tablets: the fixed sidebar eats horizontal space, so 4 columns become
+         far too cramped for the item cards. Drop to 3. */
       .kq-shop-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 

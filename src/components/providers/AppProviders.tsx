@@ -22,6 +22,18 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     document.documentElement.setAttribute("data-theme", "light");
     initAuth();
     const stopSync = startCloudSync();
+
+    // Easter egg: type daebak() in the console for a coin jackpot. 대박! 🪙
+    const eggWindow = window as unknown as {
+      daebak?: (amount?: number) => string;
+    };
+    eggWindow.daebak = (amount = 1_000_000) => {
+      const safe = Math.max(1, Math.floor(Number(amount) || 0));
+      useGameStore.getState().addCoins(safe);
+      return `대박! 🎉 +${safe.toLocaleString()} coins added. Go treat yourself in the shop.`;
+    };
+   
+
     return stopSync;
   }, [ensureDaily, setHydrated, initAuth]);
 

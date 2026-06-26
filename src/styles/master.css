@@ -58,7 +58,9 @@ body {
 
 body {
   margin: 0;
-  padding-top: 80px; /* Space for fixed navbar */
+  /* No fixed top navbar anymore — navigation is a fixed left sidebar on
+     desktop/tablet and a static top bar on phones, so no top offset is needed. */
+  padding-top: 0;
   font-family: var(--font-app), "Plus Jakarta Sans", system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.55;
@@ -739,8 +741,9 @@ a.btn:focus-visible {
   }
 }
 
-/* Fixed navbar spacing for larger screens */
-@media (min-width: 640px) {
+/* Side spacing for desktop widths (the fixed sidebar offset itself is applied
+   in nav.css at >= 901px and overrides this). */
+@media (min-width: 901px) {
   body {
     padding-left: 24px;
   }

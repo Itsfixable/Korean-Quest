@@ -2,8 +2,57 @@
   transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
 }
 
-.kq-jamo-card:hover {
-  transform: translateY(-6px) scale(1.05);
+/* The card is a link, so hovering underlines the char, pill, and stars. Kill it. */
+.kq-jamo-card,
+.kq-jamo-card:hover,
+.kq-jamo-card:focus-visible {
+  text-decoration: none;
+}
+
+/* The kq-stagger entrance animation in master.css uses fill-mode `both`, which
+   keeps `transform: scale(1)` applied and outranks normal :hover rules in the
+   cascade. !important lets the hover transform win over the animation. */
+.kq-jamo-card:hover,
+.kq-jamo-card:focus-visible {
+  transform: translateY(-8px) scale(1.04) !important;
+  z-index: 2;
+}
+
+/* Highlight the top-left character with a darker rectangle on hover/focus
+   instead of the default link underline. */
+.kq-jamo-card .aw-level-char {
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: transparent;
+  transition: background 200ms ease;
+}
+
+.kq-jamo-card:hover .aw-level-char,
+.kq-jamo-card:focus-visible .aw-level-char {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+/* Keep each star tier's background on hover. The generic .aw-level-card:hover
+   rule swaps in a light fill, which blends with the preview box and makes it
+   look like the card background vanished. */
+.kq-jamo-card.kq-stars-0:hover,
+.kq-jamo-card.kq-stars-0:focus-visible {
+  background: linear-gradient(180deg, #f4f6fb, #e6ebf5);
+}
+
+.kq-jamo-card.kq-stars-1:hover,
+.kq-jamo-card.kq-stars-1:focus-visible {
+  background: linear-gradient(180deg, #d6a36a, #b97c3c);
+}
+
+.kq-jamo-card.kq-stars-2:hover,
+.kq-jamo-card.kq-stars-2:focus-visible {
+  background: linear-gradient(180deg, #d7dde6, #aab4c4);
+}
+
+.kq-jamo-card.kq-stars-3:hover,
+.kq-jamo-card.kq-stars-3:focus-visible {
+  background: linear-gradient(180deg, #ffe38a, #d4a92c);
 }
 
 .kq-stars-0 {
@@ -41,6 +90,7 @@
   display: grid !important;
   gap: 12px;
   grid-template-columns: repeat(5, minmax(160px, 1fr));
+  margin-top: 28px;
 }
 
 @media (max-width: 1200px) {

@@ -50,8 +50,7 @@ const ENEMIES = [
   { name: "Goblin", sprite: "👹" },
   { name: "Wisp", sprite: "✨" },
   { name: "Wolf", sprite: "🐺" },
-  { name: "Drake", sprite: "🐉" },
-  { name: "Sentinel", sprite: "🛡️" },
+  { name: "Dragon", sprite: "🐉" },
   { name: "Oni", sprite: "👺" },
   { name: "Tiger Spirit", sprite: "🐯" },
 ] as const;
@@ -71,11 +70,11 @@ const ISLAND_LAYOUT: { x: number; y: number }[] = [
   { x: 38, y: 81 },
 ];
 
-// Maps 1 & 2 share the day scroll; map 3 uses the night scroll.
+// Each world gets its own scroll background.
 const WORLD_BG: Record<number, string> = {
   1: "/favicon/adventure/bg/adventureBg1.png",
-  2: "/favicon/adventure/bg/adventureBg1.png",
-  3: "/favicon/adventure/bg/adventureBg2.png",
+  2: "/favicon/adventure/bg/adventureBg2.png",
+  3: "/favicon/adventure/bg/adventureBg3.png",
 };
 
 function buildIslandPath(points: { x: number; y: number }[]) {
@@ -528,12 +527,12 @@ export default function AdventureView() {
           <h1>Adventure Map</h1>
         </header>
         <div className="kq-adventure-controls">
-          <select id="topicSelect" value={topic} onChange={(e) => setTopic(e.target.value as Topic)}>
+          <select id="topicSelect" aria-label="Quiz topic" value={topic} onChange={(e) => setTopic(e.target.value as Topic)}>
             <option value="hangul">Hangul (letters &amp; sounds)</option>
             <option value="vocab">Vocabulary</option>
             <option value="mixed">Mixed</option>
           </select>
-          <select id="difficultySelect" value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+          <select id="difficultySelect" aria-label="Quiz difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
             <option value="easy">Easy</option>
             <option value="normal">Normal</option>
             <option value="hard">Hard</option>

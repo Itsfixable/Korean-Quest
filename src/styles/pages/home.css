@@ -278,6 +278,17 @@
     font-size: 1.9rem;
   }
 
+  /* On tablets the large fixed left margin squeezes the quest copy into a thin
+     column over the banner art. Pull it back so the text has room to breathe. */
+  .kq-quests__content {
+    margin-left: clamp(0px, 6vw, 120px);
+    max-width: none;
+  }
+
+  .kq-hero-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
 }
 @media (max-width: 950px) {
   /* Keep welcome image beside buttons even when buttons collapse */
@@ -390,6 +401,20 @@
   .kq-bg--path > * {
     position: relative;
     z-index: 1;
+  }
+
+  /* Keep Level + Day Streak side by side, and let the Badges card take the
+     full width so its long text wraps over a couple lines instead of one
+     word per line. */
+  .kq-hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .kq-hero-stats .metric:last-child {
+    grid-column: 1 / -1;
+  }
+  .kq-hero-stats .metric:last-child > div:last-child {
+    line-height: 1.4;
+    word-break: break-word;
   }
 }
 

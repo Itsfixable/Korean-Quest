@@ -564,6 +564,7 @@ export default function VideoView({ room }: VideoViewProps) {
             <textarea
               id="sharedNotes"
               className="notes-area"
+              aria-label="Shared notes"
               placeholder="Write notes from the conversation..."
               value={sharedNotes}
               onChange={(e) => {
@@ -652,6 +653,7 @@ export default function VideoView({ room }: VideoViewProps) {
         <textarea
           id="callTranscript"
           className="notes-area transcript-area"
+          aria-label="Call transcript"
           placeholder="Your live transcript will appear here..."
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}

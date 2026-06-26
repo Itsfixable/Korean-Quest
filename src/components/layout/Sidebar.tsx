@@ -12,7 +12,10 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/nav.css";
 
-const MOBILE_BREAKPOINT = 640;
+// Phones and portrait tablets use the compact top-nav layout; the fixed left
+// sidebar is reserved for landscape tablets and desktops (>= 901px). Keep this
+// in sync with the matching breakpoints in nav.css / chatbot.css.
+const MOBILE_BREAKPOINT = 900;
 
 function NavLink({
   href,
@@ -79,7 +82,7 @@ function ProfileAvatar({ initials, image }: { initials: string; image?: string }
   if (image) {
     return (
       <div className="kq-sidebar-avatar">
-        <Image src={asset(image)} alt="Profile" width={52} height={52} />
+        <Image src={asset(image)} alt="Profile" width={100} height={52} />
       </div>
     );
   }
@@ -134,7 +137,7 @@ export function Sidebar() {
             <NavLink
               href="/"
               label="Home"
-              icon="nav-home.png"
+              icon="newNavIcons/homeIcon1.png"
               current={pathname === "/"}
               className="pill kq-mobile-link kq-mobile-home"
             />

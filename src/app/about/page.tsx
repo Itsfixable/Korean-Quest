@@ -15,12 +15,12 @@ const FACTS = [
 
 const FEATURES = [
   {
-    icon: "/favicon/nav/nav-learn.png",
+    icon: "/favicon/nav/newNavIcons/learnIcon1.png",
     title: "Structured Lessons",
     text: "A guided sequence from Hangul strokes to real sentence patterns, so there's always a clear next step.",
   },
   {
-    icon: "/favicon/nav/nav-adventure.png",
+    icon: "/favicon/nav/newNavIcons/adventureIcon1.png",
     title: "Adventure & Battles",
     text: "Practice is framed as a game with worlds to explore, boss battles, XP, coins, and unlockables.",
   },
@@ -30,7 +30,7 @@ const FEATURES = [
     text: "Vocabulary moves from the New stack to Known as learners review and master each card.",
   },
   {
-    icon: "/favicon/nav/nav-schedule.png",
+    icon: "/favicon/nav/newNavIcons/scheduleIcon1.png",
     title: "Live Tutoring",
     text: "Learners can book one-on-one sessions from the Schedule page to practice speaking with tutors.",
   },

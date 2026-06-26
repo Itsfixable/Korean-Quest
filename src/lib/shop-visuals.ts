@@ -167,9 +167,9 @@ export const SHOP_IMAGE_CONSTRAINTS: Record<CategoryId, ImageSettings[]> = {
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
   ],
   pets: [
-    { width: "220%", height: "150%", x: "-15px", y: "14px", scale: 1.35, objectFit: "contain", objectPosition: "center center" },
+    { width: "220%", height: "150%", x: "-15px", y: "0px", scale: 1.35, objectFit: "contain", objectPosition: "center center" },
     { width: "250%", height: "200%", x: "10px", y: "0px", scale: 1.3, objectFit: "contain", objectPosition: "center center" },
-    { width: "232%", height: "150%", x: "25px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
+    { width: "232%", height: "150%", x: "25px", y: "0px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
     { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
     { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
     { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },

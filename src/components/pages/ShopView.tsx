@@ -29,6 +29,21 @@ const SHOP_ITEM_FLOAT_CONSTRAINTS = {
   stagger: "0.18s",
 };
 
+const DEFAULT_INITIALS_BG = "#cfe0ff";
+
+// Quick-pick palette for the custom initials background. The rainbow tile at
+// the end opens the native picker for any other color.
+const INITIALS_PRESETS = [
+  "#cfe0ff",
+  "#a7c7ff",
+  "#9be7c4",
+  "#ffd27d",
+  "#ffb4a2",
+  "#f7a8d8",
+  "#c4b5fd",
+  "#9aa7bd",
+];
+
 type CategoryTab = [CategoryId, string, string];
 
 // Full list used for label/icon lookups regardless of which tabs are visible.
@@ -528,16 +543,54 @@ export default function ShopView() {
                       <div className={`kq-shop-rarity kq-rarity-${rarityClass}`}>{item.rarity}</div>
 
                       {item.id === "initials-custom" && isOwned ? (
-                        <label className="kq-initials-picker">
-                          <span className="kq-initials-picker-dot" style={{ background: initialsBgCustom || "#cfe0ff" }} />
-                          <span>Pick your color</span>
-                          <input
-                            type="color"
-                            value={initialsBgCustom || "#cfe0ff"}
-                            onChange={(e) => setInitialsBgCustom(e.target.value)}
-                            aria-label="Custom initials background color"
-                          />
-                        </label>
+                        (() => {
+                          const currentColor = (initialsBgCustom || DEFAULT_INITIALS_BG).toLowerCase();
+                          return (
+                            <div className="kq-initials-picker">
+                              <div className="kq-initials-picker-head">
+                                <span
+                                  className="kq-initials-picker-dot"
+                                  style={{ background: initialsBgCustom || DEFAULT_INITIALS_BG }}
+                                />
+                                <span className="kq-initials-picker-title">Background color</span>
+                                <span className="kq-initials-picker-hex">
+                                  {(initialsBgCustom || DEFAULT_INITIALS_BG).toUpperCase()}
+                                </span>
+                              </div>
+                              <div
+                                className="kq-initials-swatches"
+                                role="group"
+                                aria-label="Preset initials background colors"
+                              >
+                                {INITIALS_PRESETS.map((color) => {
+                                  const active = currentColor === color.toLowerCase();
+                                  return (
+                                    <button
+                                      key={color}
+                                      type="button"
+                                      className={`kq-initials-swatch-btn${active ? " is-active" : ""}`}
+                                      style={{ background: color }}
+                                      aria-label={`Use color ${color}`}
+                                      aria-pressed={active}
+                                      onClick={() => setInitialsBgCustom(color)}
+                                    />
+                                  );
+                                })}
+                                <label className="kq-initials-custom-swatch" title="Pick a custom color">
+                                  <span className="kq-initials-custom-plus" aria-hidden="true">
+                                    +
+                                  </span>
+                                  <input
+                                    type="color"
+                                    value={initialsBgCustom || DEFAULT_INITIALS_BG}
+                                    onChange={(e) => setInitialsBgCustom(e.target.value)}
+                                    aria-label="Custom initials background color"
+                                  />
+                                </label>
+                              </div>
+                            </div>
+                          );
+                        })()
                       ) : null}
 
                       <div className="kq-shop-buy-row">

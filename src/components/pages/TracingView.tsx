@@ -221,7 +221,7 @@ export default function TracingView({ char }: TracingViewProps) {
         const coins = starCount === 1 ? 30 : starCount === 2 ? 60 : 120;
         addXP(xp);
         addCoins(coins);
-        addBadge("✍️ Tracing Starter");
+        addBadge("Tracing Starter");
         addRecentWork(`Earned ${starCount} star${starCount > 1 ? "s" : ""} on ${target}`, "Tracing");
         setScoreHtml(`🎉 Stage ${starCount} complete! +${xp} XP · +${coins} coins<br/>${starsText(starCount)}`);
       } else {
@@ -236,14 +236,43 @@ export default function TracingView({ char }: TracingViewProps) {
 
   const handleGuideDrag = useCallback(
     (p: Point) => {
-      if (stage !== 1 || !guidePointsRef.current.length) return;
-      const next = guidePointsRef.current[guideIndexRef.current];
-      if (!next) return;
-      if (Math.hypot(p.x - next.x, p.y - next.y) < 42) {
-        guideIndexRef.current = Math.min(guideIndexRef.current + 1, guidePointsRef.current.length - 1);
+      if (stage !== 1) return;
+      const pts = guidePointsRef.current;
+      if (!pts.length) return;
+
+      // Advance through every guide point the cursor has reached this move so
+      // the dot keeps up even on fast drags. We step forward while the cursor
+      // is near the path and getting closer to the next point than the current
+      // one (i.e. genuinely progressing along the stroke).
+      const MAX_DIST = 48;
+      let idx = guideIndexRef.current;
+      let moved = false;
+      while (idx + 1 < pts.length) {
+        const cur = pts[idx];
+        const nxt = pts[idx + 1];
+        // Crossing into a new stroke: there is a visual gap between strokes, so
+        // once the current stroke is finished snap the dot to the next stroke's
+        // start instead of waiting for the cursor to be near it.
+        if (nxt.stroke !== cur.stroke) {
+          idx += 1;
+          moved = true;
+          continue;
+        }
+        const dCur = Math.hypot(p.x - cur.x, p.y - cur.y);
+        const dNxt = Math.hypot(p.x - nxt.x, p.y - nxt.y);
+        if (dNxt < MAX_DIST && dNxt <= dCur) {
+          idx += 1;
+          moved = true;
+        } else {
+          break;
+        }
+      }
+
+      if (moved) {
+        guideIndexRef.current = idx;
         render();
       }
-      if (guideIndexRef.current >= guidePointsRef.current.length - 2) {
+      if (idx >= pts.length - 2) {
         awardStageStar(1);
       }
     },

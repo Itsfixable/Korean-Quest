@@ -420,10 +420,19 @@ export const useGameStore = create<GameStore>()(
         }));
       },
 
-      getAchievementMeta: (name) => ACHIEVEMENTS[name] || { icon: "🏅", desc: "Achievement unlocked." },
+      getAchievementMeta: (name) => {
+        if (ACHIEVEMENTS[name]) return ACHIEVEMENTS[name];
+        // Legacy badges were stored with an emoji prefix (e.g. "✍️ Tracing
+        // Starter"); match on the known achievement name contained within.
+        const key = Object.keys(ACHIEVEMENTS).find((k) => name.includes(k));
+        return key ? ACHIEVEMENTS[key] : { icon: "🏅", desc: "Achievement unlocked." };
+      },
 
       getAchievements: () =>
-        get().player.badges.map((name) => ({ name, ...get().getAchievementMeta(name) })),
+        get().player.badges.map((stored) => {
+          const cleanName = Object.keys(ACHIEVEMENTS).find((k) => stored === k || stored.includes(k)) || stored;
+          return { name: cleanName, ...get().getAchievementMeta(stored) };
+        }),
 
       getShopCatalog: (category = "all") => {
         if (!category || category === "all") return [...KQ_SHOP_CATALOG];

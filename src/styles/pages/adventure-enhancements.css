@@ -478,8 +478,8 @@
   container-type: size;
 }
 
-/* Desktop / tablet: fill the viewport height (sidebar is fixed, out of flow) */
-@media (min-width: 641px) {
+/* Desktop / landscape tablet: fill the viewport height (sidebar is fixed, out of flow) */
+@media (min-width: 901px) {
   .kq-island-stage {
     height: 100vh;
     height: 100dvh;
@@ -855,15 +855,15 @@ body:has(.kq-treasure-adventure) #mapGrid {
   margin: 0 !important;
 }
 
-/* Desktop / tablet: butt the map flush against the fixed left sidebar (no gap) */
-@media (min-width: 641px) {
+/* Desktop / landscape tablet: butt the map flush against the fixed left sidebar (no gap) */
+@media (min-width: 901px) {
   body:has(.kq-treasure-adventure) {
     padding-left: calc(var(--kq-sidebar-offset) + var(--kq-sidebar-width)) !important;
   }
 }
 
-/* Phone: sidebar collapses to a top bar — map fills full width below it */
-@media (max-width: 640px) {
+/* Phone / portrait tablet: sidebar collapses to a top bar — map fills full width below it */
+@media (max-width: 900px) {
   body:has(.kq-treasure-adventure) {
     padding-left: 0 !important;
   }
@@ -899,7 +899,7 @@ body:has(.kq-treasure-adventure) .kq-island-stage {
   padding: clamp(16px, 3vw, 40px);
 }
 
-@media (min-width: 641px) {
+@media (min-width: 901px) {
   .kq-battle:not([hidden]) {
     min-height: 100dvh;
     overflow-y: auto;
