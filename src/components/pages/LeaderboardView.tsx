@@ -6,8 +6,15 @@ import { useGameStore } from "@/stores/useGameStore";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { fetchLeaderboard, type LeaderboardRow as CloudLeaderboardRow } from "@/lib/cloud";
 import { ShopImage, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
-import { SHOP_ASSETS, HEAD_IMAGE_CONSTRAINTS, imageSettingsToStyle, initialsBackgroundStyle } from "@/lib/shop-visuals";
+import { SHOP_ASSETS, HEAD_IMAGE_CONSTRAINTS, imageSettingsToStyle, initialsBackgroundStyle, initialsBgClass } from "@/lib/shop-visuals";
+import { KQ_SHOP_CATALOG } from "@/lib/constants/shop-catalog";
 import "@/styles/pages/leaderboard.css";
+
+// The initials background colors / animated gradients from the shop, reused to
+// give made-up leaderboard members varied (and occasionally legendary) initials.
+const INITIALS_BG_VALUES = KQ_SHOP_CATALOG.filter(
+  (item) => item.category === "initials" && item.color,
+).map((item) => item.color as string);
 
 // Stable hash so each made-up / cloud member always gets the same avatar.
 function hashName(name: string) {
@@ -145,6 +152,15 @@ export default function LeaderboardView() {
     };
   };
 
+  // Initials background for a row: the signed-in user gets their equipped color
+  // (if any); made-up / cloud members get a deterministic color or animated
+  // gradient from the shop palette so the board shows the new colors off.
+  const initialsBgFor = (row: LeaderboardRow): string | null => {
+    if (row.isUser) return initialsBgColor;
+    if (!INITIALS_BG_VALUES.length) return null;
+    return INITIALS_BG_VALUES[hashName(`${row.name}#bg`) % INITIALS_BG_VALUES.length];
+  };
+
   const topThree = data.slice(0, 3);
   const rest = data.slice(3);
   const you = data.find((row) => row.isUser);
@@ -191,12 +207,17 @@ export default function LeaderboardView() {
                       <ShopImage src={av.src} fallbackSrc={av.fallback} alt="" className="lb-avatar-img" style={av.style} />
                     </span>
                   ) : (
-                    <span
-                      className="lb-podium-emoji"
-                      style={row.isUser ? initialsBackgroundStyle(initialsBgColor) : undefined}
-                    >
-                      {getInitials(row.name)}
-                    </span>
+                    (() => {
+                      const bg = initialsBgFor(row);
+                      return (
+                        <span
+                          className={`lb-podium-emoji ${initialsBgClass(bg)}`}
+                          style={bg ? initialsBackgroundStyle(bg) : undefined}
+                        >
+                          {getInitials(row.name)}
+                        </span>
+                      );
+                    })()
                   );
                 })()}
                 <span className="lb-podium-rank">{row.rank}</span>
@@ -231,13 +252,18 @@ export default function LeaderboardView() {
                     <ShopImage src={av.src} fallbackSrc={av.fallback} alt="" className="lb-avatar-img" style={av.style} />
                   </span>
                 ) : (
-                  <span
-                    className="lb-row-avatar"
-                    aria-hidden="true"
-                    style={row.isUser ? initialsBackgroundStyle(initialsBgColor) : undefined}
-                  >
-                    {getInitials(row.name)}
-                  </span>
+                  (() => {
+                    const bg = initialsBgFor(row);
+                    return (
+                      <span
+                        className={`lb-row-avatar ${initialsBgClass(bg)}`}
+                        aria-hidden="true"
+                        style={bg ? initialsBackgroundStyle(bg) : undefined}
+                      >
+                        {getInitials(row.name)}
+                      </span>
+                    );
+                  })()
                 );
               })()}
               <div className="lb-row-meta">

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import type { ShopItem } from "@/lib/types";
 import { asset } from "@/lib/asset";
@@ -10,12 +9,16 @@ import {
   addImagesToItems,
   getEquippedVisualItem,
   imageSettingsToStyle,
+  initialsBackgroundStyle,
+  initialsBgClass,
+  isAnimatedInitialsBg,
   readableTextColor,
   type CategoryId,
   type VisualShopItem,
 } from "@/lib/shop-visuals";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
+import { useDialogStore } from "@/stores/useDialogStore";
 import "@/styles/pages/shop.css";
 import "@/styles/pages/shop-extracted.css";
 
@@ -71,6 +74,34 @@ function getRarityClass(item: ShopItem) {
   return String(item?.rarity || "Common").trim().toLowerCase().replace(/\s+/g, "-");
 }
 
+const RARITY_ORDER: Record<string, number> = {
+  starter: 0,
+  common: 1,
+  rare: 2,
+  epic: 3,
+  legendary: 4,
+};
+
+function rarityRank(rarity?: string) {
+  return RARITY_ORDER[String(rarity || "").trim().toLowerCase()] ?? 99;
+}
+
+// Sort items by rarity (starter → legendary), then by cost, keeping the
+// original order as a stable tie-breaker. Runs AFTER images are attached so the
+// index-based artwork mapping is preserved.
+function sortByRarity<T extends ShopItem>(items: T[]): T[] {
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const byRarity = rarityRank(a.item.rarity) - rarityRank(b.item.rarity);
+      if (byRarity !== 0) return byRarity;
+      const byCost = (a.item.cost || 0) - (b.item.cost || 0);
+      if (byCost !== 0) return byCost;
+      return a.index - b.index;
+    })
+    .map(({ item }) => item);
+}
+
 function getFloatDelay(index: number) {
   const stagger = parseFloat(SHOP_ITEM_FLOAT_CONSTRAINTS.stagger) || 0;
   return `${index * stagger}s`;
@@ -87,12 +118,13 @@ function getCategoryCardClass(category: CategoryId) {
 
 function getVisibleItems(items: ShopItem[], category: CategoryId) {
   const itemsWithImages = addImagesToItems(items, category);
-  if (category === "avatars") return itemsWithImages.slice(0, 7);
-  if (category === "frames") return itemsWithImages.slice(0, SHOP_ASSETS.frames.length);
-  if (category === "backgrounds") return itemsWithImages.slice(0, SHOP_ASSETS.backgrounds.length);
-  if (category === "pets") return itemsWithImages.slice(0, SHOP_ASSETS.pets.length);
-  if (category === "initials") return itemsWithImages;
-  return itemsWithImages;
+  let sliced: VisualShopItem[];
+  if (category === "avatars") sliced = itemsWithImages.slice(0, 7);
+  else if (category === "frames") sliced = itemsWithImages.slice(0, SHOP_ASSETS.frames.length);
+  else if (category === "backgrounds") sliced = itemsWithImages.slice(0, SHOP_ASSETS.backgrounds.length);
+  else if (category === "pets") sliced = itemsWithImages.slice(0, SHOP_ASSETS.pets.length);
+  else sliced = itemsWithImages;
+  return sortByRarity(sliced);
 }
 
 function getBaseTotal(items: ShopItem[], category: CategoryId) {
@@ -158,12 +190,15 @@ function ItemVisual({
   // instead of an image.
   if (category === "initials") {
     const isCustom = item.id === "initials-custom";
+    const isAnimated = isAnimatedInitialsBg(item.color);
     const swatchStyle = isCustom
       ? { background: "conic-gradient(from 210deg, #ff7a7a, #ffd36e, #8be38b, #6ec6ff, #b98bff, #ff7a7a)" }
-      : { background: item.color || "#cfe0ff", color: readableTextColor(item.color) };
+      : isAnimated
+        ? { background: item.color, color: "#ffffff" }
+        : { background: item.color || "#cfe0ff", color: readableTextColor(item.color) };
     return (
       <FloatShell index={index}>
-        <div className="kq-initials-swatch" style={swatchStyle}>
+        <div className={`kq-initials-swatch ${initialsBgClass(item.color)}`} style={swatchStyle}>
           {isCustom ? (
             <span className="kq-initials-swatch-icon" aria-hidden="true">🎨</span>
           ) : (
@@ -206,6 +241,7 @@ export default function ShopView() {
   const initialsBgCustom = useGameStore((s) => s.player.initialsBgCustom);
   const setInitialsBgCustom = useGameStore((s) => s.setInitialsBgCustom);
   const initialsBgColor = useGameStore((s) => s.getInitialsBgColor());
+  const showDialog = useDialogStore((s) => s.alert);
 
   const equipped = getEquippedCosmetics();
   const profile = getEquippedProfile();
@@ -244,10 +280,13 @@ export default function ShopView() {
     (itemId: string) => {
       const result = purchaseShopItem(itemId);
       if (!result.ok && result.reason === "coins") {
-        window.alert("You do not have enough coins for that item yet.");
+        showDialog(
+          "You do not have enough coins for that item yet. Earn more by completing lessons, daily quests, and battles!",
+          { title: "Not enough coins" },
+        );
       }
     },
-    [purchaseShopItem],
+    [purchaseShopItem, showDialog],
   );
 
   const handleEquip = useCallback(
@@ -297,7 +336,10 @@ export default function ShopView() {
         );
       }
       return (
-        <span style={initialsBgColor ? { background: initialsBgColor, color: readableTextColor(initialsBgColor) } : undefined}>
+        <span
+          className={initialsBgClass(initialsBgColor)}
+          style={initialsBgColor ? initialsBackgroundStyle(initialsBgColor) : undefined}
+        >
           {profileInitials}
         </span>
       );
@@ -538,19 +580,6 @@ export default function ShopView() {
         </section>
       </section>
 
-      <section className="kq-shop-bottom-card">
-        <div className="kq-shop-bottom-left">
-          <ShopImage src={SHOP_ASSETS.icons.earnCoins} alt="" />
-          <div>
-            <h3>How do I earn coins?</h3>
-            <p>Earn coins by completing lessons, daily quests, battles, and special events!</p>
-          </div>
-        </div>
-
-        <Link className="kq-shop-dashboard-link" href="/dashboard" id="kqDashboardLink">
-          Go to Dashboard →
-        </Link>
-      </section>
     </section>
   );
 }

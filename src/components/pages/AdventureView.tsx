@@ -322,13 +322,11 @@ export default function AdventureView() {
     return isWorldComplete(2);
   };
 
+  // Any world can be the active (viewed) world so players can preview locked
+  // maps. Locked maps still can't be played — their level nodes stay locked.
   const activeWorld = useMemo(() => {
-    const selected = WORLDS.find((w) => w.id === activeWorldId);
-    if (selected && isWorldUnlocked(selected.id)) return selected;
-    if (isWorldUnlocked(3)) return WORLDS[2];
-    if (isWorldUnlocked(2)) return WORLDS[1];
-    return WORLDS[0];
-  }, [activeWorldId, progress]);
+    return WORLDS.find((w) => w.id === activeWorldId) ?? WORLDS[0];
+  }, [activeWorldId]);
 
   const nextPlayableLevel = activeWorld.levels.find(
     (level) => level <= progress.unlocked && !progress.cleared[level],
@@ -341,6 +339,8 @@ export default function AdventureView() {
   // Start the bob the moment it begins sliding so it wiggles *as* it walks.
   useEffect(() => {
     if (!hydrated || battle) return;
+    // Don't move the bunny into a locked map the player is only previewing.
+    if (!isWorldUnlocked(activeWorld.id)) return;
     const levels: readonly number[] = activeWorld.levels;
     const target = nextPlayableLevel ?? levels[levels.length - 1];
     if (bunnyLevel === target) return;
@@ -564,9 +564,9 @@ export default function AdventureView() {
                         className={`kq-world-tab ${active ? "is-active" : ""} ${unlocked ? "" : "is-locked"} ${
                           complete ? "is-complete" : ""
                         }`}
-                        disabled={!unlocked}
                         aria-current={active ? "true" : undefined}
-                        onClick={() => unlocked && setActiveWorldId(world.id)}
+                        title={unlocked ? world.title : `${world.title} (locked preview)`}
+                        onClick={() => setActiveWorldId(world.id)}
                       >
                         <span className="kq-world-tab-badge">{badge}</span>
                         <span className="kq-world-tab-name">{world.title}</span>

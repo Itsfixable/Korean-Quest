@@ -5,6 +5,7 @@ import { useGameStore } from "@/stores/useGameStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { startCloudSync } from "@/lib/cloudSync";
 import { AuthModal } from "@/components/layout/AuthModal";
+import { AppDialog } from "@/components/layout/AppDialog";
 import { Chatbot } from "@/components/layout/Chatbot";
 import { RewardToast } from "@/components/layout/RewardToast";
 import { MotionProvider } from "@/components/layout/MotionProvider";
@@ -34,6 +35,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     <MotionProvider>
       {children}
       <AuthModal />
+      <AppDialog />
       <Chatbot />
       <RewardToast />
     </MotionProvider>

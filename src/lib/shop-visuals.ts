@@ -192,10 +192,25 @@ export function readableTextColor(hex?: string | null): string {
   return luminance > 0.62 ? "#2a2350" : "#ffffff";
 }
 
-/** Inline style for an initials swatch/background given an optional color. */
-export function initialsBackgroundStyle(color?: string | null): CSSProperties {
-  if (!color) return {};
-  return { background: color, color: readableTextColor(color) };
+/** True when an initials background value is a gradient (animated "changing color"). */
+export function isAnimatedInitialsBg(value?: string | null): boolean {
+  return Boolean(value && value.includes("gradient"));
+}
+
+/** Extra class applied to animated (gradient) initials backgrounds. */
+export function initialsBgClass(value?: string | null): string {
+  return isAnimatedInitialsBg(value) ? "kq-initials-anim" : "";
+}
+
+/**
+ * Inline style for an initials swatch/background given an optional color or
+ * gradient. Solid colors get a luminance-matched text color; animated gradients
+ * use white text (their hue shifts so a fixed readable color isn't possible).
+ */
+export function initialsBackgroundStyle(value?: string | null): CSSProperties {
+  if (!value) return {};
+  if (isAnimatedInitialsBg(value)) return { background: value, color: "#ffffff" };
+  return { background: value, color: readableTextColor(value) };
 }
 
 export function imageSettingsToStyle(settings: ImageSettings | null): CSSProperties {

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV_LINKS, NAV_SUBROUTES } from "@/lib/constants/nav-links";
 import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
-import { initialsBackgroundStyle } from "@/lib/shop-visuals";
+import { initialsBackgroundStyle, initialsBgClass } from "@/lib/shop-visuals";
 import { asset } from "@/lib/asset";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
@@ -55,7 +55,10 @@ function ProfileAvatar({ initials, image }: { initials: string; image?: string }
 
   if (usesInitials) {
     return (
-      <div className="kq-sidebar-avatar" style={initialsBackgroundStyle(initialsBgColor)}>
+      <div
+        className={`kq-sidebar-avatar ${initialsBgClass(initialsBgColor)}`}
+        style={initialsBackgroundStyle(initialsBgColor)}
+      >
         {initials}
       </div>
     );

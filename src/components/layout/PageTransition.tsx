@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       >
         {children}
+        <ScrollReveal />
       </motion.div>
     </AnimatePresence>
   );

@@ -29,6 +29,10 @@ export const KQ_SHOP_CATALOG: ShopItem[] = [
   { id: "initials-sky", name: "하늘색 (Haneul)", emoji: "🟦", image: "", category: "initials", slot: "initialsBg", cost: 40, rarity: "common", description: "A calm sky-blue backdrop for your initials.", color: "#cfe0ff" },
   { id: "initials-rose", name: "분홍색 (Bunhong)", emoji: "🌸", image: "", category: "initials", slot: "initialsBg", cost: 40, rarity: "common", description: "A soft pink backdrop for your initials.", color: "#ffd9e6" },
   { id: "initials-mint", name: "민트색 (Mint)", emoji: "🟩", image: "", category: "initials", slot: "initialsBg", cost: 70, rarity: "rare", description: "A fresh mint backdrop for your initials.", color: "#cdeede" },
+  { id: "initials-lavender", name: "라벤더색 (Lavender)", emoji: "🟪", image: "", category: "initials", slot: "initialsBg", cost: 70, rarity: "rare", description: "A dreamy lavender backdrop for your initials.", color: "#e7dcff" },
+  { id: "initials-coral", name: "산호색 (Sanho)", emoji: "🪸", image: "", category: "initials", slot: "initialsBg", cost: 70, rarity: "rare", description: "A lively coral backdrop for your initials.", color: "#ffd0c4" },
+  { id: "initials-aurora", name: "오로라 (Aurora)", emoji: "🌌", image: "", category: "initials", slot: "initialsBg", cost: 260, rarity: "legendary", description: "A shifting aurora gradient that slowly changes color.", color: "linear-gradient(120deg, #a18cd1, #8fd3f4, #84fab0, #fbc2eb, #a18cd1)" },
+  { id: "initials-rainbow", name: "무지개 (Mujigae)", emoji: "🌈", image: "", category: "initials", slot: "initialsBg", cost: 300, rarity: "legendary", description: "A flowing rainbow gradient that endlessly changes color.", color: "linear-gradient(120deg, #ff7a7a, #ffd36e, #8be38b, #6ec6ff, #b98bff, #ff7a7a)" },
   { id: "initials-custom", name: "나만의 색 (Custom)", emoji: "🎨", image: "", category: "initials", slot: "initialsBg", cost: 300, rarity: "legendary", description: "Pick any color you like for your initials backdrop." },
 ];
 

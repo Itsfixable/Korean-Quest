@@ -20,6 +20,13 @@ function rawAvatarSrc(image?: string) {
   return image.replace("/avatars/avatar", "/avatars/raw/rawAvatar");
 }
 
+// Map a framed shop pet (…/pets/bunny.png) to its no-background cutout
+// (…/pets/raw/bunnyRaw.png) so it sits cleanly in the dashboard scene.
+function rawPetSrc(image?: string) {
+  if (!image) return "";
+  return image.replace(/\/pets\/([^/]+)\.png$/i, "/pets/raw/$1Raw.png");
+}
+
 function computeJourneyPercent(
   completedLessonIds: string[],
   battlesWon: number,
@@ -68,6 +75,9 @@ export default function DashboardView() {
   const nextXp = needXP(player.level);
 
   const avatarRawSrc = rawAvatarSrc(profile.avatar?.image);
+  // Only show a companion when a pet is actually equipped (profile.pet truthy);
+  // profileVisuals.pet resolves the matching artwork.
+  const petRawSrc = profile.pet ? rawPetSrc(profileVisuals.pet?.image) : "";
 
   const journeyPercent = useMemo(
     () => computeJourneyPercent(progress.completedLessonIds, progress.battlesWon, achievements.length),
@@ -110,7 +120,7 @@ export default function DashboardView() {
               {profile.background?.emoji || "🏯"}
             </div>
           )}
-          {avatarRawSrc ? (
+          {profileUsesInitials ? null : avatarRawSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={asset(avatarRawSrc)}
@@ -127,6 +137,21 @@ export default function DashboardView() {
           ) : (
             <span className="kq-hero-avatar-emoji">{profile.avatar?.emoji || "👑"}</span>
           )}
+          {petRawSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={asset(petRawSrc)}
+              alt=""
+              className="kq-hero-pet-img"
+              onError={(e) => {
+                const img = e.currentTarget;
+                const fallback = asset(profileVisuals.pet?.image || "");
+                if (fallback && img.src !== fallback) {
+                  img.src = fallback;
+                }
+              }}
+            />
+          ) : null}
         </div>
         <div className="kq-dashboard-hero-veil" aria-hidden="true" />
 

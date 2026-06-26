@@ -7,6 +7,7 @@ import {
   getEquippedVisualItem,
   imageSettingsToStyle,
   initialsBackgroundStyle,
+  initialsBgClass,
   type VisualShopItem,
 } from "@/lib/shop-visuals";
 import { useGameStore } from "@/stores/useGameStore";
@@ -73,7 +74,7 @@ export function ProfileStack({
         ) : null}
         {showInitials ? (
           <span
-            className="kq-profile-layer kq-profile-initials"
+            className={`kq-profile-layer kq-profile-initials ${initialsBgClass(initialsBg)}`}
             style={initialsBackgroundStyle(initialsBg)}
           >
             {initials}

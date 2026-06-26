@@ -601,6 +601,40 @@
   font-size: 6rem;
 }
 
+/* Equipped pet companion: a smaller no-bg cutout standing to the left of the
+   avatar, near the ground line. */
+.kq-hero-pet-img {
+  position: absolute;
+  right: clamp(150px, 40%, 440px);
+  bottom: clamp(2px, 1.5%, 16px);
+  width: auto;
+  height: 34%;
+  max-height: 156px;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.32));
+  pointer-events: none;
+  user-select: none;
+  animation: kqHeroPetBob 3.6s ease-in-out infinite;
+}
+
+@keyframes kqHeroPetBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kq-hero-pet-img {
+    animation: none;
+  }
+}
+
 /* Dark scrim: strong on the left (behind text), clear before the avatar. */
 .kq-dashboard-hero-veil {
   position: absolute;
@@ -721,6 +755,11 @@
     max-width: 44%;
     max-height: 230px;
     opacity: 0.92;
+  }
+
+  .kq-hero-pet-img {
+    right: clamp(120px, 46%, 240px);
+    max-height: 96px;
   }
 
   /* Narrow screens: the stats sit over the scene, so deepen the scrim a touch

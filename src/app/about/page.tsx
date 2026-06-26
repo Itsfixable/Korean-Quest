@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { asset } from "@/lib/asset";
-import AnimatedContent from "@/components/reactbits/AnimatedContent";
 import "@/styles/pages/about.css";
 
 export const metadata: Metadata = {
@@ -114,7 +113,6 @@ const METRICS = [
 export default function AboutPage() {
   return (
     <main className="container grid about-page">
-      <AnimatedContent distance={40} duration={0.7}>
         <section className="card about-hero">
           <div className="about-hero-glow about-hero-glow--1" aria-hidden="true" />
           <div className="about-hero-glow about-hero-glow--2" aria-hidden="true" />
@@ -147,9 +145,7 @@ export default function AboutPage() {
             />
           </div>
         </section>
-      </AnimatedContent>
 
-      <AnimatedContent distance={50} duration={0.7} delay={0.05}>
         <section className="card about-section">
           <div className="about-section-head">
             <span className="about-section-tag">What's inside</span>
@@ -173,9 +169,7 @@ export default function AboutPage() {
             ))}
           </div>
         </section>
-      </AnimatedContent>
 
-      <AnimatedContent distance={50} duration={0.7} delay={0.05}>
         <section className="card about-section">
           <div className="about-section-head">
             <span className="about-section-tag">The curriculum</span>
@@ -196,9 +190,7 @@ export default function AboutPage() {
             ))}
           </ol>
         </section>
-      </AnimatedContent>
 
-      <AnimatedContent distance={50} duration={0.7} delay={0.05}>
         <section className="card about-section">
           <div className="about-section-head">
             <span className="about-section-tag">The team</span>
@@ -221,9 +213,7 @@ export default function AboutPage() {
             ))}
           </div>
         </section>
-      </AnimatedContent>
 
-      <AnimatedContent distance={50} duration={0.7} delay={0.05}>
         <section className="card about-section">
           <div className="about-section-head">
             <span className="about-section-tag">How we measure success</span>
@@ -253,7 +243,6 @@ export default function AboutPage() {
             ))}
           </div>
         </section>
-      </AnimatedContent>
 
       <section className="card about-attribution">
         <h2 className="about-section-title">Attribution</h2>

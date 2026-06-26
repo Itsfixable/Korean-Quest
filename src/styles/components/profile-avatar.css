@@ -77,6 +77,36 @@
   text-transform: uppercase;
 }
 
+/* Animated "changing color" initials backgrounds (legendary gradients).
+   Applied anywhere a gradient initials background is shown — shop swatch,
+   shop preview, sidebar, dashboard, and leaderboard. The !important on
+   background-size overrides the inline `background` shorthand reset so the
+   gradient is large enough to drift. */
+.kq-initials-anim {
+  background-size: 300% 300% !important;
+  animation: kqInitialsShift 9s ease-in-out infinite;
+}
+
+@keyframes kqInitialsShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kq-initials-anim {
+    animation: none;
+  }
+}
+
 /* The frame sits on top, wrapping around the clipped picture. */
 .kq-profile-frame-layer {
   position: absolute;

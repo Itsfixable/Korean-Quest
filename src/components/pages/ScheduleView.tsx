@@ -9,7 +9,24 @@ import { asset } from "@/lib/asset";
 import "@/styles/pages/schedule.css";
 
 const MAX_PER_DAY = 2;
-const TIMES = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
+
+// Bookable window: 9:00 AM through 8:30 PM in 30-minute steps. Generated so the
+// schedule offers real options throughout the day (not just the morning).
+const SLOT_START_MIN = 9 * 60;
+const SLOT_END_MIN = 20 * 60 + 30;
+const SLOT_STEP_MIN = 30;
+
+function buildTimes() {
+  const out: string[] = [];
+  for (let mins = SLOT_START_MIN; mins <= SLOT_END_MIN; mins += SLOT_STEP_MIN) {
+    const hh = String(Math.floor(mins / 60)).padStart(2, "0");
+    const mm = String(mins % 60).padStart(2, "0");
+    out.push(`${hh}:${mm}`);
+  }
+  return out;
+}
+
+const TIMES = buildTimes();
 
 function iso(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -54,6 +71,14 @@ export default function ScheduleView() {
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selectedISO, setSelectedISO] = useState(() => iso(today));
+  // Re-render every 30s so slots that pass during the session drop off and the
+  // "past" state stays accurate without a manual refresh.
+  const [nowMs, setNowMs] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNowMs(Date.now()), 30000);
+    return () => window.clearInterval(id);
+  }, []);
 
   const pruneExpired = useCallback(() => {
     Object.entries(bookings).forEach(([key, booking]) => {
@@ -106,6 +131,10 @@ export default function ScheduleView() {
   const sortedBookings = Object.values(bookings).sort(
     (a, b) => bookingDateTime(a.date, a.time).getTime() - bookingDateTime(b.date, b.time).getTime(),
   );
+
+  // Only show times that are still upcoming for the selected day. Future days
+  // keep every slot; today drops the ones that have already passed.
+  const daySlots = TIMES.filter((t) => bookingDateTime(selectedISO, t).getTime() >= nowMs);
 
   return (
     <>
@@ -205,30 +234,29 @@ export default function ScheduleView() {
             </h2>
 
             <div className="slots-grid" id="slotsGrid" role="list">
-              {TIMES.map((t) => {
-                const id = `${selectedISO}_${t}`;
-                const booked = !!bookings[id];
-                const atCap = !booked && countForDate(selectedISO) >= MAX_PER_DAY;
-                const past = isPastSlot(selectedISO, t);
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    className={`slot${booked ? " me" : ""}${past ? " past" : ""}${atCap ? " booked" : ""}`}
-                    disabled={past || atCap}
-                    title={
-                      past
-                        ? "This time has already passed"
-                        : atCap
-                          ? `Daily limit (${MAX_PER_DAY}) reached`
-                          : undefined
-                    }
-                    onClick={() => toggleBooking(selectedISO, t)}
-                  >
-                    {booked ? `Selected • ${formatTime12(t)}` : formatTime12(t)}
-                  </button>
-                );
-              })}
+              {daySlots.length === 0 ? (
+                <p className="muted slots-empty">
+                  No more times available on {humanDate(selectedISO)}. Pick another date to book a session.
+                </p>
+              ) : (
+                daySlots.map((t) => {
+                  const id = `${selectedISO}_${t}`;
+                  const booked = !!bookings[id];
+                  const atCap = !booked && countForDate(selectedISO) >= MAX_PER_DAY;
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      className={`slot${booked ? " me" : ""}${atCap ? " booked" : ""}`}
+                      disabled={atCap}
+                      title={atCap ? `Daily limit (${MAX_PER_DAY}) reached` : undefined}
+                      onClick={() => toggleBooking(selectedISO, t)}
+                    >
+                      {booked ? `Selected • ${formatTime12(t)}` : formatTime12(t)}
+                    </button>
+                  );
+                })
+              )}
             </div>
 
             <div className="flex">

@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useDialogStore } from "@/stores/useDialogStore";
 import "@/styles/pages/video.css";
 
 declare global {
@@ -136,11 +137,15 @@ export default function VideoView({ room }: VideoViewProps) {
     (codeOrRoom: string, asRole: "host" | "student" = "student") => {
       const clean = codeOrRoom.startsWith("KQ_") ? codeOrRoom : sanitizeCode(codeOrRoom);
       if (!clean) {
-        alert("Missing room code.");
+        useDialogStore.getState().alert("Please enter a room code before joining.", {
+          title: "Missing room code",
+        });
         return;
       }
       if (!window.JitsiMeetExternalAPI || !meetMountRef.current) {
-        alert("Jitsi failed to load. Refresh the page and try again.");
+        useDialogStore.getState().alert("The video service failed to load. Refresh the page and try again.", {
+          title: "Couldn't start the call",
+        });
         return;
       }
 

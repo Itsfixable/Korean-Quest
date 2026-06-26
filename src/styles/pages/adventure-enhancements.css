@@ -487,8 +487,10 @@
   }
 }
 
+/* Locked maps are previewable: keep them mostly visible (just slightly muted)
+   so players can scout ahead. The level nodes stay locked with their padlocks. */
 .kq-island-stage.locked {
-  filter: grayscale(0.7);
+  filter: grayscale(0.32) brightness(0.97);
 }
 
 .kq-stage-bg {
@@ -632,21 +634,21 @@
   color: #6c627e;
 }
 
+/* Map 3 (night) keeps the same title text colors as maps 1 & 2. */
 .kq-island-stage.is-night .kq-stage-eyebrow {
-  color: #cdbef0;
+  color: #9a7bbf;
 }
 
 .kq-island-stage.is-night .kq-stage-title h2 {
-  color: #f4ecff;
-  text-shadow: 0 2px 10px rgba(40, 28, 80, 0.5);
+  color: #5b4a8f;
 }
 
 .kq-island-stage.is-night .kq-stage-world {
-  color: #dccff7;
+  color: #7c6bb0;
 }
 
 .kq-island-stage.is-night .kq-stage-desc {
-  color: #d2c9e8;
+  color: #6c627e;
 }
 
 /* ---- Winding path between islands ---- */
@@ -714,7 +716,7 @@
 }
 
 .kq-island-img {
-  width: clamp(44px, min(15.5cqw, 24cqh), 240px);
+  width: clamp(50px, min(18cqw, 27.5cqh), 276px);
   height: auto;
   display: block;
   filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.22));
