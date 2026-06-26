@@ -29,7 +29,10 @@ const DEFAULT_STATE: GameState = {
       flair: null,
       pet: null,
       title: null,
+      initialsBg: null,
     },
+    profileUsesInitials: false,
+    shopInitialized: false,
   },
   progress: {
     lessonsDone: 0,
@@ -116,14 +119,20 @@ function ensureShopState(state: GameState): GameState {
     flair: player.equipped?.flair || null,
     pet: player.equipped?.pet || null,
     title: player.equipped?.title || null,
+    initialsBg: player.equipped?.initialsBg || null,
   };
   KQ_SHOP_STARTERS.forEach((id) => {
     if (!player.inventory.includes(id)) player.inventory.push(id);
   });
-  if (!player.equipped.avatar) player.equipped.avatar = "avatar-sejong";
-  if (!player.equipped.frame) player.equipped.frame = "frame-cloud";
-  if (!player.equipped.background) player.equipped.background = player.equipped.bg || "bg-hanok";
-  if (!player.equipped.title) player.equipped.title = "title-rookie";
+  // Starter cosmetics are equipped only on first init. After that, the player
+  // can freely unequip a slot and have it stay empty.
+  if (!player.shopInitialized) {
+    if (!player.equipped.avatar) player.equipped.avatar = "avatar-sejong";
+    if (!player.equipped.frame) player.equipped.frame = "frame-cloud";
+    if (!player.equipped.background) player.equipped.background = player.equipped.bg || "bg-hanok";
+    if (!player.equipped.title) player.equipped.title = "title-rookie";
+    player.shopInitialized = true;
+  }
   return { ...state, player };
 }
 
@@ -161,6 +170,9 @@ interface GameStore extends GameState {
   purchaseShopItem: (itemId: string) => { ok: boolean; reason?: string; item?: ShopItem };
   equipShopItem: (itemId: string) => { ok: boolean; reason?: string; item?: ShopItem };
   unequipShopSlot: (slot: string) => { ok: boolean; reason?: string };
+  setProfileUsesInitials: (value: boolean) => void;
+  setInitialsBgCustom: (color: string) => void;
+  getInitialsBgColor: () => string | null;
   getCurrentDisplayTitle: () => string;
   getCurrentDisplayEmoji: () => string;
   clearReward: () => void;
@@ -469,10 +481,25 @@ export const useGameStore = create<GameStore>()(
       },
 
       unequipShopSlot: (slot) => {
-        if (!["flair", "pet"].includes(slot)) return { ok: false, reason: "locked-slot" };
+        if (!slot) return { ok: false, reason: "missing-slot" };
         const s = ensureShopState(get());
         set({ player: { ...s.player, equipped: { ...s.player.equipped, [slot]: null } } });
         return { ok: true };
+      },
+
+      setProfileUsesInitials: (value) => {
+        set((s) => ({ player: { ...s.player, profileUsesInitials: value } }));
+      },
+
+      setInitialsBgCustom: (color) => {
+        set((s) => ({ player: { ...s.player, initialsBgCustom: color } }));
+      },
+
+      getInitialsBgColor: () => {
+        const equippedId = get().getEquippedCosmetics().initialsBg;
+        if (!equippedId) return null;
+        if (equippedId === "initials-custom") return get().player.initialsBgCustom || "#cfe0ff";
+        return get().getShopItem(equippedId)?.color || null;
       },
 
       getCurrentDisplayTitle: () => {

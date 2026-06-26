@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV_LINKS, NAV_SUBROUTES } from "@/lib/constants/nav-links";
 import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
+import { initialsBackgroundStyle } from "@/lib/shop-visuals";
 import { asset } from "@/lib/asset";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
@@ -49,6 +50,16 @@ function NavLink({
 
 function ProfileAvatar({ initials, image }: { initials: string; image?: string }) {
   const visuals = useEquippedProfileVisuals();
+  const usesInitials = useGameStore((s) => s.player.profileUsesInitials);
+  const initialsBgColor = useGameStore((s) => s.getInitialsBgColor());
+
+  if (usesInitials) {
+    return (
+      <div className="kq-sidebar-avatar" style={initialsBackgroundStyle(initialsBgColor)}>
+        {initials}
+      </div>
+    );
+  }
 
   if (visuals.avatar) {
     return (

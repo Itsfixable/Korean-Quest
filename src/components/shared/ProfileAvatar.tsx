@@ -6,6 +6,7 @@ import {
   PROFILE_LAYER_CONSTRAINTS,
   getEquippedVisualItem,
   imageSettingsToStyle,
+  initialsBackgroundStyle,
   type VisualShopItem,
 } from "@/lib/shop-visuals";
 import { useGameStore } from "@/stores/useGameStore";
@@ -49,23 +50,35 @@ export function ProfileStack({
   avatar,
   frame,
   background,
+  initials,
+  initialsBg,
 }: {
   avatar?: VisualShopItem | null;
   frame?: VisualShopItem | null;
   background?: VisualShopItem | null;
+  initials?: string | null;
+  initialsBg?: string | null;
 }) {
   const avatarSrc = avatar?.headImage || avatar?.rawImage || avatar?.image || "";
   const frameSrc = frame?.image || "";
   const backgroundSrc = background?.image || "";
   const avatarStyle = imageSettingsToStyle(avatar?.headSettings ?? PROFILE_LAYER_CONSTRAINTS.avatar);
+  const showInitials = Boolean(initials);
 
   return (
     <div className="kq-profile-stack">
       <div className="kq-profile-clip">
-        {backgroundSrc ? (
+        {backgroundSrc && !showInitials ? (
           <ShopImage src={backgroundSrc} alt="" className="kq-profile-layer kq-profile-bg" />
         ) : null}
-        {avatarSrc ? (
+        {showInitials ? (
+          <span
+            className="kq-profile-layer kq-profile-initials"
+            style={initialsBackgroundStyle(initialsBg)}
+          >
+            {initials}
+          </span>
+        ) : avatarSrc ? (
           <ShopImage
             src={avatarSrc}
             fallbackSrc={avatar?.rawImage || avatar?.image || avatarSrc}
@@ -119,9 +132,10 @@ export function useEquippedProfileVisuals() {
  */
 export default function ProfileAvatar({ fallback }: { fallback?: React.ReactNode }) {
   const visuals = useEquippedProfileVisuals();
+  const usesInitials = useGameStore((s) => s.player.profileUsesInitials);
   const src = visuals.avatar?.headImage || visuals.avatar?.image;
 
-  if (!src) return <>{fallback ?? null}</>;
+  if (usesInitials || !src) return <>{fallback ?? null}</>;
 
   return (
     <ShopImage

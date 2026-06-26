@@ -49,35 +49,6 @@
   gap: 12px;
 }
 
-/* ---- Pictures / Initials toggle ---- */
-.lb-display-toggle {
-  display: inline-flex;
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(91, 114, 159, 0.1);
-  border: 1px solid rgba(91, 114, 159, 0.16);
-}
-
-.lb-display-toggle button {
-  appearance: none;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-family: var(--font-app), "Nunito", sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: var(--muted, #5e6678);
-  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
-}
-
-.lb-display-toggle button.is-active {
-  background: #ffffff;
-  color: #41557e;
-  box-shadow: 0 3px 8px rgba(42, 59, 112, 0.14);
-}
-
 .lb-you-chip {
   display: inline-flex;
   align-items: center;

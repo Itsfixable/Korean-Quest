@@ -7,6 +7,7 @@ export interface EquippedCosmetics {
   flair: string | null;
   pet: string | null;
   title: string | null;
+  initialsBg: string | null;
 }
 
 export interface Player {
@@ -19,6 +20,11 @@ export interface Player {
   lastLoginDate: string | null;
   inventory: string[];
   equipped: EquippedCosmetics;
+  profileUsesInitials?: boolean;
+  /** Custom hex color chosen via the legendary initials color picker. */
+  initialsBgCustom?: string;
+  /** Set once after starter cosmetics are applied so unequips persist. */
+  shopInitialized?: boolean;
 }
 
 export interface RecentWork {
@@ -81,6 +87,8 @@ export interface ShopItem {
   cost: number;
   rarity: string;
   description: string;
+  /** Solid color for initials-background swatch items. */
+  color?: string;
 }
 
 export interface FakeUser {

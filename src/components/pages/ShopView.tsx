@@ -10,6 +10,7 @@ import {
   addImagesToItems,
   getEquippedVisualItem,
   imageSettingsToStyle,
+  readableTextColor,
   type CategoryId,
   type VisualShopItem,
 } from "@/lib/shop-visuals";
@@ -25,10 +26,29 @@ const SHOP_ITEM_FLOAT_CONSTRAINTS = {
   stagger: "0.18s",
 };
 
-const CATEGORIES: [CategoryId, string, string][] = [
+type CategoryTab = [CategoryId, string, string];
+
+// Full list used for label/icon lookups regardless of which tabs are visible.
+const CATEGORIES: CategoryTab[] = [
   ["avatars", "Avatars", SHOP_ASSETS.icons.avatars],
   ["frames", "Frames", SHOP_ASSETS.icons.frames],
   ["backgrounds", "Backgrounds", SHOP_ASSETS.icons.backgrounds],
+  ["pets", "Pets", SHOP_ASSETS.icons.pets],
+  ["initials", "Backgrounds", SHOP_ASSETS.icons.backgrounds],
+];
+
+// Avatar mode shows the normal cosmetic tabs. Initials mode hides Avatars (no
+// avatar is shown) and swaps Backgrounds (hidden behind initials) for Initials.
+const AVATAR_MODE_TABS: CategoryTab[] = [
+  ["avatars", "Avatars", SHOP_ASSETS.icons.avatars],
+  ["frames", "Frames", SHOP_ASSETS.icons.frames],
+  ["backgrounds", "Backgrounds", SHOP_ASSETS.icons.backgrounds],
+  ["pets", "Pets", SHOP_ASSETS.icons.pets],
+];
+
+const INITIALS_MODE_TABS: CategoryTab[] = [
+  ["frames", "Frames", SHOP_ASSETS.icons.frames],
+  ["initials", "Backgrounds", SHOP_ASSETS.icons.backgrounds],
   ["pets", "Pets", SHOP_ASSETS.icons.pets],
 ];
 
@@ -37,6 +57,7 @@ const CATEGORY_DESCRIPTIONS: Record<CategoryId, string> = {
   frames: "Decorate your profile picture with a new frame.",
   backgrounds: "Pick a background for your learner profile.",
   pets: "Choose a companion to join your Korean Quest.",
+  initials: "Pick the background color shown behind your initials.",
 };
 
 function getInitials(name: string) {
@@ -60,6 +81,7 @@ function getCategoryCardClass(category: CategoryId) {
   if (category === "frames") return "kq-frame-card";
   if (category === "backgrounds") return "kq-background-card";
   if (category === "pets") return "kq-pet-card";
+  if (category === "initials") return "kq-initials-card";
   return "";
 }
 
@@ -69,6 +91,7 @@ function getVisibleItems(items: ShopItem[], category: CategoryId) {
   if (category === "frames") return itemsWithImages.slice(0, SHOP_ASSETS.frames.length);
   if (category === "backgrounds") return itemsWithImages.slice(0, SHOP_ASSETS.backgrounds.length);
   if (category === "pets") return itemsWithImages.slice(0, SHOP_ASSETS.pets.length);
+  if (category === "initials") return itemsWithImages;
   return itemsWithImages;
 }
 
@@ -131,6 +154,26 @@ function ItemVisual({
   category: CategoryId;
   index: number;
 }) {
+  // Initials color items preview a solid swatch (or rainbow for the picker)
+  // instead of an image.
+  if (category === "initials") {
+    const isCustom = item.id === "initials-custom";
+    const swatchStyle = isCustom
+      ? { background: "conic-gradient(from 210deg, #ff7a7a, #ffd36e, #8be38b, #6ec6ff, #b98bff, #ff7a7a)" }
+      : { background: item.color || "#cfe0ff", color: readableTextColor(item.color) };
+    return (
+      <FloatShell index={index}>
+        <div className="kq-initials-swatch" style={swatchStyle}>
+          {isCustom ? (
+            <span className="kq-initials-swatch-icon" aria-hidden="true">🎨</span>
+          ) : (
+            <span className="kq-initials-swatch-letters" aria-hidden="true">AB</span>
+          )}
+        </div>
+      </FloatShell>
+    );
+  }
+
   // Frames and backgrounds each preview only their own artwork (no composited
   // avatar/background), so the gallery shows just the frame or just the bg.
   if (category === "backgrounds") {
@@ -158,6 +201,11 @@ export default function ShopView() {
   const equipShopItem = useGameStore((s) => s.equipShopItem);
   const unequipShopSlot = useGameStore((s) => s.unequipShopSlot);
   const needXP = useGameStore((s) => s.needXP);
+  const profileUsesInitials = useGameStore((s) => s.player.profileUsesInitials);
+  const setProfileUsesInitials = useGameStore((s) => s.setProfileUsesInitials);
+  const initialsBgCustom = useGameStore((s) => s.player.initialsBgCustom);
+  const setInitialsBgCustom = useGameStore((s) => s.setInitialsBgCustom);
+  const initialsBgColor = useGameStore((s) => s.getInitialsBgColor());
 
   const equipped = getEquippedCosmetics();
   const profile = getEquippedProfile();
@@ -213,6 +261,14 @@ export default function ShopView() {
     [equipShopItem, unequipShopSlot],
   );
 
+  const visibleCategories = profileUsesInitials ? INITIALS_MODE_TABS : AVATAR_MODE_TABS;
+
+  useEffect(() => {
+    if (!visibleCategories.some(([id]) => id === activeCategory)) {
+      setActiveCategory(visibleCategories[0][0]);
+    }
+  }, [visibleCategories, activeCategory]);
+
   const categoryMeta = CATEGORIES.find(([id]) => id === activeCategory);
   const categoryLabel = categoryMeta?.[1] || "Shop";
   const categoryIcon = categoryMeta?.[2] || SHOP_ASSETS.icons.avatars;
@@ -225,7 +281,28 @@ export default function ShopView() {
       profileVisuals.pet?.image,
   );
 
+  const profileInitials = user?.avatarInitials || getInitials(username);
+
   const userAvatarContent = (() => {
+    if (profileUsesInitials) {
+      if (hasProfileStack) {
+        return (
+          <ProfileStack
+            avatar={profileVisuals.avatar}
+            frame={profileVisuals.frame}
+            background={profileVisuals.background}
+            initials={profileInitials}
+            initialsBg={initialsBgColor}
+          />
+        );
+      }
+      return (
+        <span style={initialsBgColor ? { background: initialsBgColor, color: readableTextColor(initialsBgColor) } : undefined}>
+          {profileInitials}
+        </span>
+      );
+    }
+
     if (hasProfileStack) {
       return (
         <ProfileStack
@@ -240,7 +317,7 @@ export default function ShopView() {
       return <ShopImage src={user.avatarImage} alt={`${username} profile picture`} />;
     }
 
-    return <span>{user?.avatarInitials || getInitials(username)}</span>;
+    return <span>{profileInitials}</span>;
   })();
 
   return (
@@ -263,6 +340,29 @@ export default function ShopView() {
               <p>
                 📍 {profile.title?.name || "New Challenger"} · {profile.background?.name || "Hanok Courtyard"}
               </p>
+              <div
+                className="kq-profile-display-toggle"
+                role="group"
+                aria-label="Profile picture display"
+              >
+                <span className="kq-profile-display-label">Show as</span>
+                <button
+                  type="button"
+                  className={`kq-profile-display-btn${!profileUsesInitials ? " is-active" : ""}`}
+                  aria-pressed={!profileUsesInitials}
+                  onClick={() => setProfileUsesInitials(false)}
+                >
+                  Avatar
+                </button>
+                <button
+                  type="button"
+                  className={`kq-profile-display-btn${profileUsesInitials ? " is-active" : ""}`}
+                  aria-pressed={profileUsesInitials}
+                  onClick={() => setProfileUsesInitials(true)}
+                >
+                  Initials
+                </button>
+              </div>
             </div>
           </div>
 
@@ -308,7 +408,7 @@ export default function ShopView() {
 
       <section className="kq-shop-panel">
         <div id="kqShopTabs" className="kq-shop-tabs">
-          {CATEGORIES.map(([id, label, icon]) => (
+          {visibleCategories.map(([id, label, icon]) => (
             <button
               key={id}
               className={`kq-shop-tab ${activeCategory === id ? "is-active" : ""}`}
@@ -341,7 +441,10 @@ export default function ShopView() {
           </div>
         </div>
 
-        <section className="kq-shop-grid kq-stagger" id="kqShopGrid">
+        <section
+          className={`kq-shop-grid kq-stagger${visibleItems.length < 4 ? " is-centered" : ""}`}
+          id="kqShopGrid"
+        >
           {!visibleItems.length ? (
             <article className="kq-shop-item">
               <div className="kq-shop-image-zone">
@@ -382,6 +485,19 @@ export default function ShopView() {
                       <h3>{item.name}</h3>
                       <div className={`kq-shop-rarity kq-rarity-${rarityClass}`}>{item.rarity}</div>
 
+                      {item.id === "initials-custom" && isOwned ? (
+                        <label className="kq-initials-picker">
+                          <span className="kq-initials-picker-dot" style={{ background: initialsBgCustom || "#cfe0ff" }} />
+                          <span>Pick your color</span>
+                          <input
+                            type="color"
+                            value={initialsBgCustom || "#cfe0ff"}
+                            onChange={(e) => setInitialsBgCustom(e.target.value)}
+                            aria-label="Custom initials background color"
+                          />
+                        </label>
+                      ) : null}
+
                       <div className="kq-shop-buy-row">
                         <button
                           className={`kq-shop-price-btn ${isOwned ? "is-owned" : ""} is-${rarityClass}`}
@@ -402,7 +518,7 @@ export default function ShopView() {
                             data-equipped={isEquipped ? "true" : "false"}
                             onClick={() => handleEquip(item.id, item.slot, isEquipped)}
                           >
-                            {isEquipped ? "Equipped ✓" : "Equip"}
+                            {isEquipped ? "Unequip" : "Equip"}
                           </button>
                         ) : null}
                       </div>
@@ -412,19 +528,9 @@ export default function ShopView() {
               })}
 
               {activeCategory === "avatars" ? (
-                <article className="kq-shop-item kq-shop-lock-card">
-                  <div className="kq-shop-image-zone">
-                    <div className="kq-coming-soon-lock">🔒</div>
-                  </div>
-                  <div className="kq-shop-info">
-                    <h3>Coming Soon</h3>
-                    <div className="kq-shop-rarity kq-rarity-common">Stay tuned for more!</div>
-                    <div className="kq-shop-buy-row">
-                      <button className="kq-shop-price-btn is-owned" type="button" disabled>
-                        Locked
-                      </button>
-                    </div>
-                  </div>
+                <article className="kq-shop-item kq-coming-soon-card" aria-label="Coming soon avatar">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="kq-coming-soon-img" src={asset(SHOP_ASSETS.avatars[7])} alt="Coming soon avatar" />
                 </article>
               ) : null}
             </>

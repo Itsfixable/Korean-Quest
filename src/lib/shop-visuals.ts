@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { ShopItem } from "@/lib/types";
 
-export type CategoryId = "avatars" | "frames" | "backgrounds" | "pets";
+export type CategoryId = "avatars" | "frames" | "backgrounds" | "pets" | "initials";
 
 export interface ImageSettings {
   width?: string;
@@ -33,6 +33,7 @@ export const SHOP_ASSETS = {
     frames: "/favicon/shop/icons/frames.png",
     backgrounds: "/favicon/shop/icons/bg.png",
     pets: "/favicon/shop/icons/pets.png",
+    initials: "/favicon/shop/icons/frames.png",
   },
   avatars: [
     "/favicon/shop/avatars/avatar1.png",
@@ -173,7 +174,29 @@ export const SHOP_IMAGE_CONSTRAINTS: Record<CategoryId, ImageSettings[]> = {
     { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
     { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
   ],
+  initials: [],
 };
+
+/** Returns a readable text color (dark or white) for a given hex background. */
+export function readableTextColor(hex?: string | null): string {
+  const fallback = "#3b3470";
+  if (!hex) return fallback;
+  let h = hex.trim().replace("#", "");
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  if (h.length !== 6) return fallback;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  // Relative luminance (sRGB perceptual weighting).
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.62 ? "#2a2350" : "#ffffff";
+}
+
+/** Inline style for an initials swatch/background given an optional color. */
+export function initialsBackgroundStyle(color?: string | null): CSSProperties {
+  if (!color) return {};
+  return { background: color, color: readableTextColor(color) };
+}
 
 export function imageSettingsToStyle(settings: ImageSettings | null): CSSProperties {
   if (!settings) return {};
@@ -191,6 +214,7 @@ export function getCategoryAssets(category: CategoryId) {
   if (category === "avatars") return SHOP_ASSETS.avatars;
   if (category === "frames") return SHOP_ASSETS.frames;
   if (category === "backgrounds") return SHOP_ASSETS.backgrounds;
+  if (category === "initials") return [] as string[];
   return SHOP_ASSETS.pets;
 }
 

@@ -41,6 +41,7 @@ html[data-theme="dark"] .kq-trace-stage-panel {
 .kq-trace-stage-tabs {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   margin-top: 14px;
 }

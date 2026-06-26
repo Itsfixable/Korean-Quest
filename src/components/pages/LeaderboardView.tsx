@@ -6,11 +6,8 @@ import { useGameStore } from "@/stores/useGameStore";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { fetchLeaderboard, type LeaderboardRow as CloudLeaderboardRow } from "@/lib/cloud";
 import { ShopImage, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
-import { SHOP_ASSETS, HEAD_IMAGE_CONSTRAINTS, imageSettingsToStyle } from "@/lib/shop-visuals";
+import { SHOP_ASSETS, HEAD_IMAGE_CONSTRAINTS, imageSettingsToStyle, initialsBackgroundStyle } from "@/lib/shop-visuals";
 import "@/styles/pages/leaderboard.css";
-
-type DisplayMode = "picture" | "initials";
-const DISPLAY_MODE_KEY = "kq_lb_avatar_mode";
 
 // Stable hash so each made-up / cloud member always gets the same avatar.
 function hashName(name: string) {
@@ -46,23 +43,10 @@ export default function LeaderboardView() {
   const userId = useAuthStore((s) => s.userId);
   const displayName = user?.loggedIn ? user.name : "You";
   const userVisuals = useEquippedProfileVisuals();
+  const profileUsesInitials = useGameStore((s) => s.player.profileUsesInitials);
+  const initialsBgColor = useGameStore((s) => s.getInitialsBgColor());
 
   const [cloudRows, setCloudRows] = useState<CloudLeaderboardRow[] | null>(null);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>("picture");
-
-  useEffect(() => {
-    const saved = localStorage.getItem(DISPLAY_MODE_KEY);
-    if (saved === "initials" || saved === "picture") setDisplayMode(saved);
-  }, []);
-
-  const chooseMode = (mode: DisplayMode) => {
-    setDisplayMode(mode);
-    try {
-      localStorage.setItem(DISPLAY_MODE_KEY, mode);
-    } catch {
-      /* ignore storage errors */
-    }
-  };
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -137,6 +121,7 @@ export default function LeaderboardView() {
   // avatar; everyone else gets a deterministic head shot keyed off their name.
   const avatarFor = (row: LeaderboardRow): { src: string; fallback: string; style: React.CSSProperties } | null => {
     if (row.isUser) {
+      if (profileUsesInitials) return null;
       const av = userVisuals.avatar;
       const src = av?.headImage || av?.rawImage || av?.image;
       if (!src) return null;
@@ -160,8 +145,6 @@ export default function LeaderboardView() {
     };
   };
 
-  const showPictures = displayMode === "picture";
-
   const topThree = data.slice(0, 3);
   const rest = data.slice(3);
   const you = data.find((row) => row.isUser);
@@ -180,24 +163,6 @@ export default function LeaderboardView() {
           </p>
         </div>
         <div className="lb-header-side">
-          <div className="lb-display-toggle" role="group" aria-label="Avatar display style">
-            <button
-              type="button"
-              className={showPictures ? "is-active" : ""}
-              aria-pressed={showPictures}
-              onClick={() => chooseMode("picture")}
-            >
-              Pictures
-            </button>
-            <button
-              type="button"
-              className={!showPictures ? "is-active" : ""}
-              aria-pressed={!showPictures}
-              onClick={() => chooseMode("initials")}
-            >
-              Initials
-            </button>
-          </div>
           {you ? (
             <div className="lb-you-chip" aria-label="Your current rank">
               <span className="lb-you-chip__rank">#{you.rank}</span>
@@ -220,13 +185,18 @@ export default function LeaderboardView() {
               <span className="lb-podium-medal">{MEDALS[row.rank]}</span>
               <div className="lb-podium-avatar">
                 {(() => {
-                  const av = showPictures ? avatarFor(row) : null;
+                  const av = avatarFor(row);
                   return av ? (
                     <span className="lb-avatar-img-wrap">
                       <ShopImage src={av.src} fallbackSrc={av.fallback} alt="" className="lb-avatar-img" style={av.style} />
                     </span>
                   ) : (
-                    <span className="lb-podium-emoji">{getInitials(row.name)}</span>
+                    <span
+                      className="lb-podium-emoji"
+                      style={row.isUser ? initialsBackgroundStyle(initialsBgColor) : undefined}
+                    >
+                      {getInitials(row.name)}
+                    </span>
                   );
                 })()}
                 <span className="lb-podium-rank">{row.rank}</span>
@@ -255,13 +225,17 @@ export default function LeaderboardView() {
             >
               <span className="lb-row-rank">{row.rank}</span>
               {(() => {
-                const av = showPictures ? avatarFor(row) : null;
+                const av = avatarFor(row);
                 return av ? (
                   <span className="lb-row-avatar has-img" aria-hidden="true">
                     <ShopImage src={av.src} fallbackSrc={av.fallback} alt="" className="lb-avatar-img" style={av.style} />
                   </span>
                 ) : (
-                  <span className="lb-row-avatar" aria-hidden="true">
+                  <span
+                    className="lb-row-avatar"
+                    aria-hidden="true"
+                    style={row.isUser ? initialsBackgroundStyle(initialsBgColor) : undefined}
+                  >
                     {getInitials(row.name)}
                   </span>
                 );

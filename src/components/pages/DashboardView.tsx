@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
 import { asset } from "@/lib/asset";
 import "@/styles/pages/dashboard.css";
@@ -42,6 +43,20 @@ export default function DashboardView() {
   const ensureDaily = useGameStore((s) => s.ensureDaily);
   const claimQuest = useGameStore((s) => s.claimQuest);
   const profileVisuals = useEquippedProfileVisuals();
+  const authUser = useAuthStore((s) => s.user);
+  const profileUsesInitials = useGameStore((s) => s.player.profileUsesInitials);
+  const initialsBgColor = useGameStore((s) => s.getInitialsBgColor());
+  const profileInitials =
+    authUser?.avatarInitials ||
+    (authUser?.name
+      ? authUser.name
+          .trim()
+          .split(/\s+/)
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase()
+      : "KQ");
 
   const [xpPct, setXpPct] = useState(0);
   const [journeyPct, setJourneyPct] = useState(0);
@@ -198,6 +213,8 @@ export default function DashboardView() {
                     avatar={profileVisuals.avatar}
                     frame={profileVisuals.frame}
                     background={profileVisuals.background}
+                    initials={profileUsesInitials ? profileInitials : null}
+                    initialsBg={initialsBgColor}
                   />
                 </div>
                 <div>
