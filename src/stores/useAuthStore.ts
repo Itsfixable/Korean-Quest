@@ -135,7 +135,15 @@ export const useAuthStore = create<AuthStore>()(
       signInWithGoogle: async () => {
         const supabase = getSupabase();
         if (!supabase) return { ok: false, error: "Supabase is not configured." };
-        const redirectTo = typeof window !== "undefined" ? window.location.href : undefined;
+        // Always redirect back to a clean base URL (origin + basePath) so any
+        // leftover OAuth params (?error=…#access_token=…) from a previous attempt
+        // are never carried into the new flow — that mismatch causes the
+        // "bad_oauth_state / OAuth state not found or expired" error.
+        let redirectTo: string | undefined;
+        if (typeof window !== "undefined") {
+          const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+          redirectTo = `${window.location.origin}${basePath}/`;
+        }
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: { redirectTo },
