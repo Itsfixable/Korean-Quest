@@ -236,7 +236,8 @@ export default function ResourcesView() {
         <h2>Credits &amp; Sources</h2>
         <p className="muted">
           Korean Quest is built on student-written content. Third-party materials used on
-          this site are credited below.
+          this site are credited below — see the{" "}
+          <Link href="/sources">Sources</Link> page for the full list.
         </p>
         <ul className="kq-credits-list">
           {CREDITS.map((credit) => (

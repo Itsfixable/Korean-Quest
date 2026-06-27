@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
+import ProgressReport from "@/components/pages/ProgressReport";
 import { asset } from "@/lib/asset";
 import "@/styles/pages/dashboard.css";
 import "@/styles/pages/dashboard-enhancements.css";
@@ -341,6 +342,8 @@ export default function DashboardView() {
           </div>
         </div>
       </section>
+
+      <ProgressReport />
 
       <section className="dashboard-columns">
         <section className="card recent-card">

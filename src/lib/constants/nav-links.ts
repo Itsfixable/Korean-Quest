@@ -7,6 +7,7 @@ export const NAV_LINKS = [
   { href: "/shop", label: "Shop", icon: "newNavIcons/shopIcon1.png" },
   { href: "/leaderboard", label: "Leaderboard", icon: "newNavIcons/leaderboardIcon1.png" },
   { href: "/about", label: "About", icon: "newNavIcons/aboutIcon1.png" },
+  { href: "/sources", label: "Sources", icon: "newNavIcons/sourceIcon1.png" },
 ] as const;
 
 // Routes that live under a top-level nav tab but have their own path. Visiting

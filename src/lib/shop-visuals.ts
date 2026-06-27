@@ -26,8 +26,8 @@ export interface VisualShopItem extends ShopItem {
 export const SHOP_ASSETS = {
   banner: "/favicon/shop/shopBanner.png",
   icons: {
-    owned: "/favicon/shop/icons/owned.png",
-    equipped: "/favicon/shop/icons/equipped.png",
+    owned: "/favicon/shop/ownedIcon.png",
+    equipped: "/favicon/shop/equipedIcon.png",
     earnCoins: "/favicon/shop/icons/earnCoins.png",
     avatars: "/favicon/shop/icons/avatar.png",
     frames: "/favicon/shop/icons/frames.png",

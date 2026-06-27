@@ -73,7 +73,7 @@ const ISLAND_LAYOUT: { x: number; y: number }[] = [
 // Each world gets its own scroll background.
 const WORLD_BG: Record<number, string> = {
   1: "/favicon/adventure/bg/adventureBg1.png",
-  2: "/favicon/adventure/bg/adventureBg2.png",
+  2: "/favicon/adventure/bg/adventureBg23.png",
   3: "/favicon/adventure/bg/adventureBg3.png",
 };
 

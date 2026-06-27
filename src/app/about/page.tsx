@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { asset } from "@/lib/asset";
 import "@/styles/pages/about.css";
 
@@ -247,8 +248,8 @@ export default function AboutPage() {
       <section className="card about-attribution">
         <h2 className="about-section-title">Attribution</h2>
         <p className="muted">
-          Third-party videos and assets are cited in the Credits &amp; Sources section of
-          the Learn page. All other content is student-written.
+          Third-party videos, fonts, software, and services are credited in full on the{" "}
+          <Link href="/sources">Sources</Link> page. All other content is student-written.
         </p>
       </section>
     </main>

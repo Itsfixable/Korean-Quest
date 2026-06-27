@@ -1,0 +1,230 @@
+/* ==== DASHBOARD — PROGRESS REPORT ==== */
+/* Theme tokens live in master.css — do not redefine :root here. */
+
+.kq-report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kq-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.kq-report-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kq-report-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.kq-report-range select {
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid rgba(91, 114, 159, 0.28);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.kq-report-btn {
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.84rem;
+  color: #ffffff;
+  background: var(--brand);
+  border: 1px solid color-mix(in srgb, var(--brand) 70%, #000000 10%);
+  border-radius: 10px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.kq-report-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.kq-report-btn.secondary {
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 12%, #ffffff);
+  border-color: rgba(91, 114, 159, 0.28);
+}
+
+.kq-report-meta {
+  margin: -6px 0 0;
+  font-size: 0.85rem;
+}
+
+/* ---------- Category filter chips ---------- */
+.kq-report-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kq-report-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--muted);
+  background: #ffffff;
+  border: 1px solid rgba(91, 114, 159, 0.22);
+  border-radius: 999px;
+  padding: 6px 13px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.kq-report-chip.is-active {
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+}
+
+.kq-report-chip input {
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+
+/* ---------- Metric grid ---------- */
+.kq-report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 12px;
+}
+
+.kq-report-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(150deg, #ffffff 0%, #f5f8fe 100%);
+  border: 1px solid rgba(91, 114, 159, 0.16);
+}
+
+.kq-report-stat-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.kq-report-stat-value {
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.kq-report-stat-hint {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.kq-report-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(91, 114, 159, 0.16);
+  overflow: hidden;
+  margin: 4px 0 2px;
+}
+
+.kq-report-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 55%, #8be3c4));
+  transition: width 0.6s ease;
+}
+
+/* ---------- Activity breakdown ---------- */
+.kq-report-activity h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.kq-report-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.kq-report-activity-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 28px;
+  align-items: center;
+  gap: 10px;
+}
+
+.kq-report-activity-type {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.kq-report-activity-track {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(91, 114, 159, 0.14);
+  overflow: hidden;
+}
+
+.kq-report-activity-track > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--brand) 80%, #b06fd0), var(--brand));
+  transition: width 0.6s ease;
+}
+
+.kq-report-activity-count {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-align: right;
+}
+
+@media (max-width: 560px) {
+  .kq-report-head {
+    align-items: flex-start;
+  }
+
+  .kq-report-activity-row {
+    grid-template-columns: 80px 1fr 24px;
+  }
+}
+
+/* Keep the report readable when printed as an output report. */
+@media print {
+  .kq-report-controls,
+  .kq-report-filters {
+    display: none !important;
+  }
+
+  .kq-report-card {
+    border: 1px solid #cccccc;
+    box-shadow: none;
+  }
+}
