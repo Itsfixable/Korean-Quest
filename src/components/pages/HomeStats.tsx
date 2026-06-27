@@ -9,14 +9,13 @@ import CountUp from "@/components/reactbits/CountUp";
 export function HomeStats() {
   const ensureDaily = useGameStore((s) => s.ensureDaily);
   const player = useGameStore((s) => s.player);
+  const getAchievements = useGameStore((s) => s.getAchievements);
 
   useEffect(() => {
     ensureDaily();
   }, [ensureDaily]);
 
-  const badges = player.badges.length
-    ? player.badges.slice(0, 3).join(" · ")
-    : "—";
+  const badges = getAchievements().slice(0, 3);
 
   return (
     <div className="kq-hero-stats" role="region" aria-label="Key progress">
@@ -41,7 +40,28 @@ export function HomeStats() {
       </div>
       <div className="metric">
         <div className="muted">Badges</div>
-        <div>{badges}</div>
+        <div className="kq-home-badges">
+          {badges.length === 0 ? (
+            "—"
+          ) : (
+            badges.map((badge) => (
+              <span
+                key={badge.name}
+                className="kq-badge-tip"
+                tabIndex={0}
+                aria-label={`${badge.name}: ${badge.desc}`}
+              >
+                <span className="kq-inline-badge" aria-hidden="true">
+                  {badge.icon}
+                </span>
+                <span className="kq-badge-tip__bubble" role="tooltip" aria-hidden="true">
+                  <span className="kq-badge-tip__name">{badge.name}</span>
+                  <span className="kq-badge-tip__desc">{badge.desc}</span>
+                </span>
+              </span>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

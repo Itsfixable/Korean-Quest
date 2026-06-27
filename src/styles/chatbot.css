@@ -54,8 +54,10 @@
   position: fixed;
   bottom: 30px;
   right: -100vw;
-  width: 420px;
-  height: 450px;
+  /* Never wider/taller than the viewport allows, so it stays usable on small
+     laptop windows and short screens while keeping the 420x450 ideal size. */
+  width: min(420px, calc(100vw - 36px));
+  height: min(450px, calc(100dvh - 120px));
   background: var(--panel);
   border-radius: 12px;
   box-shadow: 0 5px 40px rgba(0, 0, 0, 0.16);
@@ -187,21 +189,35 @@
 /* Responsive — matches the sidebar collapse breakpoint (900px) */
 @media (max-width: 900px) {
   .chatbot-container {
-    width: calc(100vw - 60px);
-    max-width: 420px;
-    bottom: 100px;
-    right: -100%;
-    height: 350px;
+    width: calc(100vw - 32px);
+    max-width: 460px;
+    /* The toggle button is hidden while the panel is open, so it can sit near
+       the bottom edge (respecting any safe-area inset on notched phones). */
+    bottom: max(16px, env(safe-area-inset-bottom));
+    right: -100vw;
+    height: min(70dvh, 440px);
   }
 
   .chatbot-container.chatbot-open {
-    right: 30px;
+    right: 16px;
   }
 
   .chatbot-toggle-btn {
     --chatbot-icon-size: 132px;
     bottom: 6px;
     right: 6px;
+  }
+}
+
+/* Very small / short phones: let the panel use more of the screen. */
+@media (max-width: 480px) {
+  .chatbot-container {
+    width: calc(100vw - 20px);
+    height: min(72dvh, 460px);
+  }
+
+  .chatbot-container.chatbot-open {
+    right: 10px;
   }
 }
 /* Force chatbot to always use Korea Quest dark blue */
