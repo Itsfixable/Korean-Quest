@@ -27,7 +27,7 @@ export default function HomePage() {
             </h1>
             <p className="kq-hero-sub">
               Master Hangul, vocabulary, and real Korean phrases through{" "}
-              <strong>interactive lessons</strong>, <strong>game battles</strong>, and{" "}
+              <strong>interactive flashcards</strong>, <strong>game battles</strong>, and{" "}
               <strong>daily challenges</strong>.
             </p>
             <div className="kq-hero-cta">
@@ -57,8 +57,8 @@ export default function HomePage() {
               <div className="kq-feature-icon">
                 <Image src={asset("/favicon/nav/newNavIcons/learnIcon1.png")} alt="" width={56} height={56} />
               </div>
-              <h3>Quick Lessons</h3>
-              <p>Learn the essentials in short, beginner-friendly lessons built for fast progress.</p>
+              <h3>Learn the Basics</h3>
+              <p>Pick up the essentials with short, beginner-friendly flashcards, tests, and videos.</p>
             </SpotlightCard>
             <SpotlightCard className="kq-feature-card">
               <div className="kq-feature-icon">
@@ -99,7 +99,7 @@ export default function HomePage() {
             <li><strong>Sentence Structure</strong> — SOV order, particles (은/는, 이/가, 을/를), time/location, and present tense.</li>
           </ol>
           <div className="kq-path-cta">
-            <Link className="btn" href="/resources">Start with Lesson 1</Link>
+            <Link className="btn" href="/resources">Start with Hangul</Link>
           </div>
         </section>
       </main>

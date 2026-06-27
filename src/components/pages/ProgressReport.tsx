@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "motion/react";
 import { useGameStore } from "@/stores/useGameStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useFlashcardStore } from "@/stores/useFlashcardStore";
 import { useBookingStore } from "@/stores/useBookingStore";
 import { FLASHCARD_SETS } from "@/lib/constants/flashcard-sets";
-import { LESSON_UNLOCKS } from "@/lib/constants/achievements";
+import { BarChart, CHART_CATEGORIES, DonutChart, RadialGauge, GROUP_COLORS } from "./ProgressCharts";
 import "@/styles/pages/dashboard-report.css";
 
 type RangeKey = "all" | "7" | "30";
@@ -30,15 +31,41 @@ const GROUP_LABELS: Record<GroupKey, string> = {
   progress: "Progress",
 };
 
+
 const RANGE_OPTIONS: { value: RangeKey; label: string }[] = [
   { value: "all", label: "All time" },
   { value: "30", label: "Last 30 days" },
   { value: "7", label: "Last 7 days" },
 ];
 
-function csvEscape(value: string) {
-  if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
-  return value;
+/** Collapse recorded activity types into the four breakdown categories. */
+function normalizeActivityType(type: string): string | null {
+  switch (type) {
+    case "Battle":
+      return "Battle";
+    case "Flashcard":
+    case "Flashcards":
+      return "Flashcard";
+    case "Test":
+    case "Quiz":
+      return "Test";
+    case "Trace":
+    case "Tracing":
+      return "Trace";
+    default:
+      return null;
+  }
+}
+
+function computeJourneyPercent(
+  completedLessonIds: string[],
+  battlesWon: number,
+  badgeCount: number,
+) {
+  const lessonScore = Math.min(completedLessonIds.length / 3, 1) * 45;
+  const battleScore = Math.min(battlesWon / 12, 1) * 35;
+  const badgeScore = Math.min(badgeCount / 8, 1) * 20;
+  return Math.round(lessonScore + battleScore + badgeScore);
 }
 
 export default function ProgressReport() {
@@ -62,28 +89,48 @@ export default function ProgressReport() {
     setMounted(true);
   }, []);
 
+  const achievements = getAchievements();
+  const adventure = getAdventureProgress();
+
+  const journeyPercent = useMemo(
+    () =>
+      computeJourneyPercent(
+        progress.completedLessonIds,
+        progress.battlesWon,
+        achievements.length,
+      ),
+    [progress.completedLessonIds, progress.battlesWon, achievements.length],
+  );
+
+  const nextUnlockText = adventure.nextLesson
+    ? `Keep going to unlock ${adventure.nextLesson.label}.`
+    : "All adventure chapters are unlocked — now clear every boss node.";
+
   const activities = useMemo(() => {
-    const list = progress.recentWork || [];
+    const list = (progress.recentWork || []).filter((item) => item.type !== "Shop");
     if (range === "all") return list;
     const cutoff = Date.now() - Number(range) * 86400000;
     return list.filter((item) => item.ts >= cutoff);
   }, [progress.recentWork, range]);
 
-  const activityByType = useMemo(() => {
+  const chartSlices = useMemo(() => {
     const counts: Record<string, number> = {};
     activities.forEach((item) => {
-      counts[item.type] = (counts[item.type] || 0) + 1;
+      const label = normalizeActivityType(item.type);
+      if (label) counts[label] = (counts[label] || 0) + 1;
     });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return CHART_CATEGORIES.map((cat) => ({
+      label: cat.label,
+      value: counts[cat.label] || 0,
+      color: cat.color,
+    }));
   }, [activities]);
+
+  const chartTotal = chartSlices.reduce((sum, slice) => sum + slice.value, 0);
 
   const metrics = useMemo<Metric[]>(() => {
     const achievements = getAchievements();
     const adventure = getAdventureProgress();
-
-    const totalLessons = Object.keys(LESSON_UNLOCKS).length;
-    const lessonsCompleted = Math.min(progress.completedLessonIds.length, totalLessons);
-    const lessonPct = totalLessons ? Math.round((lessonsCompleted / totalLessons) * 100) : 0;
 
     const totalCards = FLASHCARD_SETS.reduce((sum, set) => sum + set.cards.length, 0);
     const knownCards = Math.min(
@@ -122,13 +169,6 @@ export default function ProgressReport() {
         value: String(activities.length),
         group: "engagement",
         hint: range === "all" ? "All time" : `Last ${range} days`,
-      },
-      {
-        key: "lessons",
-        label: "Lessons completed",
-        value: `${lessonsCompleted} / ${totalLessons}`,
-        group: "learning",
-        pct: lessonPct,
       },
       {
         key: "mastery",
@@ -195,28 +235,6 @@ export default function ProgressReport() {
   const toggleGroup = (group: GroupKey) =>
     setGroups((prev) => ({ ...prev, [group]: !prev[group] }));
 
-  const handleExportCsv = () => {
-    const generatedFor = authUser?.loggedIn ? authUser.name : "Guest Learner";
-    const header = `# Korean Quest progress report\n# Learner: ${generatedFor}\n# Generated: ${new Date().toLocaleString()}\n# Range: ${
-      range === "all" ? "All time" : `Last ${range} days`
-    }\n`;
-    const rows = [
-      ["Metric", "Value", "Category"],
-      ...visibleMetrics.map((m) => [m.label, m.value, GROUP_LABELS[m.group]]),
-      ...activityByType.map(([type, count]) => [`Activity: ${type}`, String(count), "Activity"]),
-    ];
-    const csv = header + rows.map((row) => row.map(csvEscape).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `korean-quest-report-${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
-
   if (!mounted) {
     return (
       <section className="dashboard-card kq-report-card">
@@ -231,19 +249,29 @@ export default function ProgressReport() {
     );
   }
 
-  const maxActivity = activityByType.reduce((max, [, count]) => Math.max(max, count), 0) || 1;
   const generatedFor = authUser?.loggedIn ? authUser.name : "Guest Learner";
+  const minutesActive =
+    progress.studyMinutesDay === new Date().toDateString()
+      ? progress.studyMinutes || 0
+      : 0;
 
   return (
     <section className="dashboard-card kq-report-card">
       <div className="kq-report-head">
         <div className="section-head" style={{ margin: 0 }}>
           <span className="section-icon" aria-hidden="true">
-            📊
+            📈
           </span>
-          <h2>Progress Report</h2>
+          <h2>Learning Journey</h2>
         </div>
         <div className="kq-report-controls">
+          <div className="kq-report-clock" title="Active study time today">
+            <span className="kq-report-clock-icon" aria-hidden="true">
+              ⏱️
+            </span>
+            <span className="kq-report-clock-value">{minutesActive}</span>
+            <span className="kq-report-clock-unit">min active today</span>
+          </div>
           <label className="kq-report-range">
             <span>Range</span>
             <select
@@ -258,12 +286,6 @@ export default function ProgressReport() {
               ))}
             </select>
           </label>
-          <button type="button" className="kq-report-btn" onClick={handleExportCsv}>
-            ⬇ Export CSV
-          </button>
-          <button type="button" className="kq-report-btn secondary" onClick={() => window.print()}>
-            🖨 Print
-          </button>
         </div>
       </div>
 
@@ -272,11 +294,30 @@ export default function ProgressReport() {
         showing {visibleMetrics.length} metrics
       </p>
 
+      <div className="kq-journey-band">
+        <div className="kq-journey-band-head">
+          <span className="kq-journey-band-pct">{journeyPercent}%</span>
+          <div className="kq-journey-band-text">
+            <strong>Overall journey complete</strong>
+            <span>Adventure unlocked through Level {adventure.cap}</span>
+          </div>
+        </div>
+        <div className="kq-journey-band-track" aria-hidden="true">
+          <motion.span
+            className="kq-journey-band-fill"
+            initial={{ width: 0 }}
+            animate={{ width: `${journeyPercent}%` }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </div>
+        <p className="kq-journey-band-note">{nextUnlockText}</p>
+      </div>
+
       <div className="kq-report-filters" role="group" aria-label="Metric categories">
         {(Object.keys(GROUP_LABELS) as GroupKey[]).map((group) => (
           <label
             key={group}
-            className={`kq-report-chip${groups[group] ? " is-active" : ""}`}
+            className={`kq-report-chip kq-group-${group}${groups[group] ? " is-active" : ""}`}
           >
             <input
               type="checkbox"
@@ -292,41 +333,84 @@ export default function ProgressReport() {
         <p className="muted">Select at least one category to show metrics.</p>
       ) : (
         <div className="kq-report-grid">
-          {visibleMetrics.map((metric) => (
-            <article key={metric.key} className="kq-report-stat">
-              <span className="kq-report-stat-label">{metric.label}</span>
-              <strong className="kq-report-stat-value">{metric.value}</strong>
-              {typeof metric.pct === "number" ? (
-                <div className="kq-report-bar" aria-hidden="true">
-                  <span style={{ width: `${metric.pct}%` }} />
+          {visibleMetrics.map((metric, index) =>
+            typeof metric.pct === "number" ? (
+              <article
+                key={metric.key}
+                className={`kq-report-stat is-gauge kq-group-${metric.group}`}
+              >
+                <RadialGauge
+                  value={metric.pct}
+                  color={GROUP_COLORS[metric.group]}
+                  delay={0.05 * index}
+                  size={66}
+                />
+                <div className="kq-report-stat-body">
+                  <span className="kq-report-stat-label">{metric.label}</span>
+                  <strong className="kq-report-stat-value">{metric.value}</strong>
+                  {metric.hint ? (
+                    <span className="kq-report-stat-hint">{metric.hint}</span>
+                  ) : null}
                 </div>
-              ) : null}
-              {metric.hint ? <span className="kq-report-stat-hint">{metric.hint}</span> : null}
-            </article>
-          ))}
+              </article>
+            ) : (
+              <article
+                key={metric.key}
+                className={`kq-report-stat kq-group-${metric.group}`}
+              >
+                <span className="kq-report-stat-label">{metric.label}</span>
+                <strong className="kq-report-stat-value">{metric.value}</strong>
+                {metric.hint ? (
+                  <span className="kq-report-stat-hint">{metric.hint}</span>
+                ) : null}
+              </article>
+            ),
+          )}
         </div>
       )}
 
       <div className="kq-report-activity">
         <h3>Activity breakdown</h3>
-        {activityByType.length === 0 ? (
+        {chartTotal === 0 ? (
           <p className="muted">
-            No activity recorded for this range yet. Complete a lesson, quiz, or battle to
-            populate your report.
+            No activity recorded for this range yet. Win a battle, study flashcards, take a
+            test, or trace characters to populate your report.
           </p>
         ) : (
-          <ul className="kq-report-activity-list">
-            {activityByType.map(([type, count]) => (
-              <li key={type} className="kq-report-activity-row">
-                <span className="kq-report-activity-type">{type}</span>
-                <span className="kq-report-activity-track" aria-hidden="true">
-                  <span style={{ width: `${Math.round((count / maxActivity) * 100)}%` }} />
-                </span>
-                <span className="kq-report-activity-count">{count}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="kq-report-charts">
+            <div className="kq-report-chart-card">
+              <span className="kq-report-chart-title">Distribution</span>
+              <DonutChart data={chartSlices} />
+            </div>
+            <div className="kq-report-chart-card">
+              <span className="kq-report-chart-title">Counts by type</span>
+              <BarChart data={chartSlices} />
+            </div>
+          </div>
         )}
+      </div>
+
+      <div className="kq-report-badges">
+        <h3>Achievement badges</h3>
+        <div className="kq-achievement-grid kq-stagger">
+          {achievements.length === 0 ? (
+            <div className="kq-achievement-empty">
+              No badges yet — finish a quiz or win a battle to start collecting achievements.
+            </div>
+          ) : (
+            achievements.map((badge) => (
+              <article key={badge.name} className="kq-achievement-chip">
+                <div className="kq-achievement-icon" aria-hidden="true">
+                  {badge.icon}
+                </div>
+                <div>
+                  <h3>{badge.name}</h3>
+                  <p>{badge.desc}</p>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
       </div>
     </section>
   );

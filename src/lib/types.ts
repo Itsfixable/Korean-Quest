@@ -41,6 +41,10 @@ export interface Progress {
   adventureCap: number;
   recentWork: RecentWork[];
   jamoStars: Record<string, number>;
+  /** Active study minutes accrued today (resets when the day changes). */
+  studyMinutes?: number;
+  /** Day key (toDateString) the studyMinutes counter belongs to. */
+  studyMinutesDay?: string | null;
 }
 
 export interface QuestReward {

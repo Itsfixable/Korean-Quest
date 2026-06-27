@@ -361,14 +361,20 @@
 
     .kq-shop-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      /* Fluid columns that respond to the grid's own width (not the viewport),
+         so cards never squish when the sidebar or devtools narrow the area.
+         min(100%, 210px) keeps a single column from overflowing tiny widths.
+         The max(...) floor forces each column to be at least a quarter of the
+         row (minus the 3 gaps), capping the layout at 4 columns (4x2) so it
+         never grows to a 5th column on wide screens. */
+      grid-template-columns: repeat(auto-fill, minmax(max(min(100%, 210px), (100% - 66px) / 4), 1fr));
       gap: 22px;
     }
 
     /* When a category has fewer items than a full row (e.g. Frames has 3),
        size the cards and center the row instead of left-aligning them. */
     .kq-shop-grid.is-centered {
-      grid-template-columns: repeat(auto-fit, minmax(0, 248px));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 248px));
       justify-content: center;
     }
 
@@ -1006,12 +1012,6 @@
       .kq-shop-progress-shell {
         grid-template-columns: 1fr;
       }
-
-      /* Tablets: the fixed sidebar eats horizontal space, so 4 columns become
-         far too cramped for the item cards. Drop to 3. */
-      .kq-shop-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
     }
 
     @media (max-width: 900px) {
@@ -1024,10 +1024,6 @@
       }
 
       .kq-shop-tabs {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .kq-shop-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
@@ -1051,10 +1047,6 @@
 
       .kq-shop-list-panel {
         padding: 16px;
-      }
-
-      .kq-shop-grid {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
       }
 
       .kq-shop-bottom-card {

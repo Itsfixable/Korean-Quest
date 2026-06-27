@@ -177,7 +177,7 @@ export default function FlashcardsView() {
     updateProgress(nextProg);
     addXP(2);
     addCoins(1);
-    addRecentWork(`Flashcards: marked "${term}" as known (+2 XP, +1 coin)`, "Lesson");
+    addRecentWork(`Flashcards: marked "${term}" as known (+2 XP, +1 coin)`, "Flashcard");
     next();
   };
 

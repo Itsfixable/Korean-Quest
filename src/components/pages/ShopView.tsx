@@ -296,7 +296,7 @@ export default function ShopView() {
       const result = purchaseShopItem(itemId);
       if (!result.ok && result.reason === "coins") {
         showDialog(
-          "You do not have enough coins for that item yet. Earn more by completing lessons, daily quests, and battles!",
+          "You do not have enough coins for that item yet. Earn more by completing quizzes, daily quests, and battles!",
           { title: "Not enough coins" },
         );
       }

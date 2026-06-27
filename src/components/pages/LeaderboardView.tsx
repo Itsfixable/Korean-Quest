@@ -27,7 +27,6 @@ interface LeaderboardRow {
   rank: number;
   name: string;
   badge: string;
-  title: string;
   xp: number;
   streak: number;
   isUser: boolean;
@@ -44,7 +43,6 @@ function getInitials(name: string) {
 export default function LeaderboardView() {
   const leaderboard = useGameStore((s) => s.leaderboard);
   const player = useGameStore((s) => s.player);
-  const displayTitle = useGameStore((s) => s.getCurrentDisplayTitle());
   const displayEmoji = useGameStore((s) => s.getCurrentDisplayEmoji());
   const user = useAuthStore((s) => s.user);
   const userId = useAuthStore((s) => s.userId);
@@ -69,7 +67,7 @@ export default function LeaderboardView() {
   const data = useMemo<LeaderboardRow[]>(() => {
     const useCloud = Boolean(cloudRows && cloudRows.length > 0);
 
-    type RawRow = { name: string; xp: number; title: string; badge: string; streak: number; isUser: boolean };
+    type RawRow = { name: string; xp: number; badge: string; streak: number; isUser: boolean };
 
     // Always seed the board with the made-up members so it stays populated even
     // when there are few (or no) real signed-in players in the cloud.
@@ -83,7 +81,6 @@ export default function LeaderboardView() {
           .map((row): RawRow => ({
             name: row.displayName,
             xp: row.xp,
-            title: `Level ${row.level}`,
             badge: getInitials(row.displayName),
             streak: row.streak,
             isUser: false,
@@ -96,7 +93,6 @@ export default function LeaderboardView() {
       {
         name: displayName,
         xp: player.totalXPEarned,
-        title: displayTitle,
         badge: displayEmoji,
         streak: player.streak,
         isUser: true,
@@ -115,14 +111,13 @@ export default function LeaderboardView() {
         rank: index + 1,
         name: row.name,
         badge: row.badge,
-        title: row.title,
         xp: row.xp,
         streak: Number(row.streak) || 0,
         isUser,
         rankTheme,
       };
     });
-  }, [cloudRows, userId, leaderboard, displayName, displayTitle, displayEmoji, player.totalXPEarned, player.streak]);
+  }, [cloudRows, userId, leaderboard, displayName, displayEmoji, player.totalXPEarned, player.streak]);
 
   // Resolve a profile picture for a row: the signed-in user gets their equipped
   // avatar; everyone else gets a deterministic head shot keyed off their name.
@@ -175,7 +170,7 @@ export default function LeaderboardView() {
           <span className="lb-eyebrow">Weekly standings</span>
           <h1>Leaderboard</h1>
           <p className="muted">
-            XP standings update as you complete lessons, win battles, and keep your streak alive.
+            XP standings update as you take quizzes, win battles, and keep your streak alive.
           </p>
         </div>
         <div className="lb-header-side">
@@ -226,7 +221,6 @@ export default function LeaderboardView() {
                 {row.name}
                 {row.isUser ? <span className="lb-you-tag">You</span> : null}
               </h3>
-              <span className="lb-podium-title">{row.title}</span>
               <div className="lb-podium-xp">
                 <strong>{row.xp.toLocaleString()}</strong>
                 <span>XP</span>
@@ -271,7 +265,6 @@ export default function LeaderboardView() {
                   {row.name}
                   {row.isUser ? <span className="lb-you-tag">You</span> : null}
                 </span>
-                <span className="lb-row-title">{row.title}</span>
               </div>
               <span className="lb-row-streak">🔥 {row.streak}</span>
               <span className="lb-row-xp">

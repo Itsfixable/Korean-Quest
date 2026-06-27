@@ -5,7 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import "@/styles/pages/tracing.css";
 import "@/styles/pages/tracing-enhancements.css";
-import { JAMO_STROKE_DB, type Stroke } from "@/lib/jamo-strokes";
+import { JAMO_STROKE_DB } from "@/lib/jamo-strokes";
+import { gradeTrace } from "@/lib/trace-grading";
 
 type Point = { x: number; y: number };
 type StrokeDraw = { points: Point[] };
@@ -222,7 +223,7 @@ export default function TracingView({ char }: TracingViewProps) {
         addXP(xp);
         addCoins(coins);
         addBadge("Tracing Starter");
-        addRecentWork(`Earned ${starCount} star${starCount > 1 ? "s" : ""} on ${target}`, "Tracing");
+        addRecentWork(`Earned ${starCount} star${starCount > 1 ? "s" : ""} on ${target}`, "Trace");
         setScoreHtml(`🎉 Stage ${starCount} complete! +${xp} XP · +${coins} coins<br/>${starsText(starCount)}`);
       } else {
         setScoreHtml(`✅ Stage ${starCount} already completed.<br/>${starsText(prev)}`);
@@ -301,77 +302,24 @@ export default function TracingView({ char }: TracingViewProps) {
       return;
     }
 
-    const maskFromStrokeSegs = (segs: Stroke) => {
-      const c = document.createElement("canvas");
-      c.width = SIZE;
-      c.height = SIZE;
-      const cx = c.getContext("2d")!;
-      cx.lineWidth = LW;
-      cx.lineCap = "round";
-      cx.lineJoin = "round";
-      cx.strokeStyle = "#000";
-      segs.forEach((s) => {
-        const [x1, y1, x2, y2] = s.map(N);
-        cx.beginPath();
-        cx.moveTo(x1, y1);
-        cx.lineTo(x2, y2);
-        cx.stroke();
-      });
-      const d = cx.getImageData(0, 0, SIZE, SIZE).data;
-      const m = new Uint8Array(SIZE * SIZE);
-      for (let i = 0; i < d.length; i += 4) m[i >> 2] = d[i + 3] > 0 ? 1 : 0;
-      return m;
-    };
+    const result = gradeTrace(
+      tpl,
+      strokesRef.current.map((s) => s.points),
+      { size: SIZE, lineWidth: LW },
+    );
+    const { score, feedback } = result;
 
-    const maskFromPoints = (points: Point[]) => {
-      const c = document.createElement("canvas");
-      c.width = SIZE;
-      c.height = SIZE;
-      const cx = c.getContext("2d")!;
-      cx.lineWidth = LW;
-      cx.lineCap = "round";
-      cx.lineJoin = "round";
-      cx.strokeStyle = "#000";
-      for (let i = 1; i < points.length; i += 1) {
-        cx.beginPath();
-        cx.moveTo(points[i - 1].x, points[i - 1].y);
-        cx.lineTo(points[i].x, points[i].y);
-        cx.stroke();
-      }
-      const d = cx.getImageData(0, 0, SIZE, SIZE).data;
-      const m = new Uint8Array(SIZE * SIZE);
-      for (let i = 0; i < d.length; i += 4) m[i >> 2] = d[i + 3] > 0 ? 1 : 0;
-      return m;
-    };
-
-    const iouScore = (a: Uint8Array, b: Uint8Array) => {
-      let ov = 0;
-      let ca = 0;
-      let cb = 0;
-      for (let i = 0; i < a.length; i += 1) {
-        if (a[i]) ca += 1;
-        if (b[i]) cb += 1;
-        if (a[i] && b[i]) ov += 1;
-      }
-      const iou = ov / (ca + cb - ov + 1e-6);
-      const cov = ov / (ca + 1e-6);
-      return 0.65 * iou + 0.35 * cov;
-    };
-
-    let per = 0;
-    const used = Math.min(tpl.length, strokesRef.current.length);
-    for (let i = 0; i < used; i += 1) {
-      per += iouScore(maskFromStrokeSegs(tpl[i]), maskFromPoints(strokesRef.current[i].points));
-    }
-    per /= tpl.length;
-    const missing = Math.max(0, tpl.length - strokesRef.current.length);
-    const extra = Math.max(0, strokesRef.current.length - tpl.length);
-    const orderPenalty = 1 - Math.min(0.35, missing * 0.12 + extra * 0.1);
-    const score = Math.round(100 * Math.max(0, Math.min(1, per * orderPenalty * 4)));
-    const passScore = stage === 2 ? 55 : 60;
+    // Stage 3 (blank test) has no guide, so it's graded a little more leniently
+    // than Stage 2 where the stroke order is still visible.
+    const passScore = stage === 2 ? 70 : 62;
     const starToAward = stage === 2 ? 2 : 3;
-    if (score >= passScore) awardStageStar(starToAward);
-    else setScoreHtml(`Score: <strong>${score}</strong>/100<br/>Try again to pass Stage ${stage}.`);
+    if (score >= passScore) {
+      awardStageStar(starToAward);
+    } else {
+      setScoreHtml(
+        `Score: <strong>${score}</strong>/100 (need ${passScore})<br/>${feedback}`,
+      );
+    }
   };
 
   useEffect(() => {

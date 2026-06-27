@@ -160,9 +160,9 @@ export default function TestView() {
     if (pct >= 80) {
       addXP(20);
       addCoins(10);
-      addRecentWork(`Test: scored ${pct}% on "${currentSet.title}" (+20 XP, +10 coins)`, "Lesson");
+      addRecentWork(`Test: scored ${pct}% on "${currentSet.title}" (+20 XP, +10 coins)`, "Test");
     } else {
-      addRecentWork(`Test: scored ${pct}% on "${currentSet.title}"`, "Lesson");
+      addRecentWork(`Test: scored ${pct}% on "${currentSet.title}"`, "Test");
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

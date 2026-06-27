@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useStudyTimeTracker } from "@/hooks/useStudyTimeTracker";
 import { startCloudSync } from "@/lib/cloudSync";
 import { AuthModal } from "@/components/layout/AuthModal";
 import { AppDialog } from "@/components/layout/AppDialog";
@@ -15,6 +16,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const setHydrated = useGameStore((s) => s.setHydrated);
   const hydrated = useGameStore((s) => s.hydrated);
   const initAuth = useAuthStore((s) => s.init);
+
+  useStudyTimeTracker();
 
   useEffect(() => {
     setHydrated();

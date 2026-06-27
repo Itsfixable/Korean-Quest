@@ -17,7 +17,7 @@ const FACTS = [
 const FEATURES = [
   {
     icon: "/favicon/nav/newNavIcons/learnIcon1.png",
-    title: "Structured Lessons",
+    title: "Structured Learning",
     text: "A guided sequence from Hangul strokes to real sentence patterns, so there's always a clear next step.",
   },
   {
@@ -48,7 +48,7 @@ const TEAM = [
   {
     role: "Curriculum & Content",
     name: "Jiah Lee",
-    detail: "Designed the lesson sequence, vocabulary sets, and study materials.",
+    detail: "Designed the learning sequence, vocabulary sets, and study materials.",
     emoji: "📚",
     accent: "#6a9f71",
   },
@@ -84,7 +84,7 @@ const METRICS = [
     emoji: "🧠",
     accent: "#6a9f71",
     items: [
-      "Lesson completion rate across the Hangul-to-phrases sequence",
+      "Completion rate across the Hangul-to-phrases sequence",
       "Flashcard mastery rate (cards moved to the Known stack)",
       "Test score improvement between first and latest attempts",
     ],
@@ -122,12 +122,12 @@ export default function AboutPage() {
             <h1 className="about-hero-title">About Korean Quest</h1>
             <p className="about-mission">
               <strong>Our mission:</strong> make Korean learning engaging,
-              collaborative, and accessible through gamified lessons and
+              collaborative, and accessible through gamified learning and
               peer-to-peer support.
             </p>
             <p className="about-lede">
               Korean Quest is a student-built study platform that blends structured
-              Hangul lessons, spaced-repetition flashcards, and an adventure mode
+              Hangul practice, spaced-repetition flashcards, and an adventure mode
               that rewards consistent practice with XP, coins, and unlockables.
             </p>
             <ul className="about-facts">
@@ -176,7 +176,7 @@ export default function AboutPage() {
             <span className="about-section-tag">The curriculum</span>
             <h2 className="about-section-title">How the learning path is structured</h2>
             <p className="muted">
-              Lessons follow a deliberate order so each stage builds on the last.
+              Each stage follows a deliberate order so it builds on the last.
             </p>
           </div>
           <ol className="about-journey">

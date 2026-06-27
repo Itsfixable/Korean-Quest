@@ -14,7 +14,7 @@ const fontApp = Nunito({
 
 export const metadata: Metadata = {
   title: "Korean Quest",
-  description: "Learn Korean through interactive lessons, game battles, and daily challenges.",
+  description: "Learn Korean through interactive flashcards, game battles, and daily challenges.",
   icons: {
     icon: asset("/favicon/logoImage.png"),
     shortcut: asset("/favicon/logoImage.png"),

@@ -34,7 +34,7 @@ const DOWNLOADABLES = [
   {
     title: "Korean Words List",
     filename: "/resources/KoreanWordsList.pdf",
-    note: "Student-compiled vocabulary reference covering the words used across Korean Quest lessons.",
+    note: "Student-compiled vocabulary reference covering the words used across Korean Quest.",
   },
   {
     title: "Hangul Practice Worksheet",
@@ -50,7 +50,7 @@ const DOWNLOADABLES = [
 
 const CREDITS = [
   {
-    label: "Video lessons",
+    label: "Videos",
     detail:
       "Billy Go's Beginner Korean Course — Learn Korean with GO! Billy Korean (YouTube). Embedded with credit; all video content belongs to its creator.",
     href: "https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k",
@@ -68,9 +68,9 @@ const CREDITS = [
     href: "https://fonts.google.com/specimen/Nunito",
   },
   {
-    label: "Lessons & artwork",
+    label: "Content & artwork",
     detail:
-      "All lessons, vocabulary sets, quizzes, and page illustrations are original, student-written content created by the Korean Quest team.",
+      "All vocabulary sets, quizzes, and page illustrations are original, student-written content created by the Korean Quest team.",
     href: null,
   },
 ];
@@ -150,10 +150,10 @@ export default function ResourcesView() {
             height={32}
             className="section-title__icon"
           />
-          <span>Lessons</span>
+          <span>Where to Start</span>
         </h1>
 
-        <p className="muted">Short, student-written lessons that build from Hangul to full sentences.</p>
+        <p className="muted">A short, student-written path that builds from Hangul to full sentences.</p>
 
         <div className="lesson-list kq-stagger" id="lesson-list">
           {LESSONS.map((lesson) => (
@@ -174,7 +174,7 @@ export default function ResourcesView() {
                 ))}
                 {lesson.showStartLesson ? (
                   <button className="btn secondary" type="button" onClick={() => startLesson(lesson)}>
-                    Start lesson
+                    Start
                   </button>
                 ) : null}
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
@@ -28,26 +28,13 @@ function rawPetSrc(image?: string) {
   return image.replace(/\/pets\/([^/]+)\.png$/i, "/pets/raw/$1Raw.png");
 }
 
-function computeJourneyPercent(
-  completedLessonIds: string[],
-  battlesWon: number,
-  badgeCount: number,
-) {
-  const lessonScore = Math.min(completedLessonIds.length / 3, 1) * 45;
-  const battleScore = Math.min(battlesWon / 12, 1) * 35;
-  const badgeScore = Math.min(badgeCount / 8, 1) * 20;
-  return Math.round(lessonScore + battleScore + badgeScore);
-}
-
 export default function DashboardView() {
   const player = useGameStore((s) => s.player);
   const quests = useGameStore((s) => s.quests);
   const progress = useGameStore((s) => s.progress);
   const needXP = useGameStore((s) => s.needXP);
   const getAchievements = useGameStore((s) => s.getAchievements);
-  const getAdventureProgress = useGameStore((s) => s.getAdventureProgress);
   const getEquippedProfile = useGameStore((s) => s.getEquippedProfile);
-  const getCurrentDisplayTitle = useGameStore((s) => s.getCurrentDisplayTitle);
   const ensureDaily = useGameStore((s) => s.ensureDaily);
   const claimQuest = useGameStore((s) => s.claimQuest);
   const profileVisuals = useEquippedProfileVisuals();
@@ -67,23 +54,16 @@ export default function DashboardView() {
       : "KQ");
 
   const [xpPct, setXpPct] = useState(0);
-  const [journeyPct, setJourneyPct] = useState(0);
 
   const achievements = getAchievements();
-  const adventure = getAdventureProgress();
   const profile = getEquippedProfile();
-  const displayTitle = getCurrentDisplayTitle();
+  const profileName = authUser?.name || "Your Profile";
   const nextXp = needXP(player.level);
 
   const avatarRawSrc = rawAvatarSrc(profile.avatar?.image);
   // Only show a companion when a pet is actually equipped (profile.pet truthy);
   // profileVisuals.pet resolves the matching artwork.
   const petRawSrc = profile.pet ? rawPetSrc(profileVisuals.pet?.image) : "";
-
-  const journeyPercent = useMemo(
-    () => computeJourneyPercent(progress.completedLessonIds, progress.battlesWon, achievements.length),
-    [progress.completedLessonIds, progress.battlesWon, achievements.length],
-  );
 
   useEffect(() => {
     ensureDaily();
@@ -96,17 +76,7 @@ export default function DashboardView() {
     return () => window.clearTimeout(t);
   }, [player.xp, nextXp]);
 
-  useEffect(() => {
-    setJourneyPct(0);
-    const t = window.setTimeout(() => setJourneyPct(journeyPercent), 50);
-    return () => window.clearTimeout(t);
-  }, [journeyPercent]);
-
-  const nextUnlockText = adventure.nextLesson
-    ? `Complete the next lesson to unlock ${adventure.nextLesson.label}.`
-    : "All adventure chapters are unlocked — now clear every boss node.";
-
-  const recentWork = progress.recentWork || [];
+  const recentWork = (progress.recentWork || []).filter((item) => item.type !== "Shop");
   const dailyQuests = quests.daily || [];
 
   return (
@@ -244,101 +214,18 @@ export default function DashboardView() {
                   />
                 </div>
                 <div>
-                  <h3 className="kq-profile-title">{displayTitle}</h3>
+                  <h3 className="kq-profile-title">{profileName}</h3>
                   <p className="kq-profile-sub">
-                    {profile.background?.name || "Hanok Courtyard"} · {player.coins} coins · Level {player.level}
+                    {player.coins} coins · Level {player.level}
                   </p>
                 </div>
               </div>
-            </div>
-            <div className="kq-profile-tags">
-              <span className="kq-profile-tag">
-                {profile.avatar?.emoji || "👑"} {profile.avatar?.name || "Starter Avatar"}
-              </span>
-              <span className="kq-profile-tag">
-                {profile.frame?.emoji || "☁️"} {profile.frame?.name || "Cloud Frame"}
-              </span>
-              <span className="kq-profile-tag">
-                {profile.background?.emoji || "🏯"} {profile.background?.name || "Hanok Courtyard"}
-              </span>
-              {profile.pet ? (
-                <span className="kq-profile-tag">
-                  {profile.pet.emoji} {profile.pet.name}
-                </span>
-              ) : null}
             </div>
           </div>
           <div className="kq-profile-actions">
             <Link className="kq-profile-shop-link" href="/shop">
               Open Shop
             </Link>
-          </div>
-        </div>
-      </section>
-
-      <section id="kqLearningJourneyCard" className="dashboard-card kq-learning-card">
-        <div className="section-head">
-          <span className="section-icon" aria-hidden="true">
-            📈
-          </span>
-          <h2>Learning Journey</h2>
-        </div>
-
-        <div className="kq-learning-row">
-          <div>
-            <div className="kq-learning-meta">
-              <span id="kqJourneyLabel">{journeyPercent}% complete</span>
-              <span id="kqJourneyUnlock">Adventure unlocked through Level {adventure.cap}</span>
-            </div>
-            <div className="kq-overall-bar" aria-hidden="true">
-              <span id="kqJourneyBar" style={{ width: `${journeyPct}%` }} />
-            </div>
-            <p id="kqJourneyNote" className="kq-journey-note">
-              {nextUnlockText}
-            </p>
-          </div>
-
-          <div className="kq-stat-grid">
-            <div className="kq-mini-stat">
-              <strong id="kqLessonsDone">{progress.completedLessonIds.length}</strong>
-              <span>Lessons completed</span>
-            </div>
-            <div className="kq-mini-stat">
-              <strong id="kqBattlesWon">{progress.battlesWon}</strong>
-              <span>Battles won</span>
-            </div>
-            <div className="kq-mini-stat">
-              <strong id="kqBadgeCount">{achievements.length}</strong>
-              <span>Badges earned</span>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div className="section-head" style={{ marginBottom: 12 }}>
-            <span className="section-icon" aria-hidden="true">
-              🏅
-            </span>
-            <h2 style={{ fontSize: "1.35rem" }}>Achievement Badges</h2>
-          </div>
-          <div id="kqAchievementGrid" className="kq-achievement-grid kq-stagger">
-            {achievements.length === 0 ? (
-              <div className="kq-achievement-empty">
-                No badges yet — finish a lesson or win a battle to start collecting achievements.
-              </div>
-            ) : (
-              achievements.map((badge) => (
-                <article key={badge.name} className="kq-achievement-chip">
-                  <div className="kq-achievement-icon" aria-hidden="true">
-                    {badge.icon}
-                  </div>
-                  <div>
-                    <h3>{badge.name}</h3>
-                    <p>{badge.desc}</p>
-                  </div>
-                </article>
-              ))
-            )}
           </div>
         </div>
       </section>
@@ -358,11 +245,11 @@ export default function DashboardView() {
               <li className="kq-empty">
                 <span className="kq-empty-title">Nothing here yet</span>
                 <span className="kq-empty-hint">
-                  Complete a lesson or flashcard session and your activity will show up
+                  Complete a flashcard session or quiz and your activity will show up
                   here.
                 </span>
                 <Link className="btn kq-empty-cta" href="/resources">
-                  Start a lesson
+                  Start studying
                 </Link>
               </li>
             ) : (

@@ -42,6 +42,8 @@ const DEFAULT_STATE: GameState = {
     adventureCap: 1,
     recentWork: [],
     jamoStars: {},
+    studyMinutes: 0,
+    studyMinutesDay: null,
   },
   quests: {
     daily: [],
@@ -70,7 +72,7 @@ const DEFAULT_STATE: GameState = {
     { name: "Ethan Yoo", xp: 780, title: "Adventure Scout", badge: "🗺️", streak: 7 },
     { name: "Nari Lim", xp: 745, title: "Quiz Champ", badge: "🏆", streak: 6 },
     { name: "Daniel Kwon", xp: 700, title: "Streak Saver", badge: "⏰", streak: 6 },
-    { name: "Sujin Oh", xp: 660, title: "Lesson Explorer", badge: "📘", streak: 5 },
+    { name: "Sujin Oh", xp: 660, title: "Hangul Scholar", badge: "📘", streak: 5 },
     { name: "Yuna Bae", xp: 620, title: "Vocab Voyager", badge: "🧳", streak: 5 },
     { name: "Tae Jeong", xp: 585, title: "Combo Crafter", badge: "⚡", streak: 4 },
     { name: "Bo-ram Seo", xp: 540, title: "Daily Devotee", badge: "🌙", streak: 4 },
@@ -83,9 +85,28 @@ const DEFAULT_STATE: GameState = {
 function dailyQuestTemplate() {
   return [
     { id: "xp-daily", desc: "Earn 30 XP today", target: 30, progress: 0, done: false, reward: { coins: 20 } },
-    { id: "lesson-1", desc: "Complete 1 lesson", target: 1, progress: 0, done: false, reward: { coins: 10, badge: "Hangul Hero" } },
+    { id: "work-15", desc: "Work for 3 minutes", target: 3, progress: 0, done: false, reward: { coins: 10, badge: "Hangul Hero" } },
     { id: "battle-1", desc: "Win 1 battle", target: 1, progress: 0, done: false, reward: { coins: 10 } },
   ];
+}
+
+// Reconcile persisted daily quests against the current template so that
+// description/target/reward changes apply immediately, while preserving the
+// player's progress/done state for matching quest ids. Quests whose ids no
+// longer exist in the template are dropped.
+function reconcileDailyQuests(saved: unknown) {
+  if (!Array.isArray(saved) || saved.length === 0) return [];
+  const savedById = new Map(
+    saved
+      .filter((q): q is { id: string } => !!q && typeof (q as { id?: unknown }).id === "string")
+      .map((q) => [q.id, q as Record<string, unknown>]),
+  );
+  return dailyQuestTemplate().map((template) => {
+    const prev = savedById.get(template.id);
+    if (!prev) return template;
+    const progress = Math.min(template.target, Number(prev.progress) || 0);
+    return { ...template, progress, done: Boolean(prev.done) };
+  });
 }
 
 export function nowStr() {
@@ -147,6 +168,7 @@ interface GameStore extends GameState {
   addBadge: (name: string) => void;
   addRecentWork: (title: string, type: string) => void;
   incQuest: (id: string, amount?: number) => void;
+  logStudyMinutes: (minutes: number) => void;
   claimQuest: (id: string) => void;
   markLessonComplete: (opts?: { id?: string; title?: string; adventureUnlockCap?: number }) => { firstCompletion: boolean };
   markQuizComplete: (title?: string) => void;
@@ -299,6 +321,23 @@ export const useGameStore = create<GameStore>()(
         set((s) => ({ quests: { ...s.quests, daily } }));
       },
 
+      logStudyMinutes: (minutes) => {
+        const safe = Math.max(0, Math.floor(Number(minutes) || 0));
+        if (!safe) return;
+        get().incQuest("work-15", safe);
+        set((s) => {
+          const today = nowStr();
+          const sameDay = s.progress.studyMinutesDay === today;
+          return {
+            progress: {
+              ...s.progress,
+              studyMinutesDay: today,
+              studyMinutes: (sameDay ? s.progress.studyMinutes || 0 : 0) + safe,
+            },
+          };
+        });
+      },
+
       claimQuest: (id) => {
         get().ensureDaily();
         const quest = get().quests.daily.find((q) => q.id === id);
@@ -352,7 +391,7 @@ export const useGameStore = create<GameStore>()(
 
       markLessonComplete: (opts = {}) => {
         const safeId = String(opts.id || "").trim();
-        const safeTitle = String(opts.title || safeId || "Completed lesson").trim();
+        const safeTitle = String(opts.title || safeId || "Completed activity").trim();
         let firstCompletion = false;
 
         if (safeId && !get().progress.completedLessonIds.includes(safeId)) {
@@ -372,11 +411,10 @@ export const useGameStore = create<GameStore>()(
           firstCompletion = true;
         }
 
-        get().addRecentWork(firstCompletion ? safeTitle : `Reviewed ${safeTitle}`, "Lesson");
-        get().addBadge("Lesson Starter");
-        get().incQuest("lesson-1", 1);
+        get().addRecentWork(firstCompletion ? safeTitle : `Reviewed ${safeTitle}`, "Study");
+        get().addBadge("Study Starter");
 
-        if (get().progress.completedLessonIds.length >= 3) get().addBadge("Lesson Explorer");
+        if (get().progress.completedLessonIds.length >= 3) get().addBadge("Hangul Explorer");
         if (firstCompletion && (opts.adventureUnlockCap || LESSON_UNLOCKS[safeId]?.cap)) {
           get().unlockAdventureTo(opts.adventureUnlockCap || LESSON_UNLOCKS[safeId].cap, safeTitle);
         }
@@ -470,7 +508,6 @@ export const useGameStore = create<GameStore>()(
             inventory: [...s.player.inventory, itemId],
           },
         });
-        get().addRecentWork(`Bought ${item.name} for ${item.cost} coins`, "Shop");
         return { ok: true, item };
       },
 
@@ -485,7 +522,6 @@ export const useGameStore = create<GameStore>()(
           equipped.bg = itemId === "bg-palace" ? "bgPalace" : itemId;
         }
         set({ player: { ...s.player, equipped } });
-        get().addRecentWork(`Equipped ${item.name}`, "Shop");
         return { ok: true, item };
       },
 
@@ -546,7 +582,7 @@ export const useGameStore = create<GameStore>()(
           quests: {
             ...current.quests,
             ...saved.quests,
-            daily: Array.isArray(saved.quests?.daily) ? saved.quests.daily : [],
+            daily: reconcileDailyQuests(saved.quests?.daily),
             weekly: Array.isArray(saved.quests?.weekly) ? saved.quests.weekly : current.quests.weekly,
           },
         };

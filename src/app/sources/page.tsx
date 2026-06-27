@@ -28,7 +28,7 @@ const GROUPS: SourceGroup[] = [
   {
     id: "learning",
     tag: "Learning content",
-    title: "Lessons, videos & references",
+    title: "Study content & references",
     intro:
       "The teaching material that informs Korean Quest. Third-party content is embedded or linked with credit to its creators.",
     emoji: "📚",
@@ -37,7 +37,7 @@ const GROUPS: SourceGroup[] = [
       {
         label: "Billy Go's Beginner Korean Course",
         detail:
-          "Video lessons embedded from “Learn Korean with GO! Billy Korean” on YouTube. All video content belongs to its creator and is shown with credit.",
+          "Videos embedded from “Learn Korean with GO! Billy Korean” on YouTube. All video content belongs to its creator and is shown with credit.",
         meta: "YouTube · video",
         href: "https://www.youtube.com/playlist?list=PLbFrQnW0BNMUkAFj4MjYauXBPtO3I9O_k",
       },
@@ -49,9 +49,9 @@ const GROUPS: SourceGroup[] = [
         href: "https://www.linguajunkie.com",
       },
       {
-        label: "Lessons, vocabulary & quizzes",
+        label: "Vocabulary, quizzes & written content",
         detail:
-          "All lesson text, vocabulary sets, flashcard decks, and test questions are original content written by the Korean Quest team.",
+          "All written text, vocabulary sets, flashcard decks, and test questions are original content written by the Korean Quest team.",
         meta: "Original · student-written",
         href: null,
       },
@@ -69,7 +69,7 @@ const GROUPS: SourceGroup[] = [
       {
         label: "Korean Words List",
         detail:
-          "Student-compiled vocabulary reference covering the words used across Korean Quest lessons.",
+          "Student-compiled vocabulary reference covering the words used across Korean Quest.",
         meta: "Original · student-compiled",
         href: "/resources/KoreanWordsList.pdf",
       },
@@ -217,7 +217,7 @@ export default function SourcesPage() {
           <h1 className="sources-hero-title">Sources</h1>
           <p className="sources-lede">
             Korean Quest is built on original, student-written content. Where we
-            rely on third-party lessons, fonts, software, or services, we credit
+            rely on third-party videos, fonts, software, or services, we credit
             them here. Everything else — the curriculum, artwork, and game
             systems — is our own work.
           </p>
