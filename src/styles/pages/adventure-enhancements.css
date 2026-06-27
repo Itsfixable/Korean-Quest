@@ -672,10 +672,6 @@
   animation: kqPathDash 3.4s linear infinite;
 }
 
-.kq-island-stage.is-night .kq-island-path path {
-  stroke: rgba(223, 213, 247, 0.8);
-}
-
 @keyframes kqPathDash {
   to {
     stroke-dashoffset: -22;

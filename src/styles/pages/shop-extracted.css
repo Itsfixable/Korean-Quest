@@ -181,9 +181,10 @@
     }
 
     .kq-stat-icon {
-      width: 28px;
-      height: 28px;
+      width: 44px;
+      height: 44px;
       object-fit: contain;
+      flex: 0 0 44px;
     }
 
     .kq-stat-box span {
