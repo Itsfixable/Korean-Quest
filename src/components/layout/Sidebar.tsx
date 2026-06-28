@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NAV_LINKS, NAV_SUBROUTES } from "@/lib/constants/nav-links";
 import { ProfileStack, useEquippedProfileVisuals } from "@/components/shared/ProfileAvatar";
 import { initialsBackgroundStyle, initialsBgClass } from "@/lib/shop-visuals";
@@ -82,7 +82,7 @@ function ProfileAvatar({ initials, image }: { initials: string; image?: string }
   if (image) {
     return (
       <div className="kq-sidebar-avatar">
-        <Image src={asset(image)} alt="Profile" width={100} height={52} />
+        <Image src={asset(image)} alt="Profile" width={52} height={52} />
       </div>
     );
   }
@@ -95,6 +95,10 @@ export function Sidebar() {
   const player = useGameStore((s) => s.player);
   const [mobile, setMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
+  // Whether the scrolling nav has more content above / below the viewport, so we
+  // can show fade + chevron cues that hint there are more tabs to scroll to.
+  const [scrollCue, setScrollCue] = useState({ top: false, bottom: false });
 
   useEffect(() => {
     const check = () => setMobile(window.innerWidth <= MOBILE_BREAKPOINT);
@@ -102,6 +106,32 @@ export function Sidebar() {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el || mobile) {
+      setScrollCue({ top: false, bottom: false });
+      return;
+    }
+    const update = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const overflowing = scrollHeight - clientHeight > 2;
+      setScrollCue({
+        top: overflowing && scrollTop > 2,
+        bottom: overflowing && scrollTop + clientHeight < scrollHeight - 2,
+      });
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [mobile, user?.loggedIn]);
 
   const matchesPath = (target: string) =>
     pathname === target || pathname.startsWith(`${target}/`);
@@ -194,7 +224,7 @@ export function Sidebar() {
 
   return (
     <header className="container site-header">
-      <nav className="nav site-nav" aria-label="Primary">
+      <nav className="nav site-nav" aria-label="Primary" ref={navRef}>
         {brand}
         <div className="kq-sidebar-profile">
           {user?.loggedIn ? (
@@ -244,6 +274,16 @@ export function Sidebar() {
           )}
         </div>
       </nav>
+      <div
+        className={`kq-sidebar-fade kq-sidebar-fade--top${scrollCue.top ? " is-visible" : ""}`}
+        aria-hidden="true"
+      />
+      <div
+        className={`kq-sidebar-fade kq-sidebar-fade--bottom${scrollCue.bottom ? " is-visible" : ""}`}
+        aria-hidden="true"
+      >
+        <span className="kq-sidebar-fade-chevron">⌄</span>
+      </div>
     </header>
   );
 }
