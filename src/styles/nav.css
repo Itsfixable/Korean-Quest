@@ -313,7 +313,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  height: clamp(34px, 6vh, 52px);
+  height: clamp(56px, 9vh, 84px);
   pointer-events: none;
   opacity: 0;
   transition: opacity 180ms ease;
@@ -326,7 +326,7 @@ body {
 
 .kq-sidebar-fade--top {
   top: 0;
-  background: linear-gradient(to bottom, #eaf0fb 38%, rgba(234, 240, 251, 0));
+  background: linear-gradient(to bottom, #eaf0fb 42%, rgba(234, 240, 251, 0));
   border-radius: var(--kq-card-radius) var(--kq-card-radius) 0 0;
 }
 
@@ -335,17 +335,27 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: linear-gradient(to top, #eaf0fb 38%, rgba(234, 240, 251, 0));
+  padding-bottom: 8px;
+  background: linear-gradient(to top, #eaf0fb 42%, rgba(234, 240, 251, 0));
   border-radius: 0 0 var(--kq-card-radius) var(--kq-card-radius);
 }
 
+/* A clear circular badge with a big chevron — much harder to miss than a bare
+   glyph, so users notice there are more tabs below. */
 .kq-sidebar-fade-chevron {
-  font-size: 1.15rem;
+  display: grid;
+  place-items: center;
+  width: clamp(34px, 4.6vh, 42px);
+  height: clamp(34px, 4.6vh, 42px);
+  border-radius: 50%;
+  font-size: 1.5rem;
   font-weight: 900;
   line-height: 1;
-  color: #5b729f;
-  padding-bottom: 6px;
-  animation: kqSidebarChevron 1.6s ease-in-out infinite;
+  padding-bottom: 4px;
+  color: #fff;
+  background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%);
+  box-shadow: 0 6px 16px rgba(41, 55, 95, 0.32);
+  animation: kqSidebarChevron 1.4s ease-in-out infinite;
 }
 
 @keyframes kqSidebarChevron {
@@ -353,7 +363,7 @@ body {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(3px);
+    transform: translateY(4px);
   }
 }
 
