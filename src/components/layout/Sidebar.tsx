@@ -280,9 +280,29 @@ export function Sidebar() {
       />
       <div
         className={`kq-sidebar-fade kq-sidebar-fade--bottom${scrollCue.bottom ? " is-visible" : ""}`}
-        aria-hidden="true"
+        aria-hidden={!scrollCue.bottom}
       >
-        <span className="kq-sidebar-fade-chevron">⌄</span>
+        <button
+          type="button"
+          className="kq-sidebar-fade-chevron"
+          aria-label="Scroll to more tabs"
+          tabIndex={scrollCue.bottom ? 0 : -1}
+          onClick={() => {
+            const el = navRef.current;
+            if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+              d="M6 9l6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
     </header>
   );

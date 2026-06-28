@@ -50,6 +50,11 @@ body {
   .site-nav {
     display: flex !important;
     flex-direction: column !important;
+    /* Never wrap into multiple columns. A global rule (responsive.css) sets
+       .nav { flex-wrap: wrap } up to 960px, which would otherwise make the
+       column-direction sidebar wrap into a second column between 901–960px and
+       overlap the main content. */
+    flex-wrap: nowrap !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
     gap: var(--kq-sidebar-gap) !important;
@@ -347,15 +352,37 @@ body {
   place-items: center;
   width: clamp(34px, 4.6vh, 42px);
   height: clamp(34px, 4.6vh, 42px);
+  border: none;
   border-radius: 50%;
-  font-size: 1.5rem;
-  font-weight: 900;
-  line-height: 1;
-  padding-bottom: 4px;
   color: #fff;
   background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%);
   box-shadow: 0 6px 16px rgba(41, 55, 95, 0.32);
   animation: kqSidebarChevron 1.4s ease-in-out infinite;
+  /* The fade wrapper is click-through; re-enable pointer events on the button
+     itself so it can be clicked to scroll the nav to the bottom. */
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.kq-sidebar-fade-chevron:hover {
+  /* Pause the bob so the hover transform isn't overridden by the animation. */
+  animation-play-state: paused;
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(41, 55, 95, 0.4);
+}
+
+.kq-sidebar-fade-chevron:active {
+  transform: scale(0.96);
+}
+
+.kq-sidebar-fade-chevron:focus-visible {
+  outline: 3px solid rgba(109, 132, 183, 0.5);
+  outline-offset: 2px;
+}
+
+.kq-sidebar-fade-chevron svg {
+  display: block;
 }
 
 @keyframes kqSidebarChevron {
