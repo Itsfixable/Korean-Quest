@@ -967,6 +967,18 @@
       padding: 0px 2px;
     }
 
+    /* Pet PNGs have differing intrinsic sizes; without this they'd render at
+       their natural size and look mismatched. Make every pet fill its (equal
+       aspect-ratio) zone so the artwork and the info below it line up across
+       cards. */
+    .kq-pet-card .kq-shop-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 18px;
+    }
+
     .kq-avatar-card:hover .kq-shop-art,
     .kq-frame-card:hover .kq-shop-art,
     .kq-background-card:hover .kq-shop-art,
@@ -1025,6 +1037,26 @@
 
       .kq-shop-tabs {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .kq-shop-tab {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        gap: 10px;
+        overflow: hidden;
+      }
+
+      .kq-shop-tab img {
+        width: 46px;
+        height: 46px;
+      }
+
+      .kq-shop-tab span {
+        min-width: 0;
+        text-align: center;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
       }
     }
 
@@ -1043,6 +1075,19 @@
 
       .kq-shop-tabs {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .kq-shop-tab {
+        padding: 12px 12px;
+        font-size: 0.9rem;
+        gap: 8px;
+        border-radius: 18px;
+      }
+
+      .kq-shop-tab img {
+        width: 40px;
+        height: 40px;
       }
 
       .kq-shop-list-panel {

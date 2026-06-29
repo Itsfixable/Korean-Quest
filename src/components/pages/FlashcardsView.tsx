@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FLASHCARD_SETS } from "@/lib/constants/flashcard-sets";
 import type { FlashcardProgress, FlashcardSet } from "@/lib/types";
 import { useFlashcardStore } from "@/stores/useFlashcardStore";
@@ -56,6 +56,9 @@ export default function FlashcardsView() {
   const [incomingFlipped, setIncomingFlipped] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [shuffling, setShuffling] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef({ startX: 0, startY: 0, active: false, moved: false });
 
   const currentSet = FLASHCARD_SETS.find((s) => s.id === currentSetId) || FLASHCARD_SETS[0];
   const prog = ensureSetProgress(getSetProgress(currentSet.id), currentSet);
@@ -122,6 +125,44 @@ export default function FlashcardsView() {
 
   const next = () => animateSwap(idx + 1, "next");
   const prev = () => animateSwap(idx - 1, "prev");
+
+  const SWIPE_THRESHOLD = 60;
+  const TAP_SLOP = 8;
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (isAnimating || shuffling) return;
+    dragRef.current = { startX: e.clientX, startY: e.clientY, active: true, moved: false };
+    setIsDragging(true);
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    if (Math.abs(dx) > TAP_SLOP || Math.abs(dy) > TAP_SLOP) d.moved = true;
+    // Only track horizontal drags; let vertical scrolling pass through.
+    if (Math.abs(dx) > Math.abs(dy)) {
+      setDragX(dx);
+    }
+  };
+
+  const endDrag = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    d.active = false;
+    setIsDragging(false);
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    setDragX(0);
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) next();
+      else prev();
+    } else if (!d.moved) {
+      flip();
+    }
+  };
 
   const makeTossClone = (fromRect: DOMRect, text: string) => {
     const el = document.createElement("div");
@@ -302,22 +343,40 @@ export default function FlashcardsView() {
             </div>
           </div>
 
-          <div
-            className="flash-deck"
-            id="flashcard"
-            role="button"
-            tabIndex={0}
-            aria-label="Flashcard (click to flip)"
-            onClick={flip}
-            onKeyDown={(e) => {
-              if (e.code === "Space" || e.code === "Enter") {
-                e.preventDefault();
-                flip();
-              }
-              if (e.code === "ArrowRight") next();
-              if (e.code === "ArrowLeft") prev();
-            }}
-          >
+          <div className="flash-deck-shell">
+            <button
+              className="flash-side-nav flash-side-prev"
+              id="prevBtn"
+              type="button"
+              aria-label="Previous card"
+              onClick={(e) => {
+                e.stopPropagation();
+                prev();
+              }}
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+
+            <div
+              className="flash-deck"
+              id="flashcard"
+              role="button"
+              tabIndex={0}
+              aria-label="Flashcard (click to flip, swipe to navigate)"
+              style={{ touchAction: "pan-y" }}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerCancel={endDrag}
+              onKeyDown={(e) => {
+                if (e.code === "Space" || e.code === "Enter") {
+                  e.preventDefault();
+                  flip();
+                }
+                if (e.code === "ArrowRight") next();
+                if (e.code === "ArrowLeft") prev();
+              }}
+            >
             <div className="flash-meta">
               <span className={`flash-side-badge${showingDef ? " is-def" : ""}`} id="cardSide">
                 {showingDef ? "Definition" : "Term"}
@@ -328,9 +387,17 @@ export default function FlashcardsView() {
             </div>
 
             <div
-              className={`flash-stage${animClass ? ` ${animClass}` : ""}${shuffling ? " is-shuffling" : ""}`}
+              className={`flash-stage${animClass ? ` ${animClass}` : ""}${shuffling ? " is-shuffling" : ""}${isDragging ? " is-dragging" : ""}`}
               id="flashStage"
               aria-hidden="true"
+              style={
+                dragX !== 0
+                  ? {
+                      transform: `translateX(${dragX}px) rotate(${dragX * 0.02}deg)`,
+                      opacity: Math.max(0.45, 1 - Math.abs(dragX) / 420),
+                    }
+                  : undefined
+              }
             >
               <div className={`flash-3d${flipped ? " flipped" : ""}`} id="flash3d">
                 <div className="flash-face flash-front">
@@ -375,22 +442,30 @@ export default function FlashcardsView() {
 
             <div className="flash-hint">
               <span>Click or press Space to flip</span>
-              <span className="flash-hint-keys">← → to navigate</span>
+              <span className="flash-hint-keys">Swipe or ← → to navigate</span>
             </div>
+            </div>
+
+            <button
+              className="flash-side-nav flash-side-next"
+              id="nextBtn"
+              type="button"
+              aria-label="Next card"
+              onClick={(e) => {
+                e.stopPropagation();
+                next();
+              }}
+            >
+              <span aria-hidden="true">›</span>
+            </button>
           </div>
 
           <div className="flash-actions">
             <div className="flash-action-group flash-action-nav">
               <span className="flash-action-label muted">Navigate</span>
               <div className="flash-action-buttons">
-                <button className="btn secondary" id="prevBtn" type="button" onClick={(e) => { e.stopPropagation(); prev(); }}>
-                  ← Prev
-                </button>
                 <button className="btn" id="flipBtn" type="button" onClick={(e) => { e.stopPropagation(); flip(); }}>
-                  Flip
-                </button>
-                <button className="btn secondary" id="nextBtn" type="button" onClick={(e) => { e.stopPropagation(); next(); }}>
-                  Next →
+                  Flip card
                 </button>
               </div>
             </div>

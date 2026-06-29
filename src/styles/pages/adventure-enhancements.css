@@ -863,6 +863,45 @@ body:has(.kq-treasure-adventure) #mapGrid {
   body:has(.kq-treasure-adventure) {
     padding-left: 0 !important;
   }
+
+  /* Make the whole column flex so the map can grow to fill the space left under
+     the in-flow top bar — no fixed aspect ratio (which left a big empty gap on
+     phones) and no need to guess the header's height. */
+  body:has(.kq-treasure-adventure) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  body:has(.kq-treasure-adventure) > div,
+  body:has(.kq-treasure-adventure) main.container,
+  body:has(.kq-treasure-adventure) .kq-adventure-page,
+  body:has(.kq-treasure-adventure) #mapCard:not([hidden]),
+  body:has(.kq-treasure-adventure) #mapGrid,
+  body:has(.kq-treasure-adventure) .kq-treasure-adventure {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  body:has(.kq-treasure-adventure) .kq-island-stage {
+    flex: 1 1 auto;
+    aspect-ratio: auto;
+    height: auto;
+    min-height: 0;
+  }
+
+  /* Give the title a touch more room and keep the bg centered on the parchment
+     as the sides crop in on the now-taller portrait stage. */
+  .kq-stage-title {
+    width: 86%;
+    top: 3.5%;
+  }
+
+  .kq-stage-bg {
+    object-position: center;
+  }
 }
 
 body:has(.kq-treasure-adventure) #mapCard {

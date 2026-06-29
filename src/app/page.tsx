@@ -5,7 +5,6 @@ import { HomeStats } from "@/components/pages/HomeStats";
 import { asset } from "@/lib/asset";
 import SplitText from "@/components/reactbits/SplitText";
 import GradientText from "@/components/reactbits/GradientText";
-import SpotlightCard from "@/components/reactbits/SpotlightCard";
 
 export default function HomePage() {
   return (
@@ -53,27 +52,27 @@ export default function HomePage() {
             </p>
           </div>
           <div className="kq-feature-grid">
-            <SpotlightCard className="kq-feature-card">
+            <div className="kq-feature-card">
               <div className="kq-feature-icon">
                 <Image src={asset("/favicon/nav/newNavIcons/learnIcon1.png")} alt="" width={56} height={56} />
               </div>
               <h3>Learn the Basics</h3>
               <p>Pick up the essentials with short, beginner-friendly flashcards, tests, and videos.</p>
-            </SpotlightCard>
-            <SpotlightCard className="kq-feature-card">
+            </div>
+            <div className="kq-feature-card">
               <div className="kq-feature-icon">
                 <Image src={asset("/favicon/nav/newNavIcons/adventureIcon1.png")} alt="" width={56} height={56} />
               </div>
               <h3>Game Adventure</h3>
               <p>Turn practice into motivation with battles, unlocks, and world progression.</p>
-            </SpotlightCard>
-            <SpotlightCard className="kq-feature-card">
+            </div>
+            <div className="kq-feature-card">
               <div className="kq-feature-icon">
                 <Image src={asset("/favicon/index/streakEmoji.png")} alt="" width={56} height={56} />
               </div>
               <h3>Daily Momentum</h3>
               <p>Build streaks, complete quests, and stay consistent with bite-sized daily goals.</p>
-            </SpotlightCard>
+            </div>
           </div>
         </section>
 

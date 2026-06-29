@@ -113,6 +113,7 @@ export default function VideoView({ room }: VideoViewProps) {
 
   const transcriptLinesRef = useRef<string[]>([]);
   const autoJoinedRef = useRef(false);
+  const summarySectionRef = useRef<HTMLElement>(null);
 
   const addSessionXP = (amount: number) => setSessionXp((x) => x + amount);
 
@@ -204,6 +205,16 @@ export default function VideoView({ room }: VideoViewProps) {
     destroyMeeting();
     if (timerRef.current) window.clearInterval(timerRef.current);
   }, [destroyMeeting]);
+
+  // Once the AI summary is generated and rendered, glide down to it so the
+  // user sees their recap without scrolling manually.
+  useEffect(() => {
+    if (!summaryVisible || !summaryData) return;
+    const id = window.requestAnimationFrame(() => {
+      summarySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [summaryVisible, summaryData]);
 
   const saveNotes = () => {
     localStorage.setItem("kq_video_notes", sharedNotes);
@@ -667,7 +678,12 @@ export default function VideoView({ room }: VideoViewProps) {
         </p>
       </section>
 
-      <section id="summarySection" className="card summary-card" hidden={!summaryVisible}>
+      <section
+        id="summarySection"
+        ref={summarySectionRef}
+        className="card summary-card"
+        hidden={!summaryVisible}
+      >
         <div className="summary-top">
           <div>
             <p className="eyebrow">AI Session Summary</p>

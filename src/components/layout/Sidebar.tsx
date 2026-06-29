@@ -23,18 +23,21 @@ function NavLink({
   icon,
   current,
   className,
+  onClick,
 }: {
   href: string;
   label: string;
   icon: string;
   current: boolean;
   className: string;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
       className={className}
       aria-current={current ? "page" : undefined}
+      onClick={onClick}
     >
       <Image
         className={className.includes("mobile") ? "kq-mobile-link-icon" : "kq-side-link-icon"}
@@ -161,16 +164,9 @@ export function Sidebar() {
   if (mobile) {
     return (
       <header className="container site-header">
-        <nav className="nav site-nav" aria-label="Primary">
-          {brand}
-          <div className="kq-mobile-top">
-            <NavLink
-              href="/"
-              label="Home"
-              icon="newNavIcons/homeIcon1.png"
-              current={pathname === "/"}
-              className="pill kq-mobile-link kq-mobile-home"
-            />
+        <nav className={`nav site-nav kq-mobile-nav${menuOpen ? " is-open" : ""}`} aria-label="Primary">
+          <div className="kq-mobile-bar">
+            {brand}
             <div className="kq-mobile-right">
               {user?.loggedIn && (
                 <div className="kq-mobile-user-chip">
@@ -188,13 +184,17 @@ export function Sidebar() {
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                 onClick={() => setMenuOpen((o) => !o)}
               >
-                {menuOpen ? "✕" : "☰"}
+                <span className="kq-mobile-toggle-bars" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
               </button>
             </div>
           </div>
           <div className={`kq-mobile-menu${menuOpen ? " open" : ""}`}>
             <div className="kq-mobile-cascade">
-              {NAV_LINKS.filter((l) => l.href !== "/").map((link) => (
+              {NAV_LINKS.map((link) => (
                 <NavLink
                   key={link.href}
                   href={link.href}
@@ -202,6 +202,7 @@ export function Sidebar() {
                   icon={link.icon}
                   current={isCurrent(link.href)}
                   className="pill kq-mobile-link"
+                  onClick={() => setMenuOpen(false)}
                 />
               ))}
             </div>

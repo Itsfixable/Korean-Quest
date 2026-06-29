@@ -124,12 +124,6 @@
   border-radius: 16px;
   padding: 18px;
   background: linear-gradient(180deg, #ffffff, #f5f9fd);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-
-.kq-feature-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 26px rgba(42, 59, 112, 0.1);
 }
 
 .kq-feature-icon {

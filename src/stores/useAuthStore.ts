@@ -172,11 +172,17 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: async () => {
+        // Clear local auth state first so the UI reflects the sign-out
+        // instantly, instead of waiting on the Supabase network round-trip.
+        set({ user: null, userId: null });
         const supabase = getSupabase();
         if (supabase) {
-          await supabase.auth.signOut();
+          try {
+            await supabase.auth.signOut();
+          } catch {
+            /* The local session is already cleared; ignore network errors. */
+          }
         }
-        set({ user: null, userId: null });
       },
     }),
     {
