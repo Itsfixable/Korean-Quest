@@ -174,7 +174,9 @@ export const SHOP_IMAGE_CONSTRAINTS: Record<CategoryId, ImageSettings[]> = {
   // the centered pet is never clipped, and every pet lands at the same size.
   pets: [
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
-    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
+    // Cat cutout sits a touch left of center in its source frame; pull the crop
+    // toward the left side so the cat lands dead-center like the others.
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "42% center" },
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
