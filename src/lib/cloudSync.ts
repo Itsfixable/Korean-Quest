@@ -4,7 +4,14 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import { fetchProfile, saveProfile } from "@/lib/cloud";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useGameStore } from "@/stores/useGameStore";
+import { useFlashcardStore } from "@/stores/useFlashcardStore";
 import type { Player, Progress } from "@/lib/types";
+
+// Tracks which account the locally-persisted game state belongs to, so we can
+// wipe it when a different account signs in (otherwise the previous account's
+// data, cached in localStorage, bleeds into — and gets uploaded to — the new
+// account).
+const OWNER_KEY = "kq-state-owner";
 
 let started = false;
 let activeUserId: string | null = null;
@@ -13,6 +20,39 @@ let lastSerialized = "";
 
 function isCloudUser(id: string | null): id is string {
   return Boolean(id) && !String(id).startsWith("local:");
+}
+
+function getStateOwner(): string | null {
+  try {
+    return localStorage.getItem(OWNER_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setStateOwner(id: string | null): void {
+  try {
+    if (id) localStorage.setItem(OWNER_KEY, id);
+    else localStorage.removeItem(OWNER_KEY);
+  } catch {
+    /* localStorage unavailable (private mode / SSR) — nothing to persist. */
+  }
+}
+
+// Adventure map progress is persisted on its own localStorage key (see
+// AdventureView's STORE_KEY) rather than in a synced store, so it must be
+// cleared explicitly. Keep this string in sync with AdventureView.
+const ADVENTURE_STORE_KEY = "kq_node_adv_progress_v1";
+
+/** Wipe all locally-persisted learner data back to a clean slate. */
+function resetLocalData(): void {
+  useGameStore.getState().resetAll();
+  useFlashcardStore.setState({ progress: {} });
+  try {
+    localStorage.removeItem(ADVENTURE_STORE_KEY);
+  } catch {
+    /* localStorage unavailable (private mode / SSR) — nothing to clear. */
+  }
 }
 
 function mergePlayer(base: Player, incoming: Partial<Player>): Player {
@@ -51,6 +91,13 @@ function schedulePush() {
 }
 
 async function reconcileOnLogin(userId: string) {
+  const owner = getStateOwner();
+  // The local state belongs to a different cloud account — clear it before
+  // loading this account so nothing carries over between accounts.
+  if (owner && isCloudUser(owner) && owner !== userId) {
+    resetLocalData();
+  }
+
   const game = useGameStore.getState();
   const cloud = await fetchProfile(userId);
 
@@ -62,10 +109,15 @@ async function reconcileOnLogin(userId: string) {
     });
     useGameStore.getState().setHydrated();
   } else {
-    // New account (empty row): seed it with whatever is in this browser.
+    // Empty cloud row. Only carry the browser's progress into it when the data
+    // belonged to a guest (no prior cloud owner) — i.e. a first-time signup
+    // keeps the warm-up progress they made before creating an account. A switch
+    // from another account was already reset above, so this seeds a clean row.
     const seeded = useGameStore.getState();
     await saveProfile(userId, { player: seeded.player, progress: seeded.progress });
   }
+
+  setStateOwner(userId);
   lastSerialized = JSON.stringify({
     player: useGameStore.getState().player,
     progress: useGameStore.getState().progress,
@@ -86,6 +138,19 @@ export function startCloudSync(): () => void {
     activeUserId = userId;
     if (isCloudUser(userId)) {
       void reconcileOnLogin(userId);
+    } else {
+      // Signed out (or a legacy local user). If the cached state belongs to a
+      // cloud account, wipe it so the signed-out view doesn't keep showing —
+      // and a later account doesn't inherit — that account's data.
+      const owner = getStateOwner();
+      if (owner && isCloudUser(owner)) {
+        resetLocalData();
+        setStateOwner(null);
+        lastSerialized = JSON.stringify({
+          player: useGameStore.getState().player,
+          progress: useGameStore.getState().progress,
+        });
+      }
     }
   };
 

@@ -569,6 +569,11 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* The background art has a light painted border baked into the image. Scale
+     it up so that frame is cropped by the hero's overflow:hidden, leaving the
+     scene flush to all four edges with no white gaps. */
+  transform: scale(1.08);
+  transform-origin: center;
 }
 
 .kq-dashboard-hero-bg--emoji {

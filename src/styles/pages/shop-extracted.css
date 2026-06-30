@@ -371,11 +371,15 @@
       gap: 22px;
     }
 
-    /* When a category has fewer items than a full row (e.g. Frames has 3),
-       size the cards and center the row instead of left-aligning them. */
+    /* When a category has fewer items than a full row (e.g. Pets/Frames have 3),
+       keep the cards fluid and the whole row centered instead of left-aligning.
+       The clamp() lets each card grow with the viewport but never get too small
+       or too large, and the auto margins center the group at any width. */
     .kq-shop-grid.is-centered {
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 248px));
+      grid-template-columns: repeat(auto-fit, minmax(clamp(170px, 26vw, 240px), 1fr));
       justify-content: center;
+      max-width: 840px;
+      margin-inline: auto;
     }
 
     .kq-shop-item {
@@ -955,12 +959,18 @@
     }
 
     .kq-pet-card .kq-shop-image-zone {
-      /* Pet artwork is a portrait illustration (~5:6). Let the zone follow that
-         ratio so the art fills it edge to edge with no empty space up top. */
+      /* Pets render from transparent cutouts on this shared backdrop, so every
+         pet card looks uniform regardless of the original artwork's background.
+         The 5:6 ratio keeps the zone responsive and the pet centered. */
       min-height: 0;
       height: auto;
+      width: 100%;
       aspect-ratio: 5 / 6;
       border-radius: 22px;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 30%, #fff7fb 0%, #ffeef5 52%, #ffe4ee 100%) !important;
+      border: 1px solid rgba(104, 125, 202, 0.12) !important;
     }
 
     .kq-pet-card .kq-shop-info {
@@ -971,12 +981,11 @@
        their natural size and look mismatched. Make every pet fill its (equal
        aspect-ratio) zone so the artwork and the info below it line up across
        cards. */
+    /* Transparent pet cutout sits on the shared zone backdrop. Sizing/fit come
+       from the inline image settings (cover, centered) in shop-visuals.ts. */
     .kq-pet-card .kq-shop-art {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 18px;
     }
 
     .kq-avatar-card:hover .kq-shop-art,

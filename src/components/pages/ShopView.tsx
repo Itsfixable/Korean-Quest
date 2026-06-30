@@ -168,8 +168,18 @@ function FloatShell({ index, children }: { index: number; children: ReactNode })
   );
 }
 
-function PlainItemImage({ item, index, extraClass = "" }: { item: VisualShopItem; index: number; extraClass?: string }) {
-  if (!item.image) {
+function PlainItemImage({
+  item,
+  index,
+  extraClass = "",
+  preferRaw = false,
+}: {
+  item: VisualShopItem;
+  index: number;
+  extraClass?: string;
+  preferRaw?: boolean;
+}) {
+  if (!item.image && !item.rawImage) {
     return (
       <FloatShell index={index}>
         <div className={`kq-shop-placeholder ${extraClass}`} aria-hidden="true">
@@ -179,11 +189,14 @@ function PlainItemImage({ item, index, extraClass = "" }: { item: VisualShopItem
     );
   }
 
+  const primarySrc = preferRaw ? item.rawImage || item.image : item.image || item.rawImage;
+  const fallbackSrc = preferRaw ? item.image || item.rawImage : item.rawImage || item.image;
+
   return (
     <FloatShell index={index}>
       <ShopImage
-        src={item.image || item.rawImage}
-        fallbackSrc={item.rawImage || item.image}
+        src={primarySrc}
+        fallbackSrc={fallbackSrc}
         alt={item.name}
         className={`kq-shop-art ${extraClass}`}
         style={imageSettingsToStyle(item.imageSettings)}
@@ -232,6 +245,11 @@ function ItemVisual({
 
   if (category === "frames") {
     return <PlainItemImage item={item} index={index} extraClass="kq-shop-art--frame" />;
+  }
+
+  // Pets use the transparent cutout so they share one uniform zone background.
+  if (category === "pets") {
+    return <PlainItemImage item={item} index={index} extraClass="kq-shop-art--pet" preferRaw />;
   }
 
   return <PlainItemImage item={item} index={index} />;

@@ -493,10 +493,8 @@ export default function AdventureView() {
       showAdventureToast(`🔒 Clear Level ${level - 1} first.`);
       return;
     }
-    if (progress.cleared[level]) {
-      showAdventureToast("You already cleared this level!");
-      return;
-    }
+    // Cleared levels stay replayable — players can revisit any island they've
+    // already beaten to practice again.
     const enemy = ENEMIES[(level - 1) % ENEMIES.length];
     const boss = BOSS_LEVELS.has(level);
     const hp = 16 + Math.floor(level * 2.1);

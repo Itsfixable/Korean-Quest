@@ -84,13 +84,15 @@ export const SHOP_ASSETS = {
     "/favicon/shop/pets/pet5.png",
     "/favicon/shop/pets/pet6.png",
   ],
+  // Transparent cutouts (pet only, no baked background) so the shop can place
+  // every pet on one shared backdrop for a uniform look.
   rawPets: [
-    "/favicon/shop/raw-images/pets/bunny.png",
-    "/favicon/shop/raw-images/pets/cat.png",
-    "/favicon/shop/raw-images/pets/dog.png",
-    "/favicon/shop/raw-images/pets/pet4.png",
-    "/favicon/shop/raw-images/pets/pet5.png",
-    "/favicon/shop/raw-images/pets/pet6.png",
+    "/favicon/shop/pets/raw/bunnyRaw.png",
+    "/favicon/shop/pets/raw/catRaw.png",
+    "/favicon/shop/pets/raw/dogRaw.png",
+    "/favicon/shop/pets/pet4.png",
+    "/favicon/shop/pets/pet5.png",
+    "/favicon/shop/pets/pet6.png",
   ],
 };
 
@@ -166,13 +168,17 @@ export const SHOP_IMAGE_CONSTRAINTS: Record<CategoryId, ImageSettings[]> = {
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
     { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1, objectFit: "cover", objectPosition: "center center" },
   ],
+  // Pets render from transparent cutouts (1920×1080, animal centered) placed on
+  // a shared zone background. `cover` scales the landscape cutout to fill the
+  // portrait zone by height, cropping only the empty transparent side margins —
+  // the centered pet is never clipped, and every pet lands at the same size.
   pets: [
-    { width: "220%", height: "150%", x: "-15px", y: "0px", scale: 1.35, objectFit: "contain", objectPosition: "center center" },
-    { width: "250%", height: "200%", x: "10px", y: "0px", scale: 1.3, objectFit: "contain", objectPosition: "center center" },
-    { width: "232%", height: "150%", x: "25px", y: "0px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-    { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-    { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
-    { width: "148%", height: "148%", x: "0px", y: "12px", scale: 1.32, objectFit: "contain", objectPosition: "center center" },
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
+    { width: "100%", height: "100%", x: "0px", y: "0px", scale: 1.05, objectFit: "cover", objectPosition: "center center" },
   ],
   initials: [],
 };
