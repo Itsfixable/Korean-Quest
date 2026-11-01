@@ -189,11 +189,11 @@ const GROUPS: SourceGroup[] = [
         href: "https://supabase.com",
       },
       {
-        label: "Hugging Face Inference Providers",
+        label: "Cloudflare Workers AI",
         detail:
-          "Open-weight language models (gpt-oss, Gemma, Llama) for the chatbot and AI session summaries, and Whisper for live captions, reached from the app's serverless workers.",
-        meta: "Hugging Face · hosted service",
-        href: "https://huggingface.co/docs/inference-providers",
+          "Open-weight models run by the app's serverless workers: Google Gemma 4 (with Meta Llama 3.1 as a backup) for the chatbot and AI session summaries, and OpenAI Whisper for live captions.",
+        meta: "Hosted service",
+        href: "https://developers.cloudflare.com/workers-ai/",
       },
       {
         label: "Jitsi Meet",

@@ -1,15 +1,22 @@
-const ROUTER_URL = "https://router.huggingface.co/v1/chat/completions";
-// Tried in order; the router dropped Qwen2.5-7B, so a model that disappears
-// just moves the request on to the next one.
+// AI summaries run on Cloudflare Workers AI (the `AI` binding in
+// wrangler.jsonc), tried in order so a failing or retired model falls through
+// to the next. If every model fails, the rule-based summary is returned.
 const MODEL_CHAIN = [
-  "google/gemma-3-12b-it:fastest",
-  "meta-llama/Llama-3.1-8B-Instruct:fastest",
-  "openai/gpt-oss-20b:fastest",
+  {
+    // Gemma 4 "thinks" by default and can spend the whole token budget on
+    // hidden reasoning, leaving no JSON, so switch that off.
+    model: "@cf/google/gemma-4-26b-a4b-it",
+    options: { chat_template_kwargs: { enable_thinking: false } },
+  },
+  { model: "@cf/meta/llama-3.1-8b-instruct-fp8", options: {} },
 ];
+
+// Keeps a very long call from using a big slice of the daily AI allowance.
+const MAX_TRANSCRIPT_CHARS = 12000;
 
 // Only the live site and local dev may call this worker. Browsers always send
 // Origin on cross-site requests, so this stops other websites from spending our
-// Hugging Face credits through it.
+// Workers AI allowance through it.
 const ALLOWED_ORIGINS = new Set([
   "https://itsfixable.github.io",
   "http://localhost:3000",
@@ -56,8 +63,8 @@ export default {
         {
           ok: true,
           service: "kq-call-summary",
-          mode: env?.HF_TOKEN ? "ai-summary" : "local-rule-based-summary",
-          model: MODEL_CHAIN[0],
+          mode: env?.AI ? "ai-summary" : "local-rule-based-summary",
+          model: MODEL_CHAIN[0].model,
         },
         { headers: corsHeaders() }
       );
@@ -80,7 +87,7 @@ export default {
         const fallback = buildSummaryFromTranscript(transcript);
 
         let summary = fallback;
-        if (env?.HF_TOKEN) {
+        if (env?.AI) {
           try {
             const aiSummary = await buildSummaryWithAI(transcript, env);
             if (aiSummary) summary = mergeSummaries(fallback, aiSummary);
@@ -112,54 +119,35 @@ export default {
 };
 
 async function buildSummaryWithAI(transcript, env) {
-  const models = env.HF_MODEL && !/Arch-Router/i.test(env.HF_MODEL)
-    ? [env.HF_MODEL, ...MODEL_CHAIN]
-    : MODEL_CHAIN;
-
-  for (const model of models) {
-    const summary = await summarizeWithModel(model, transcript, env);
-    if (summary) return summary;
+  for (const { model, options } of MODEL_CHAIN) {
+    try {
+      const summary = await summarizeWithModel(model, options, transcript, env);
+      if (summary) return summary;
+    } catch (error) {
+      console.error(`kq-call-summary: ${model} failed: ${error?.message || error}`);
+    }
   }
   return null;
 }
 
-async function summarizeWithModel(model, transcript, env) {
-  const response = await fetch(ROUTER_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.HF_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: SUMMARY_SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Transcript of the Korean practice call:\n\n${transcript}`,
-        },
-      ],
-      max_tokens: 700,
-      temperature: 0.4,
-      response_format: { type: "json_object" },
-    }),
+async function summarizeWithModel(model, options, transcript, env) {
+  const result = await env.AI.run(model, {
+    messages: [
+      { role: "system", content: SUMMARY_SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: `Transcript of the Korean practice call:\n\n${transcript.slice(0, MAX_TRANSCRIPT_CHARS)}`,
+      },
+    ],
+    max_tokens: 900,
+    temperature: 0.4,
+    ...options,
   });
 
-  if (!response.ok) {
-    console.error(`kq-call-summary: ${model} failed with status ${response.status}`);
-    return null;
-  }
-
-  const rawText = new TextDecoder("utf-8").decode(await response.arrayBuffer());
-  let parsed = null;
-  try {
-    parsed = JSON.parse(rawText);
-  } catch {
-    return null;
-  }
-
-  const content = parsed?.choices?.[0]?.message?.content;
+  const content = result?.choices?.[0]?.message?.content ?? result?.response;
   if (!content) return null;
+  // Some models hand back an already-parsed object for JSON-looking output.
+  if (typeof content === "object") return content;
 
   return extractJsonObject(content);
 }

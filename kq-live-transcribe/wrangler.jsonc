@@ -4,5 +4,9 @@
   "compatibility_date": "2026-03-07",
   "observability": {
     "enabled": true
+  },
+  // Workers AI, available in the worker as env.AI.
+  "ai": {
+    "binding": "AI"
   }
 }

@@ -1,9 +1,14 @@
-const MODEL_ID = "openai/whisper-large-v3";
-const HF_PROVIDER = "hf-inference";
+// Captions run on Cloudflare Workers AI (the `AI` binding in wrangler.jsonc).
+const MODEL_ID = "@cf/openai/whisper-large-v3-turbo";
+const PROVIDER = "workers-ai";
+
+// Caption chunks are a few seconds of 16 kHz mono WAV (well under 1 MB); refuse
+// anything far bigger so one request can't eat the daily AI allowance.
+const MAX_AUDIO_BYTES = 4 * 1024 * 1024;
 
 // Only the live site and local dev may call this worker. Browsers always send
 // Origin on cross-site requests, so this stops other websites from spending our
-// Hugging Face credits through it.
+// Workers AI allowance through it.
 const ALLOWED_ORIGINS = new Set([
   "https://itsfixable.github.io",
   "http://localhost:3000",
@@ -26,7 +31,7 @@ export default {
 
     if (url.pathname === "/health") {
       return json(
-        { ok: true, model: MODEL_ID, provider: HF_PROVIDER },
+        { ok: true, model: MODEL_ID, provider: PROVIDER },
         { headers: corsHeaders() }
       );
     }
@@ -44,48 +49,32 @@ export default {
           );
         }
 
-        const audioBytes = await audioFile.arrayBuffer();
-
-        const hfResponse = await fetch(
-          `https://router.huggingface.co/hf-inference/models/${MODEL_ID}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${env.HF_TOKEN}`,
-              "Content-Type": "audio/wav",
-              "X-Wait-For-Model": "true",
-            },
-            body: audioBytes,
-          }
-        );
-
-        const rawText = await hfResponse.text();
-        let parsed;
-
-        try {
-          parsed = JSON.parse(rawText);
-        } catch {
-          parsed = null;
-        }
-
-        if (!hfResponse.ok) {
+        if (audioFile.size > MAX_AUDIO_BYTES) {
           return json(
-            {
-              error:
-                parsed?.error ||
-                parsed?.message ||
-                `Hugging Face request failed with status ${hfResponse.status}.`,
-              details: parsed || rawText,
-            },
-            { status: hfResponse.status, headers: corsHeaders() }
+            { error: "Audio chunk is too large." },
+            { status: 413, headers: corsHeaders() }
           );
         }
 
-        const text =
-          parsed?.text ||
-          parsed?.generated_text ||
-          parsed?.transcription ||
-          "";
+        const audioBytes = await audioFile.arrayBuffer();
+
+        let result;
+        try {
+          result = await env.AI.run(MODEL_ID, {
+            audio: toBase64(audioBytes),
+            language,
+            vad_filter: true,
+          });
+        } catch (error) {
+          // Keep provider details in the worker logs, not the response.
+          console.error(`kq-live-transcribe: ${error?.message || error}`);
+          return json(
+            { error: "Transcription failed." },
+            { status: 502, headers: corsHeaders() }
+          );
+        }
+
+        const text = (result?.text || "").trim();
 
         return json(
           {
@@ -115,6 +104,16 @@ export default {
     });
   },
 };
+
+// Base64-encodes in chunks so large buffers don't overflow the call stack.
+function toBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
 
 function corsHeaders() {
   return {
