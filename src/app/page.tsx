@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomePageStyles } from "@/components/PageStyles";
-import { HomeStats } from "@/components/pages/HomeStats";
+import { HomeQuests, HomeStats } from "@/components/pages/HomeStats";
 import { asset } from "@/lib/asset";
 import SplitText from "@/components/reactbits/SplitText";
 import GradientText from "@/components/reactbits/GradientText";
@@ -82,6 +82,7 @@ export default function HomePage() {
             <p className="muted kq-quests__desc">
               Complete daily quests to earn coins, grow your streak, and build a habit that makes Korean stick.
             </p>
+            <HomeQuests />
             <Link className="btn secondary kq-view-quests" href="/dashboard">
               View Quests ›
             </Link>
@@ -93,9 +94,9 @@ export default function HomePage() {
           <h2>Follow a clear path from beginner to confident learner</h2>
           <ol className="learning-path kq-stagger">
             <li><strong>Hangul</strong> — write & read consonants (초성/종성), vowels (중성), and build syllables.</li>
-            <li><strong>Common Words</strong> — numbers, family, food, school, and everyday essentials.</li>
-            <li><strong>Phrases</strong> — greetings, introductions, requests, and likes/dislikes.</li>
-            <li><strong>Sentence Structure</strong> — SOV order, particles (은/는, 이/가, 을/를), time/location, and present tense.</li>
+            <li><strong>Common Words</strong> — food basics today; numbers, family, and school sets are coming soon.</li>
+            <li><strong>Phrases</strong> — greetings and polite basics today; introductions, requests, and likes/dislikes are coming soon.</li>
+            <li><strong>Sentence Structure</strong> <em>(coming soon)</em> — SOV order, particles (은/는, 이/가, 을/를), time/location, and present tense.</li>
           </ol>
           <div className="kq-path-cta">
             <Link className="btn" href="/resources">Start with Hangul</Link>

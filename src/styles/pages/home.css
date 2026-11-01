@@ -210,6 +210,23 @@
   max-width: 520px;
   margin-top: 8px;
 }
+.kq-home-quests {
+  list-style: none;
+  max-width: 520px;
+  margin: 4px 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.kq-home-quests li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 600;
+}
 .kq-view-quests {
   margin-top: 5px;
   display: inline-flex;

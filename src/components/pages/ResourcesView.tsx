@@ -20,7 +20,7 @@ const LESSONS = [
   {
     id: "L2_vocab_food",
     title: "Vocab: Food Basics (밥, 물, 김치, 빵, 우유, 사과)",
-    description: "Learn high-frequency food words with picture matching and timed drills.",
+    description: "Learn high-frequency food words with flashcards, then battle them in the Adventure’s Food Forest.",
     unlockCap: 8,
     actions: [
       { href: "/adventure", label: "Adventure", primary: true },
@@ -153,7 +153,7 @@ export default function ResourcesView() {
           <span>Where to Start</span>
         </h1>
 
-        <p className="muted">A short, student-written path that builds from Hangul to full sentences.</p>
+        <p className="muted">A short, student-written path that builds from Hangul to everyday words.</p>
 
         <div className="lesson-list kq-stagger" id="lesson-list">
           {LESSONS.map((lesson) => (
@@ -224,7 +224,7 @@ export default function ResourcesView() {
               </div>
               <h3>{pdf.title}</h3>
               <p>{pdf.note}</p>
-              <a className="kq-pdf-link" href={pdf.filename} download>
+              <a className="kq-pdf-link" href={asset(pdf.filename)} download>
                 Download PDF
               </a>
             </article>

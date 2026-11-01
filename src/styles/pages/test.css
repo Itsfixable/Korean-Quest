@@ -248,3 +248,26 @@
   border: 1px solid #c3c3c3 !important;
   color: #000000 !important;
 }
+/* Selects have an intrinsic min width ("Multiple Choice" ≈ 160px), so in the
+   ~140px columns the desktop sidebar leaves at ~1024px they spilled into the
+   next column. Let them shrink to their column, and only use the single-row
+   layout when there's room for it. */
+.setup-field,
+.setup-field select {
+  min-width: 0;
+  width: 100%;
+}
+
+.setup-grid {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+@media (max-width: 1180px) {
+  .setup-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .setup-start {
+    grid-column: span 2;
+  }
+}

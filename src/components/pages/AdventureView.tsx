@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { asset } from "@/lib/asset";
+import { FLASHCARD_SETS } from "@/lib/constants/flashcard-sets";
 import "@/styles/pages/adventure.css";
 import "@/styles/pages/adventure-enhancements.css";
 
@@ -21,6 +22,8 @@ const HANGUL = [
   { char: "ㅗ", roman: "o" },
   { char: "ㅣ", roman: "i" },
 ] as const;
+
+const HANGUL_VOWELS = new Set(["ㅏ", "ㅓ", "ㅗ", "ㅣ"]);
 
 const VOCAB = [
   { ko: "학교", en: "school" },
@@ -99,7 +102,25 @@ const ISLAND_PATH = buildIslandPath(
   ISLAND_LAYOUT.map((point) => ({ x: point.x, y: point.y + PATH_ANCHOR_Y_OFFSET })),
 );
 
-type Topic = "hangul" | "vocab" | "mixed";
+type Topic = "hangul" | "vocab" | "food" | "greetings" | "mixed";
+
+type VocabItem = { ko: string; en: string };
+
+function vocabFromSet(id: string): VocabItem[] {
+  const set = FLASHCARD_SETS.find((s) => s.id === id);
+  return (set?.cards ?? []).map((card) => ({ ko: card.term, en: card.def }));
+}
+
+const FOOD_VOCAB = vocabFromSet("food-basics");
+const GREETING_VOCAB = vocabFromSet("greetings");
+
+// Each world drills what its name promises: letters in Hangul Hills, food
+// words in Food Forest, and greetings in Greeting Kingdom.
+function topicForLevel(level: number): Topic {
+  if (level <= 4) return "hangul";
+  if (level <= 8) return "food";
+  return "greetings";
+}
 type Difficulty = "easy" | "normal" | "hard";
 
 type ProgressState = {
@@ -163,9 +184,9 @@ function loadProgress(): ProgressState {
 }
 
 function difficultyDurations(level: Difficulty) {
-  if (level === "hard") return 2600;
-  if (level === "normal") return 3800;
-  return 5200;
+  if (level === "hard") return 3500;
+  if (level === "normal") return 5500;
+  return 8000;
 }
 
 function dmgFor(level: Difficulty) {
@@ -183,8 +204,12 @@ function enemyDmgFor(level: Difficulty) {
 function makeHangulQuestion(): Question {
   const promptType = Math.random() < 0.5 ? "sound" : "symbol";
   const picked = randomFrom(HANGUL);
+  // Distractors come from the same kind of letter (vowel vs consonant) so the
+  // answer can't be spotted just by its shape or length.
+  const pickedIsVowel = HANGUL_VOWELS.has(picked.char);
+  const sameKind = HANGUL.filter((item) => HANGUL_VOWELS.has(item.char) === pickedIsVowel);
   if (promptType === "sound") {
-    const distractors = shuffle(HANGUL.filter((item) => item.roman !== picked.roman))
+    const distractors = shuffle(sameKind.filter((item) => item.roman !== picked.roman))
       .slice(0, 3)
       .map((item) => item.roman);
     return {
@@ -194,7 +219,7 @@ function makeHangulQuestion(): Question {
       choices: shuffle([picked.roman, ...distractors]),
     };
   }
-  const distractors = shuffle(HANGUL.filter((item) => item.char !== picked.char))
+  const distractors = shuffle(sameKind.filter((item) => item.char !== picked.char))
     .slice(0, 3)
     .map((item) => item.char);
   return {
@@ -205,11 +230,11 @@ function makeHangulQuestion(): Question {
   };
 }
 
-function makeVocabQuestion(): Question {
+function makeVocabQuestion(list: readonly VocabItem[] = VOCAB): Question {
   const promptType = Math.random() < 0.5 ? "koToEn" : "enToKo";
-  const picked = randomFrom(VOCAB);
+  const picked = randomFrom(list);
   if (promptType === "koToEn") {
-    const distractors = shuffle(VOCAB.filter((item) => item.en !== picked.en))
+    const distractors = shuffle(list.filter((item) => item.en !== picked.en))
       .slice(0, 3)
       .map((item) => item.en);
     return {
@@ -219,7 +244,7 @@ function makeVocabQuestion(): Question {
       choices: shuffle([picked.en, ...distractors]),
     };
   }
-  const distractors = shuffle(VOCAB.filter((item) => item.ko !== picked.ko))
+  const distractors = shuffle(list.filter((item) => item.ko !== picked.ko))
     .slice(0, 3)
     .map((item) => item.ko);
   return {
@@ -233,6 +258,8 @@ function makeVocabQuestion(): Question {
 function makeQuestion(topic: Topic): Question {
   if (topic === "hangul") return makeHangulQuestion();
   if (topic === "vocab") return makeVocabQuestion();
+  if (topic === "food") return makeVocabQuestion(FOOD_VOCAB);
+  if (topic === "greetings") return makeVocabQuestion(GREETING_VOCAB);
   return Math.random() < 0.5 ? makeHangulQuestion() : makeVocabQuestion();
 }
 
@@ -240,6 +267,7 @@ export default function AdventureView() {
   const addXP = useGameStore((s) => s.addXP);
   const addCoins = useGameStore((s) => s.addCoins);
   const markBattleWin = useGameStore((s) => s.markBattleWin);
+  const unlockAdventureTo = useGameStore((s) => s.unlockAdventureTo);
   const [hydrated, setHydrated] = useState(false);
   const [progress, setProgress] = useState<ProgressState>({ unlocked: 1, cleared: {} });
   const [activeWorldId, setActiveWorldId] = useState(1);
@@ -283,8 +311,17 @@ export default function AdventureView() {
   useEffect(() => {
     setHydrated(true);
     const loadedProgress = loadProgress();
+    // The game store's cap is cloud-synced, so honour it if this browser's
+    // local map progress is behind (e.g. after signing in on a new device).
+    loadedProgress.unlocked = Math.min(
+      12,
+      Math.max(loadedProgress.unlocked, useGameStore.getState().progress.adventureCap || 1),
+    );
     setProgress(loadedProgress);
     setActiveWorldId(getWorldForLevel(loadedProgress.unlocked));
+    // And the other way: map progress saved before the two were linked still
+    // needs to reach the dashboard (and cloud sync).
+    useGameStore.getState().unlockAdventureTo(loadedProgress.unlocked, "your saved map progress");
   }, []);
 
   useEffect(() => {
@@ -412,6 +449,8 @@ export default function AdventureView() {
         unlocked: Math.min(12, Math.max(prev.unlocked, battleState.level + 1)),
         cleared: { ...prev.cleared, [battleState.level]: true },
       }));
+      // Keep the dashboard's "unlocked through" figure in step with the map.
+      unlockAdventureTo(Math.min(12, battleState.level + 1), `clearing Level ${battleState.level}`);
       if (battleState.level <= 4 && activeWorldId === 1 && battleState.level === 4) setActiveWorldId(2);
       if (battleState.level <= 8 && activeWorldId === 2 && battleState.level === 8) setActiveWorldId(3);
       setFeedback(`✅ Victory! +${rewardXP} XP • +${rewardCoins} coins`);
@@ -507,7 +546,7 @@ export default function AdventureView() {
       enemyHP: hp,
       playerHPMax: playerHP,
       playerHP: playerHP,
-      topic,
+      topic: topicForLevel(level),
       difficulty,
       streak: 0,
     };

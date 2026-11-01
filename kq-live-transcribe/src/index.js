@@ -1,9 +1,22 @@
 const MODEL_ID = "openai/whisper-large-v3";
 const HF_PROVIDER = "hf-inference";
 
+// Only the live site and local dev may call this worker. Browsers always send
+// Origin on cross-site requests, so this stops other websites from spending our
+// Hugging Face credits through it.
+const ALLOWED_ORIGINS = new Set([
+  "https://itsfixable.github.io",
+  "http://localhost:3000",
+]);
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    const origin = request.headers.get("Origin");
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      return json({ error: "Forbidden origin." }, { status: 403, headers: corsHeaders() });
+    }
 
     if (request.method === "OPTIONS") {
       return new Response(null, {

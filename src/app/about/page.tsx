@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const FACTS = [
-  "Covers Hangul → full sentences",
+  "Hangul, words & phrases — sentences next",
   "6 ways to study",
   "Built by two students",
 ];
@@ -27,21 +27,21 @@ const FEATURES = [
   },
   {
     icon: "/favicon/resources/brainEmoji.png",
-    title: "Spaced-Repetition Flashcards",
-    text: "Vocabulary moves from the New stack to Known as learners review and master each card.",
+    title: "Flashcards & Tests",
+    text: "Learners sort each card into Still learning or Known, then quiz themselves on either stack.",
   },
   {
     icon: "/favicon/nav/newNavIcons/scheduleIcon1.png",
-    title: "Live Tutoring",
-    text: "Learners can book one-on-one sessions from the Schedule page to practice speaking with tutors.",
+    title: "Speaking Practice",
+    text: "Learners book a session on the Schedule page and get a private room code to practice speaking with a study partner over video.",
   },
 ];
 
 const JOURNEY = [
   { step: "01", title: "Hangul", text: "Read & write consonants, vowels, and full syllable blocks." },
-  { step: "02", title: "Common Words", text: "Numbers, family, food, school, and everyday essentials." },
-  { step: "03", title: "Phrases", text: "Greetings, introductions, requests, and likes / dislikes." },
-  { step: "04", title: "Sentences", text: "SOV order, particles (은/는, 이/가, 을/를), time & tense." },
+  { step: "02", title: "Common Words", text: "Food basics today; numbers, family, and school sets coming soon." },
+  { step: "03", title: "Phrases", text: "Greetings and polite basics today; introductions, requests, and likes / dislikes coming soon." },
+  { step: "04", title: "Sentences (coming soon)", text: "SOV order, particles (은/는, 이/가, 을/를), time & tense." },
 ];
 
 const TEAM = [
@@ -106,7 +106,7 @@ const METRICS = [
     items: [
       "30-day learner retention rate",
       "Net Promoter Score (NPS) from student feedback surveys",
-      "Tutoring session bookings made through the Schedule page",
+      "Speaking-practice bookings made through the Schedule page",
     ],
   },
 ];
@@ -127,7 +127,7 @@ export default function AboutPage() {
             </p>
             <p className="about-lede">
               Korean Quest is a student-built study platform that blends structured
-              Hangul practice, spaced-repetition flashcards, and an adventure mode
+              Hangul practice, flashcards and tests, and an adventure mode
               that rewards consistent practice with XP, coins, and unlockables.
             </p>
             <ul className="about-facts">
@@ -218,9 +218,9 @@ export default function AboutPage() {
         <section className="card about-section">
           <div className="about-section-head">
             <span className="about-section-tag">How we measure success</span>
-            <h2 className="about-section-title">The indicators we track</h2>
+            <h2 className="about-section-title">The indicators we plan to track</h2>
             <p className="muted">
-              Korean Quest watches measurable indicators across four areas to see
+              These are the measures we&apos;re building toward across four areas to see
               whether the site keeps students engaged, learning, and coming back.
             </p>
           </div>

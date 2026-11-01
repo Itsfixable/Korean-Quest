@@ -66,3 +66,30 @@ export function HomeStats() {
     </div>
   );
 }
+
+// Compact read-only view of today's quests for the Home page; claiming
+// rewards happens on the Dashboard.
+export function HomeQuests() {
+  const dailyQuests = useGameStore((s) => s.quests.daily);
+
+  if (dailyQuests.length === 0) return null;
+
+  return (
+    <ul className="kq-home-quests">
+      {dailyQuests.map((q) => {
+        const prog = Math.min(q.progress, q.target);
+        const ready = !q.done && prog >= q.target;
+        return (
+          <li key={q.id}>
+            <span>
+              {q.done ? "✅" : ready ? "🎁" : "⬜"} {q.desc}
+            </span>
+            <span className="muted">
+              {q.done ? "Claimed" : ready ? "Ready to claim" : `${prog}/${q.target}`}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

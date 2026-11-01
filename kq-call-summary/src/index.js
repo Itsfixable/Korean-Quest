@@ -1,5 +1,19 @@
 const ROUTER_URL = "https://router.huggingface.co/v1/chat/completions";
-const DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct:fastest";
+// Tried in order; the router dropped Qwen2.5-7B, so a model that disappears
+// just moves the request on to the next one.
+const MODEL_CHAIN = [
+  "google/gemma-3-12b-it:fastest",
+  "meta-llama/Llama-3.1-8B-Instruct:fastest",
+  "openai/gpt-oss-20b:fastest",
+];
+
+// Only the live site and local dev may call this worker. Browsers always send
+// Origin on cross-site requests, so this stops other websites from spending our
+// Hugging Face credits through it.
+const ALLOWED_ORIGINS = new Set([
+  "https://itsfixable.github.io",
+  "http://localhost:3000",
+]);
 
 const SUMMARY_SYSTEM_PROMPT =
   "You are a Korean-language speaking coach. You will be given the transcript " +
@@ -26,6 +40,11 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    const origin = request.headers.get("Origin");
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      return json({ error: "Forbidden origin." }, { status: 403, headers: corsHeaders() });
+    }
+
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: corsHeaders(),
@@ -38,7 +57,7 @@ export default {
           ok: true,
           service: "kq-call-summary",
           mode: env?.HF_TOKEN ? "ai-summary" : "local-rule-based-summary",
-          model: DEFAULT_MODEL,
+          model: MODEL_CHAIN[0],
         },
         { headers: corsHeaders() }
       );
@@ -93,10 +112,18 @@ export default {
 };
 
 async function buildSummaryWithAI(transcript, env) {
-  const model = env.HF_MODEL && !/Arch-Router/i.test(env.HF_MODEL)
-    ? env.HF_MODEL
-    : DEFAULT_MODEL;
+  const models = env.HF_MODEL && !/Arch-Router/i.test(env.HF_MODEL)
+    ? [env.HF_MODEL, ...MODEL_CHAIN]
+    : MODEL_CHAIN;
 
+  for (const model of models) {
+    const summary = await summarizeWithModel(model, transcript, env);
+    if (summary) return summary;
+  }
+  return null;
+}
+
+async function summarizeWithModel(model, transcript, env) {
   const response = await fetch(ROUTER_URL, {
     method: "POST",
     headers: {
@@ -118,7 +145,10 @@ async function buildSummaryWithAI(transcript, env) {
     }),
   });
 
-  if (!response.ok) return null;
+  if (!response.ok) {
+    console.error(`kq-call-summary: ${model} failed with status ${response.status}`);
+    return null;
+  }
 
   const rawText = new TextDecoder("utf-8").decode(await response.arrayBuffer());
   let parsed = null;

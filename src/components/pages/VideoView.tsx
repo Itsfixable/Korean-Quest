@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDialogStore } from "@/stores/useDialogStore";
+import { generateRoomCode, ROOM_CODE_LENGTH, sanitizeRoomCode } from "@/lib/room-code";
 import "@/styles/pages/video.css";
 
 declare global {
@@ -68,16 +69,6 @@ function formatTime(totalSeconds: number) {
   return `${minutes}:${seconds}`;
 }
 
-function sanitizeCode(value: string) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
-}
-
-function generateRoomCode(length = 6) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < length; i += 1) code += chars[Math.floor(Math.random() * chars.length)];
-  return code;
-}
 
 export default function VideoView({ room }: VideoViewProps) {
   const [initialRoom, setInitialRoom] = useState<string | undefined>(room);
@@ -112,7 +103,7 @@ export default function VideoView({ room }: VideoViewProps) {
   const [copyLabel, setCopyLabel] = useState("Copy");
 
   const transcriptLinesRef = useRef<string[]>([]);
-  const autoJoinedRef = useRef(false);
+  const prefilledRef = useRef(false);
   const summarySectionRef = useRef<HTMLElement>(null);
 
   const addSessionXP = (amount: number) => setSessionXp((x) => x + amount);
@@ -129,14 +120,9 @@ export default function VideoView({ room }: VideoViewProps) {
     if (meetMountRef.current) meetMountRef.current.innerHTML = "";
   }, []);
 
-  const getRoomName = (codeOrRoom: string) => {
-    if (codeOrRoom.startsWith("KQ_")) return codeOrRoom;
-    return `${ROOM_PREFIX}-${sanitizeCode(codeOrRoom)}`;
-  };
-
   const joinCall = useCallback(
-    (codeOrRoom: string, asRole: "host" | "student" = "student") => {
-      const clean = codeOrRoom.startsWith("KQ_") ? codeOrRoom : sanitizeCode(codeOrRoom);
+    (code: string, asRole: "host" | "student" = "student") => {
+      const clean = sanitizeRoomCode(code);
       if (!clean) {
         useDialogStore.getState().alert("Please enter a room code before joining.", {
           title: "Missing room code",
@@ -151,12 +137,13 @@ export default function VideoView({ room }: VideoViewProps) {
       }
 
       destroyMeeting();
-      const displayCode = codeOrRoom.startsWith("KQ_") ? codeOrRoom.replace(/^KQ_/, "").slice(0, 6) : clean;
-      setRoomCode(displayCode);
+      // The code shown (and copied) is exactly the one the room is named
+      // after, so a partner who pastes it lands in the same call.
+      setRoomCode(clean);
       setRole(asRole);
 
       jitsiRef.current = new window.JitsiMeetExternalAPI(JITSI_DOMAIN, {
-        roomName: getRoomName(clean),
+        roomName: `${ROOM_PREFIX}-${clean}`,
         parentNode: meetMountRef.current,
         width: "100%",
         height: "100%",
@@ -194,12 +181,14 @@ export default function VideoView({ room }: VideoViewProps) {
     if (saved) setSharedNotes(saved);
   }, []);
 
+  // A booking's Join link only fills in its code; the learner still presses
+  // Join, so the camera and mic aren't requested the moment the page loads.
   useEffect(() => {
-    if (initialRoom && jitsiReady && !autoJoinedRef.current) {
-      autoJoinedRef.current = true;
-      joinCall(decodeURIComponent(initialRoom), "student");
+    if (initialRoom && !prefilledRef.current) {
+      prefilledRef.current = true;
+      setJoinInput(sanitizeRoomCode(decodeURIComponent(initialRoom)));
     }
-  }, [initialRoom, jitsiReady, joinCall]);
+  }, [initialRoom]);
 
   useEffect(() => () => {
     destroyMeeting();
@@ -458,6 +447,7 @@ export default function VideoView({ room }: VideoViewProps) {
                 id="createGroupBtn"
                 className="btn room-action-btn"
                 type="button"
+                disabled={!jitsiReady}
                 onClick={() => {
                   const code = generateRoomCode();
                   setRoomCode(code);
@@ -482,10 +472,10 @@ export default function VideoView({ room }: VideoViewProps) {
                 className="text-input room-input"
                 type="text"
                 placeholder="Enter code..."
-                maxLength={12}
+                maxLength={ROOM_CODE_LENGTH}
                 autoComplete="off"
                 value={joinInput}
-                onChange={(e) => setJoinInput(sanitizeCode(e.target.value))}
+                onChange={(e) => setJoinInput(sanitizeRoomCode(e.target.value))}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -498,6 +488,7 @@ export default function VideoView({ room }: VideoViewProps) {
                 id="joinGroupBtn"
                 className="btn room-action-btn"
                 type="button"
+                disabled={!jitsiReady}
                 onClick={() => {
                   addSessionXP(5);
                   joinCall(joinInput, "student");

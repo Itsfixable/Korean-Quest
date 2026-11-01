@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBookingStore } from "@/stores/useBookingStore";
 import type { Booking } from "@/lib/types";
 import { asset } from "@/lib/asset";
+import { generateRoomCode } from "@/lib/room-code";
 import "@/styles/pages/schedule.css";
 
 const MAX_PER_DAY = 2;
@@ -58,10 +59,6 @@ function isPastSlot(dateISO: string, timeStr: string) {
   return bookingDateTime(dateISO, timeStr).getTime() < Date.now();
 }
 
-function roomFor(dateISO: string, timeStr: string) {
-  return `KQ_${dateISO.replaceAll("-", "")}_${timeStr.replace(":", "")}`;
-}
-
 export default function ScheduleView() {
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
@@ -109,7 +106,7 @@ export default function ScheduleView() {
     const booking: Booking = {
       date: dateISO,
       time,
-      room: roomFor(dateISO, time),
+      room: generateRoomCode(),
       going: true,
       createdAt: Date.now(),
     };
@@ -151,7 +148,7 @@ export default function ScheduleView() {
           />
         </div>
 
-        <p className="muted schedule-subtitle">Pick a date, then choose a time. Booked slots are grayed out.</p>
+        <p className="muted schedule-subtitle">Pick a date, then choose a time. Each booking gets its own private room code to share with your study partner.</p>
 
         <div className="appt-layout">
           <div className="cal card cal-card">
@@ -266,8 +263,9 @@ export default function ScheduleView() {
             </div>
 
             <p className="muted" id="slotHint" style={{ marginTop: 8 }}>
-              Tip: click a time to select or deselect. You can book up to {MAX_PER_DAY} session(s) on{" "}
-              {humanDate(selectedISO)}.
+              {countForDate(selectedISO) >= MAX_PER_DAY
+                ? `You've booked the maximum of ${MAX_PER_DAY} sessions on ${humanDate(selectedISO)}. Click a selected time to cancel it and pick another.`
+                : `Tip: click a time to select or deselect. You can book up to ${MAX_PER_DAY} sessions on ${humanDate(selectedISO)}.`}
             </p>
           </div>
         </div>
@@ -291,6 +289,7 @@ export default function ScheduleView() {
               <li key={`${b.date}_${b.time}`} className="booking-row">
                 <span className="booking-text">
                   {humanDate(b.date)} @ {formatTime12(b.time)}
+                  <span className="muted"> · Room code {b.room}</span>
                 </span>
                 <span className="booking-actions">
                   <Link className="btn" href={`/video?room=${encodeURIComponent(b.room)}`}>

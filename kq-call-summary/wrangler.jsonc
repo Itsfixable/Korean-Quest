@@ -4,10 +4,8 @@
   "compatibility_date": "2026-03-06",
   "observability": {
     "enabled": true
-  },
-  "vars": {
-    // OpenAI-compatible Hugging Face router model used to generate the AI
-    // session summary. ":fastest" lets the router pick a live provider.
-    "HF_MODEL": "Qwen/Qwen2.5-7B-Instruct:fastest"
   }
+  // No HF_MODEL var: the worker walks its own MODEL_CHAIN (src/index.js), so a
+  // model the router drops can't break summaries. Set HF_MODEL only to try a
+  // specific model first.
 }

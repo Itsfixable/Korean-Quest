@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Booking } from "@/lib/types";
+import { generateRoomCode } from "@/lib/room-code";
 
 interface BookingStore {
   bookings: Record<string, Booking>;
@@ -30,6 +31,21 @@ export const useBookingStore = create<BookingStore>()(
         }));
       },
     }),
-    { name: "kq_bookings_v1" },
+    {
+      name: "kq_bookings_v1",
+      version: 1,
+      // v0 rooms were named after the slot's date and time (KQ_20261101_1600),
+      // so anyone booking the same slot could walk into the call. Give each
+      // existing booking a fresh random code.
+      migrate: (persisted, version) => {
+        const state = persisted as Pick<BookingStore, "bookings">;
+        if (version < 1 && state?.bookings) {
+          for (const booking of Object.values(state.bookings)) {
+            if (booking) booking.room = generateRoomCode();
+          }
+        }
+        return state as BookingStore;
+      },
+    },
   ),
 );

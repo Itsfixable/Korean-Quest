@@ -167,10 +167,11 @@ export default function LeaderboardView() {
     <section className="card lb-page-card">
       <div className="lb-header">
         <div className="lb-header-copy">
-          <span className="lb-eyebrow">Weekly standings</span>
+          <span className="lb-eyebrow">Practice standings</span>
           <h1>Leaderboard</h1>
           <p className="muted">
-            XP standings update as you take quizzes, win battles, and keep your streak alive.
+            Your XP updates as you take quizzes, win battles, and keep your streak alive. The other
+            learners are sample rivals to race against while a shared leaderboard is in the works.
           </p>
         </div>
         <div className="lb-header-side">

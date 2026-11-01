@@ -102,9 +102,10 @@ export default function ProgressReport() {
     [progress.completedLessonIds, progress.battlesWon, achievements.length],
   );
 
-  const nextUnlockText = adventure.nextLesson
-    ? `Keep going to unlock ${adventure.nextLesson.label}.`
-    : "All adventure chapters are unlocked — now clear every boss node.";
+  const nextUnlockText =
+    adventure.cap < ADVENTURE_MAX_CAP
+      ? `Win Level ${adventure.cap} to unlock Level ${adventure.cap + 1}.`
+      : "All adventure levels are unlocked — now clear every boss node.";
 
   const activities = useMemo(() => {
     const list = (progress.recentWork || []).filter((item) => item.type !== "Shop");
@@ -206,7 +207,7 @@ export default function ProgressReport() {
       },
       {
         key: "sessions",
-        label: "Tutoring sessions booked",
+        label: "Speaking sessions booked",
         value: String(sessionsBooked),
         group: "progress",
         hint: sessionsBooked ? `${sessionsGoing} marked going` : undefined,

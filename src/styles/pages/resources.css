@@ -202,3 +202,30 @@ button.btn {
     height: 36px;
   }
 }
+
+/* The two illustrated lesson cards already reserve room for their artwork
+   with padding-right, so the 52% text cap above squeezed their copy twice
+   (down to a word per line). And the two-column list only collapses on a
+   viewport breakpoint, which ignores the desktop sidebar — so collapse it on
+   the width the list actually gets instead. */
+section:has(> .lesson-list) {
+  container-type: inline-size;
+}
+
+.lesson[data-lesson-id] h2,
+.lesson[data-lesson-id] > p {
+  max-width: none;
+}
+
+@media (min-width: 721px) {
+  .lesson[data-lesson-id="L1_hangul"] {
+    background-size: 290px auto;
+    padding-right: 300px;
+  }
+}
+
+@container (max-width: 1040px) {
+  .lesson-list {
+    grid-template-columns: 1fr;
+  }
+}

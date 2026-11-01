@@ -1113,3 +1113,25 @@
       }
     }
   
+/* At ~1024px the sidebar leaves each tab ~140px, but a 70px icon beside the
+   label needs ~230px, so "Avatars"/"Backgrounds" spilled out of their tabs.
+   Stack icon over label whenever the tab bar itself is narrow (viewport
+   breakpoints don't see the sidebar). */
+:has(> .kq-shop-tabs) {
+  container-type: inline-size;
+}
+
+@container (max-width: 900px) {
+  .kq-shop-tabs .kq-shop-tab {
+    flex-direction: column;
+    padding: 12px 10px;
+    gap: 6px;
+    font-size: 0.95rem;
+    min-width: 0;
+  }
+
+  .kq-shop-tabs .kq-shop-tab img {
+    width: 48px;
+    height: 48px;
+  }
+}

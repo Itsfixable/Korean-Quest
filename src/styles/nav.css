@@ -329,6 +329,13 @@ body {
   opacity: 1;
 }
 
+/* Re-enable the chevron only while its cue is showing, so it can be clicked to
+   scroll the nav to the bottom. */
+.kq-sidebar-fade.is-visible .kq-sidebar-fade-chevron {
+  pointer-events: auto;
+  visibility: visible;
+}
+
 .kq-sidebar-fade--top {
   top: 0;
   background: linear-gradient(to bottom, #eaf0fb 42%, rgba(234, 240, 251, 0));
@@ -358,9 +365,11 @@ body {
   background: linear-gradient(180deg, #6d84b7 0%, #5971a1 100%);
   box-shadow: 0 6px 16px rgba(41, 55, 95, 0.32);
   animation: kqSidebarChevron 1.4s ease-in-out infinite;
-  /* The fade wrapper is click-through; re-enable pointer events on the button
-     itself so it can be clicked to scroll the nav to the bottom. */
-  pointer-events: auto;
+  /* Stays click-through while the cue is hidden: the fade wrapper is only
+     transparent, so without this the invisible button would sit on top of the
+     Log In / Sign Up button and swallow clicks. */
+  pointer-events: none;
+  visibility: hidden;
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }

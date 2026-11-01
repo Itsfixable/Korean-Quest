@@ -752,3 +752,18 @@ html body
   border: 1px dashed rgba(91, 114, 159, 0.35);
   border-radius: 12px;
 }
+/* The breakpoints above key off the viewport, but on desktop the sidebar takes
+   ~300px of it, so at ~1024px three fixed 120px slot columns pushed the page
+   wider than the screen. Let both grids size to the space they actually have. */
+html body .appt-layout {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+html body .slots-grid,
+html body #slotsGrid {
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+}
+@media (max-width: 900px) {
+  html body .appt-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

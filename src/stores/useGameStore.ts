@@ -122,10 +122,7 @@ function deriveAdventureCap(completedLessonIds: string[] = []) {
 }
 
 function lessonLabelFromCap(cap: number) {
-  if (cap >= 12) return "Adventure Levels 9–12";
-  if (cap >= 8) return "Adventure Levels 5–8";
-  if (cap >= 4) return "Adventure Levels 1–4";
-  return "Level 1 only";
+  return cap <= 1 ? "Level 1 only" : `Adventure Levels 1–${cap}`;
 }
 
 function ensureShopState(state: GameState): GameState {
@@ -261,8 +258,10 @@ export const useGameStore = create<GameStore>()(
 
         set({ player, rewardMessage: safeAmount > 0 ? `+${safeAmount} XP` : get().rewardMessage });
 
+        // Quest-reward XP (countForQuest: false) doesn't count toward XP
+        // quests, daily or weekly, so the two progress bars always agree.
         const weekly = state.quests.weekly.map((quest) => {
-          if (quest.done) return quest;
+          if (quest.done || !countForQuest) return quest;
           const progress = Math.min(quest.target, (Number(quest.progress) || 0) + safeAmount);
           const done = progress >= quest.target;
           if (done) {
@@ -587,7 +586,15 @@ export const useGameStore = create<GameStore>()(
           },
         };
         merged.progress.lessonsDone = merged.progress.completedLessonIds.length;
-        merged.progress.adventureCap = deriveAdventureCap(merged.progress.completedLessonIds);
+        // Battle wins also raise the cap (see AdventureView), so keep the saved
+        // value rather than recomputing it from lessons alone.
+        merged.progress.adventureCap = Math.min(
+          12,
+          Math.max(
+            Number(saved.progress?.adventureCap) || 1,
+            deriveAdventureCap(merged.progress.completedLessonIds),
+          ),
+        );
         merged.player.totalXPEarned = Number(merged.player.totalXPEarned) || Number(merged.player.xp) || 0;
         return merged as GameStore;
       },

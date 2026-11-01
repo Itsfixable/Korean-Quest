@@ -178,7 +178,7 @@ const GROUPS: SourceGroup[] = [
     tag: "AI & infrastructure",
     title: "Services that power the app",
     intro:
-      "Backend services and AI models behind sign-in, the chatbot, and live tutoring tools.",
+      "Backend services and AI models behind sign-in, the chatbot, and the speaking-practice call room.",
     emoji: "🤖",
     accent: "#d07a7a",
     sources: [
@@ -189,18 +189,29 @@ const GROUPS: SourceGroup[] = [
         href: "https://supabase.com",
       },
       {
-        label: "OpenAI",
+        label: "Hugging Face Inference Providers",
         detail:
-          "Language models that power the in-app chatbot and AI session summaries, reached from the app's serverless workers.",
-        meta: "OpenAI · hosted service",
-        href: "https://openai.com",
+          "Open-weight language models (gpt-oss, Gemma, Llama) for the chatbot and AI session summaries, and Whisper for live captions, reached from the app's serverless workers.",
+        meta: "Hugging Face · hosted service",
+        href: "https://huggingface.co/docs/inference-providers",
       },
       {
-        label: "Cloudflare Workers & Pages",
-        detail:
-          "Host the serverless chat, call-summary, and transcription endpoints, and serve the static site.",
+        label: "Jitsi Meet",
+        detail: "Open-source video calls embedded in the speaking-practice call room (meet.jit.si).",
+        meta: "Apache-2.0 · hosted service",
+        href: "https://jitsi.org/jitsi-meet/",
+      },
+      {
+        label: "Cloudflare Workers",
+        detail: "Host the serverless chat, call-summary, and transcription endpoints.",
         meta: "Hosted service",
         href: "https://workers.cloudflare.com",
+      },
+      {
+        label: "GitHub Pages",
+        detail: "Serves the static site.",
+        meta: "Hosted service",
+        href: "https://pages.github.com",
       },
     ],
   },
@@ -264,7 +275,7 @@ export default function SourcesPage() {
                   {source.href ? (
                     <a
                       className="sources-item-link"
-                      href={source.href}
+                      href={source.href.startsWith("http") ? source.href : asset(source.href)}
                       target={source.href.startsWith("http") ? "_blank" : undefined}
                       rel={source.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     >

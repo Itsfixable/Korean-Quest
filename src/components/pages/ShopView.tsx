@@ -142,14 +142,6 @@ function getVisibleItems(items: ShopItem[], category: CategoryId) {
   return sortByRarity(sliced);
 }
 
-function getBaseTotal(items: ShopItem[], category: CategoryId) {
-  if (category === "avatars") return Math.min(items.length, SHOP_ASSETS.avatars.length);
-  if (category === "frames") return Math.min(items.length, SHOP_ASSETS.frames.length);
-  if (category === "backgrounds") return Math.min(items.length, SHOP_ASSETS.backgrounds.length);
-  if (category === "pets") return Math.min(items.length, SHOP_ASSETS.pets.length);
-  return items.length;
-}
-
 function FloatShell({ index, children }: { index: number; children: ReactNode }) {
   const floatingClass = SHOP_ITEM_FLOAT_CONSTRAINTS.enabled ? "is-floating" : "";
   return (
@@ -296,7 +288,7 @@ export default function ShopView() {
   }, [getShopCatalog, profile.avatar?.id, profile.frame?.id, profile.background?.id, profile.pet?.id]);
 
   const visibleItems = useMemo(() => getVisibleItems(items, activeCategory), [items, activeCategory]);
-  const baseTotal = useMemo(() => getBaseTotal(items, activeCategory), [items, activeCategory]);
+  const baseTotal = visibleItems.length;
   const ownedVisible = visibleItems.filter((item) => ownedIds.has(item.id)).length;
   const equippedCount = Object.values(equipped).filter(Boolean).length;
   const xpNeeded = needXP(player.level);
@@ -413,7 +405,7 @@ export default function ShopView() {
             <div className="kq-shop-user-copy">
               <h2>{username}</h2>
               <p>
-                📍 {profile.title?.name || "New Challenger"} · {profile.background?.name || "Hanok Courtyard"}
+                📍 {profile.title?.name || "New Challenger"} · {profile.background?.name || "Seoul Night"}
               </p>
               <div
                 className="kq-profile-display-toggle"

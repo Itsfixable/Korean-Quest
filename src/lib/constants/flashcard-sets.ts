@@ -4,7 +4,7 @@ export const FLASHCARD_SETS: FlashcardSet[] = [
   {
     id: "food-basics",
     title: "Food Basics",
-    description: "High-frequency food words (Resources page set).",
+    description: "High-frequency food words.",
     cards: [
       { term: "밥", def: "rice / meal" },
       { term: "물", def: "water" },

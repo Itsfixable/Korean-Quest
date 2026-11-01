@@ -7,15 +7,22 @@
 const ROUTER_URL = "https://router.huggingface.co/v1/chat/completions";
 
 // ":fastest" lets the router pick whichever live provider is fastest, which
-// avoids breaking again if a single provider drops the model.
-const DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct:fastest";
-
-// Models the client is allowed to request. Anything else (including the old
-// deprecated id) falls back to DEFAULT_MODEL so the chatbot keeps working.
-const ALLOWED_MODELS = new Set([
-  "Qwen/Qwen2.5-7B-Instruct:fastest",
+// avoids breaking again if a single provider drops the model. The worker owns
+// this list (the client can't pick a model), and walks it in order: if a model
+// is dropped from the router (Qwen2.5-7B and gemma-2-2b both were), it moves on
+// to the next one instead of failing.
+const MODEL_CHAIN = [
+  "openai/gpt-oss-20b:fastest",
+  "google/gemma-3-12b-it:fastest",
   "meta-llama/Llama-3.1-8B-Instruct:fastest",
-  "google/gemma-2-2b-it:fastest",
+];
+
+// Only the live site and local dev may call this worker. Browsers always send
+// Origin on cross-site POSTs, so this stops other websites from spending our
+// Hugging Face credits through it.
+const ALLOWED_ORIGINS = new Set([
+  "https://itsfixable.github.io",
+  "http://localhost:3000",
 ]);
 
 const SYSTEM_PROMPT =
@@ -30,10 +37,6 @@ const SYSTEM_PROMPT =
   "Only output valid, complete characters — never emit broken or placeholder " +
   "symbols.";
 
-// Smaller, faster model the worker falls back to when the primary model keeps
-// timing out (504s usually mean a cold/slow provider on the bigger model).
-const FAST_FALLBACK_MODEL = "google/gemma-2-2b-it:fastest";
-
 // Upstream statuses worth retrying — transient gateway/rate/availability errors.
 const TRANSIENT_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
@@ -43,9 +46,11 @@ const REQUEST_TIMEOUT_MS = 25000;
 const ATTEMPTS_PER_MODEL = 2;
 
 const FALLBACK_REPLY =
-  "음… 지금 AI가 잠깐 바쁜 것 같아요. 다시 한 번 해볼까요?";
+  "음… 지금 AI가 잠깐 바쁜 것 같아요. 다시 한 번 해볼까요?\n" +
+  "(The assistant is busy right now. Please try again in a moment.)";
 
 const MAX_MESSAGES = 16;
+const MAX_MESSAGE_CHARS = 2000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -53,6 +58,11 @@ function sleep(ms) {
 
 export default {
   async fetch(request, env) {
+    const origin = request.headers.get("Origin");
+    if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      return replyJson("Forbidden origin.", { status: 403 });
+    }
+
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders() });
     }
@@ -79,17 +89,21 @@ export default {
     }
 
     if (!env.HF_TOKEN) {
-      return replyJson(
-        `${FALLBACK_REPLY}\n\nDetails: Server is missing HF_TOKEN secret.`,
-        { status: 500 }
-      );
+      console.error("kq-chat: missing HF_TOKEN secret");
+      return replyJson(FALLBACK_REPLY, { status: 500 });
     }
 
-    const primaryModel = ALLOWED_MODELS.has(body?.model) ? body.model : DEFAULT_MODEL;
-    // Try the requested model first; if it keeps timing out, drop down to a
-    // smaller/faster model so the user still gets an answer.
-    const modelChain = [primaryModel];
-    if (primaryModel !== FAST_FALLBACK_MODEL) modelChain.push(FAST_FALLBACK_MODEL);
+    const modelChain = MODEL_CHAIN;
+
+    // When the client asks for streaming, try to open a token stream and pipe
+    // deltas straight back so the reply appears word-by-word. If no model can
+    // stream we fall through to the buffered retry chain below.
+    if (body?.stream === true) {
+      for (const model of modelChain) {
+        const streamed = await tryStream(model, messages, env);
+        if (streamed) return streamed;
+      }
+    }
 
     let lastStatus = 0;
     let lastDetail = "Unknown chat worker error.";
@@ -112,13 +126,9 @@ export default {
             parsed?.message ||
             `status ${response.status}`;
 
-          // Don't bother retrying errors that won't fix themselves (e.g. 400/401).
-          if (!TRANSIENT_STATUSES.has(response.status)) {
-            return replyJson(
-              `${FALLBACK_REPLY}\n\nDetails: Hugging Face error (${lastStatus}): ${lastDetail}`,
-              { status: 502 }
-            );
-          }
+          // Errors that won't fix themselves (e.g. a 400 because the router
+          // no longer serves this model) skip straight to the next model.
+          if (!TRANSIENT_STATUSES.has(response.status)) break;
         } catch (error) {
           lastStatus = 504;
           lastDetail =
@@ -136,10 +146,9 @@ export default {
       }
     }
 
-    return replyJson(
-      `${FALLBACK_REPLY}\n\nDetails: Hugging Face error (${lastStatus || 502}): ${lastDetail}`,
-      { status: 502 }
-    );
+    // Keep upstream details in the worker logs, not in front of learners.
+    console.error(`kq-chat: all models failed (${lastStatus || 502}): ${lastDetail}`);
+    return replyJson(FALLBACK_REPLY, { status: 502 });
   },
 };
 
@@ -179,6 +188,80 @@ async function callModel(model, messages, env) {
   }
 }
 
+// Opens a streaming completion and returns a Response that emits clean reply
+// text as it arrives. Returns null if the stream can't be established, so the
+// caller can fall back to the buffered (non-streaming) retry chain.
+async function tryStream(model, messages, env) {
+  const controller = new AbortController();
+  // Only guard time-to-first-byte; cleared once headers arrive so long
+  // replies aren't cut off mid-stream.
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let upstream;
+  try {
+    upstream = await fetch(ROUTER_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.HF_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+        max_tokens: 512,
+        temperature: 0.4,
+        stream: true,
+      }),
+      signal: controller.signal,
+    });
+  } catch {
+    clearTimeout(timer);
+    return null;
+  }
+  clearTimeout(timer);
+
+  if (!upstream.ok || !upstream.body) return null;
+
+  const decoder = new TextDecoder("utf-8");
+  const encoder = new TextEncoder();
+  let buffer = "";
+
+  const transform = new TransformStream({
+    transform(chunk, ctrl) {
+      buffer += decoder.decode(chunk, { stream: true });
+      const lines = buffer.split("\n");
+      // Keep the last (possibly partial) line for the next chunk.
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith("data:")) continue;
+        const data = trimmed.slice(5).trim();
+        if (!data || data === "[DONE]") continue;
+        try {
+          const json = JSON.parse(data);
+          const delta = json?.choices?.[0]?.delta?.content;
+          if (delta) {
+            const clean = delta.replace(/\uFFFD/g, "");
+            if (clean) ctrl.enqueue(encoder.encode(clean));
+          }
+        } catch {
+          // Ignore keep-alive or non-JSON lines.
+        }
+      }
+    },
+  });
+
+  upstream.body.pipeTo(transform.writable).catch(() => {});
+
+  return new Response(transform.readable, {
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "no-store",
+      ...corsHeaders(),
+    },
+  });
+}
+
 function cleanReply(text) {
   return String(text || "")
     // Drop Unicode replacement characters left by any broken byte sequence.
@@ -197,7 +280,7 @@ function sanitizeMessages(messages) {
         typeof m.content === "string" &&
         m.content.trim().length > 0
     )
-    .map((m) => ({ role: m.role, content: m.content.trim() }))
+    .map((m) => ({ role: m.role, content: m.content.trim().slice(0, MAX_MESSAGE_CHARS) }))
     .slice(-MAX_MESSAGES);
 }
 

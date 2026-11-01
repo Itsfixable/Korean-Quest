@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { asset } from "@/lib/asset";
 
 const CHAT_ENDPOINT = "https://crimson-truth-507c.mr-koji-tanaka.workers.dev";
-const MODEL = "Qwen/Qwen2.5-7B-Instruct:fastest";
 const MAX_HISTORY = 14;
 
 interface ChatMessage {
@@ -19,6 +18,7 @@ export function Chatbot() {
     { role: "bot", text: "Welcome! Ask me anything about Korean language, culture, or grammar." },
   ]);
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
   const historyRef = useRef<{ role: string; content: string }[]>([]);
 
   const sendMessage = async () => {
@@ -28,6 +28,7 @@ export function Chatbot() {
     setInput("");
     setMessages((m) => [...m, { role: "user", text }]);
     setLoading(true);
+    setStreaming(false);
 
     historyRef.current = [
       ...historyRef.current,
@@ -38,15 +39,28 @@ export function Chatbot() {
       const res = await fetch(CHAT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: historyRef.current, model: MODEL }),
+        body: JSON.stringify({ messages: historyRef.current, stream: true }),
       });
-      const data = await res.json();
-      const reply = data?.reply || data?.message || "Sorry, I could not respond right now.";
+
+      const contentType = res.headers.get("content-type") || "";
+      const canStream = res.ok && !!res.body && contentType.includes("text/plain");
+
+      let reply: string;
+
+      if (canStream) {
+        reply = await consumeStream(res.body!);
+      } else {
+        const data = await res.json();
+        reply = data?.reply || data?.message || "Sorry, I could not respond right now.";
+        setMessages((m) => [...m, { role: "bot", text: reply }]);
+      }
+
+      if (!reply.trim()) reply = "Sorry, I could not respond right now.";
+
       historyRef.current = [
         ...historyRef.current,
         { role: "assistant", content: reply },
       ].slice(-MAX_HISTORY);
-      setMessages((m) => [...m, { role: "bot", text: reply }]);
     } catch {
       setMessages((m) => [
         ...m,
@@ -54,7 +68,46 @@ export function Chatbot() {
       ]);
     } finally {
       setLoading(false);
+      setStreaming(false);
     }
+  };
+
+  // Reads token text from the streaming response, appending a bot bubble on the
+  // first token and updating it in place as more arrives. Returns the full text.
+  const consumeStream = async (body: ReadableStream<Uint8Array>) => {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let full = "";
+    let started = false;
+
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      full += decoder.decode(value, { stream: true });
+      if (!full) continue;
+
+      if (!started) {
+        started = true;
+        setStreaming(true);
+        setMessages((m) => [...m, { role: "bot", text: full }]);
+      } else {
+        setMessages((m) => {
+          const copy = m.slice();
+          copy[copy.length - 1] = { role: "bot", text: full };
+          return copy;
+        });
+      }
+    }
+
+    full += decoder.decode();
+    if (started) {
+      setMessages((m) => {
+        const copy = m.slice();
+        copy[copy.length - 1] = { role: "bot", text: full };
+        return copy;
+      });
+    }
+    return full;
   };
 
   return (
@@ -95,11 +148,11 @@ export function Chatbot() {
 
         <div id="chatbot-messages" className="chatbot-messages">
           {messages.map((msg, i) => (
-            <div key={i} className={`chatbot-message ${msg.role}`}>
+            <div key={i} className={`chatbot-message chatbot-${msg.role}`}>
               {msg.text}
             </div>
           ))}
-          {loading && <div className="chatbot-message bot">Thinking...</div>}
+          {loading && !streaming && <div className="chatbot-message chatbot-bot">Thinking...</div>}
         </div>
 
         <div className="chatbot-input-area">

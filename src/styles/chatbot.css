@@ -133,6 +133,7 @@
   border-radius: 8px;
   max-width: 85%;
   word-wrap: break-word;
+  white-space: pre-wrap;
   line-height: 1.4;
   font-size: 14px;
 }
